@@ -11,5 +11,4 @@ export const mobileNavigation = [
     { title: "Home", path: "/", icon: <MdHomeFilled /> },
     ...navigation,
     { title: "Search", path: "/search", icon: <IoSearchOutline /> },
-
 ]
