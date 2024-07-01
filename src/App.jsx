@@ -2,18 +2,35 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import Search from "./components/Search";
-import LandingPageMain from "./pages/LandingPageMain";
+import SearchPage from "./pages/SearchPage";
+import ExplorePage from "./pages/ExplorePage";
+import LandingPage from "./pages/LandingPage";
+import DetailsPage from './pages/DetailsPage'
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <LandingPageMain/>,
+    element: <LandingPage />,
+    children: [
+      {
+        path: "",
+        element: <LandingPage />,
+      },
+      {
+        path: ":explore",
+        element: <ExplorePage />,
+      },
+      {
+        path: ":explore/:id",
+        element: <DetailsPage />,
+      },
+      {
+        path: "/search",
+        element: <SearchPage />,
+      },
+    ]
   },
-  {
-    path: "/search",
-    element: <Search/>,
-  },
+
 ]);
 
 const App = () => {
