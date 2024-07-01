@@ -4,12 +4,15 @@ import Header2 from "./components/Reusables/Header2"
 import MobileNavigation from "./components/MobileNavigation"
 import axiosInstance from './utils/axiosConfig'
 import { useEffect } from "react"
+import { useDispatch } from "react-redux"
+import { setBannerData } from "./reduxStore/Reducer/movieSlice"
 
 const App = () => {
+  const dispatch = useDispatch()
   const fetchTrendingData = async () => {
     try {
       const response = await await axiosInstance.get('/trending/all/week')
-      console.log(response, "reponse")
+      dispatch(setBannerData(response.data.results))
     } catch (error) {
       console.log("error", error)
     }
@@ -18,6 +21,7 @@ const App = () => {
   useEffect(() =>{
     fetchTrendingData()
   },[])
+  
   return (
     <main className="pb-14 lg:pb-0">
       <Header2 />
