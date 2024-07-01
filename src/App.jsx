@@ -3,7 +3,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import Search from "./components/Search";
-import LandingPageMain from "./components/LandingPage/LandingPageMain";
+import LandingPageMain from "./pages/LandingPageMain";
 
 const router = createBrowserRouter([
   {
