@@ -1,41 +1,18 @@
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
-import SearchPage from "./pages/SearchPage";
-import ExplorePage from "./pages/ExplorePage";
-import LandingPage from "./pages/LandingPage";
-import DetailsPage from './pages/DetailsPage'
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <LandingPage />,
-    children: [
-      {
-        path: "",
-        element: <LandingPage />,
-      },
-      {
-        path: ":explore",
-        element: <ExplorePage />,
-      },
-      {
-        path: ":explore/:id",
-        element: <DetailsPage />,
-      },
-      {
-        path: "/search",
-        element: <SearchPage />,
-      },
-    ]
-  },
-
-]);
+import { Outlet } from "react-router-dom"
+import Footer from "./components/Reusables/Footer"
+import Header2 from "./components/Reusables/Header2"
+import MobileNavigation from "./components/MobileNavigation"
 
 const App = () => {
   return (
-    <RouterProvider router={router} />
+    <main className="pb-14 lg:pb-0">
+      <Header2 />
+      <div className="pt-16">
+        <Outlet />
+      </div>
+      <Footer />
+      <MobileNavigation/>
+    </main>
   )
 }
 

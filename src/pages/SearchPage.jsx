@@ -1,7 +1,13 @@
-const Search = () => {
+import { useLocation } from "react-router-dom"
+
+const SearchPage = () => {
+  const location = useLocation()
+  console.log("location", location)
   return (
-    <div>Search</div>
+    <div>
+
+    </div>
   )
 }
 
-export default Search
+export default SearchPage
