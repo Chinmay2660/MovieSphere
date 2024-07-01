@@ -1,10 +1,8 @@
 import { useState } from 'react'
 
 const Navbar = () => {
-
     const [state, setState] = useState(false)
 
-    // Replace javascript:void(0) paths with your paths
     const navigation = [
         { title: "Features", path: "/" },
         { title: "Features", path: "/" },
