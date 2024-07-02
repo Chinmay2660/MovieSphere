@@ -7,7 +7,10 @@ import backgroundImg from '../assets/background.webp';
 const LandingPageMain = () => {
   return (
     <>
-      <div className=' absolute w-full h-full top-0 left-0 inset-0 bg-black opacity-30 -z-10 bg-cover bg-center bg-no-repeat' style={{ backgroundImage: `url(${backgroundImg})` }}>
+      <div
+        className='absolute w-[99vw] top-0 left-0 inset-0 bg-black opacity-30 -z-10 bg-cover bg-center bg-no-repeat'
+        style={{ height: '100vh', backgroundImage: `url(${backgroundImg})` }}
+      >
       </div>
       <HeroSection />
       <Features />

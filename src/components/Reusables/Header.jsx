@@ -6,6 +6,9 @@ import { IoSearchOutline } from 'react-icons/io5';
 
 const Header = () => {
     const [searchInput, setSearchInput] = useState('');
+    const [isVisible, setIsVisible] = useState(true);
+    const [isTransparent, setIsTransparent] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -14,15 +17,40 @@ const Header = () => {
         }
     }, [searchInput, navigate]);
 
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY === 0) {
+                setIsTransparent(true);
+            } else if (window.scrollY > lastScrollY) {
+                setIsVisible(false);
+                setIsTransparent(false);
+            } else {
+                setIsVisible(true);
+                setIsTransparent(false);
+            }
+            setLastScrollY(window.scrollY);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, [lastScrollY]);
+
     const handleSubmit = (e) => {
         e.preventDefault();
     };
 
     return (
-        <nav className=" sticky top-0 z-50 w-full border-b text-sm border-none bg-background">
+        <nav
+            className={`fixed top-0 z-50 w-full transition-all duration-300 ${
+                isVisible ? 'translate-y-0' : '-translate-y-full'
+            } ${isTransparent ? 'bg-opacity-0' : 'bg-background bg-opacity-100'}`}
+        >
             <div className="items-center max-w-screen-xl mx-auto flex px-8">
-                <div className="flex items-center justify-between py-2 w-full">
-                    <div className='flex items-center gap-6'>
+                <div className="flex items-center justify-between py-4 w-full">
+                    <div className="flex items-center gap-6">
                         <a href="/">
                             <img
                                 src={logo}
