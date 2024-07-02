@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom"
 import Footer from "./components/Reusables/Footer"
-import Header2 from "./components/Reusables/Header2"
+import Header from "./components/Reusables/Header"
 import MobileNavigation from "./components/MobileNavigation"
 import axiosInstance from './utils/axiosConfig'
 import { useEffect } from "react"
@@ -18,13 +18,13 @@ const App = () => {
     }
   }
 
-  useEffect(() =>{
+  useEffect(() => {
     fetchTrendingData()
-  },[])
-  
+  }, [])
+
   return (
     <main className="pb-14 lg:pb-0">
-      <Header2 />
+      <Header />
       <div className="pt-16">
         <Outlet />
       </div>
