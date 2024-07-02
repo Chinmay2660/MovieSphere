@@ -16,7 +16,6 @@ const Header = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        navigate(`/search?q=${searchInput}`);
     };
 
     return (
@@ -58,7 +57,7 @@ const Header = () => {
                                 />
                             </div>
                         </form>
-                        
+
                         <a
                             href="/login"
                             className="block py-3 text-center text-text text-base font-bold hover:text-secondary border rounded-lg border-none"
