@@ -46,7 +46,7 @@ const Header = () => {
         <nav
             className={`fixed top-0 z-50 w-full transition-all duration-300 ${
                 isVisible ? 'translate-y-0' : '-translate-y-full'
-            } ${isTransparent ? 'bg-opacity-0' : 'bg-background bg-opacity-100'}`}
+            } ${isTransparent ? 'bg-transparent' : 'bg-background bg-opacity-100'}`}
         >
             <div className="items-center max-w-screen-xl mx-auto flex px-8">
                 <div className="flex items-center justify-between py-4 w-full">
@@ -79,7 +79,9 @@ const Header = () => {
                                 <input
                                     type="text"
                                     placeholder="Find Movies, TV shows and more"
-                                    className="py-2 pl-10 pr-4 w-full border rounded-lg border-gray-500 focus:outline-none focus:border-gray-400 hover:border-gray-400 bg-background text-text hover:text-gray-200"
+                                    className={`py-2 pl-10 pr-4 w-full border rounded-lg border-gray-500 focus:outline-none focus:border-gray-400 hover:border-gray-400 ${
+                                        isTransparent ? 'bg-transparent' : 'bg-background'
+                                    } text-text hover:text-gray-200`}
                                     value={searchInput}
                                     onChange={(e) => setSearchInput(e.target.value)}
                                 />
