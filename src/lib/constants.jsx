@@ -1,6 +1,8 @@
 import { MdHomeFilled, MdLocalMovies } from "react-icons/md";
 import { PiTelevisionFill } from "react-icons/pi";
 import { IoSearchOutline } from "react-icons/io5";
+import { FaTwitter, FaFacebookF, FaLinkedinIn, FaInstagram, FaGithub } from 'react-icons/fa';
+
 
 export const navigation = [
     { title: "TV Shows", path: "/tv", icon: <PiTelevisionFill /> },
@@ -83,4 +85,12 @@ export const faqsList = [
         q: "Is Movie Sphere really free?",
         a: "Yes! Movie Sphere is a free (and legal) video streaming application. To keep our service free and legal, we include adverts, which monetise the content that our partners, such as MGM, Lionsgate, and Paramount, provide to us!"
     },
+];
+
+export const socialMediaLinks = [
+    { href: 'javascript:void()', icon: FaTwitter, label: 'Twitter' },
+    { href: 'javascript:void()', icon: FaFacebookF, label: 'Facebook' },
+    { href: 'javascript:void()', icon: FaLinkedinIn, label: 'LinkedIn' },
+    { href: 'javascript:void()', icon: FaInstagram, label: 'Instagram' },
+    { href: 'javascript:void()', icon: FaGithub, label: 'GitHub' },
 ];

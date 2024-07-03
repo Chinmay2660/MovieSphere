@@ -5,7 +5,7 @@ const FAQ = () => {
     return (
         <section className="leading-relaxed max-w-screen-xl mt-10 mb-10 mx-auto px-4 md:px-8">
             <div className="space-y-3 text-center">
-                <h1 className="text-3xl text-text font-semibold">
+                <h1 className="text-5xl text-text font-semibold">
                     Frequently Asked Questions
                 </h1>
             </div>
