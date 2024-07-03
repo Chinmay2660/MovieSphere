@@ -22,7 +22,7 @@ const Features = () => {
                                     <div className="text-primary pb-3">
                                         {item.icon}
                                     </div>
-                                    <h4 className="text-lg text-text font-semibold">
+                                    <h4 className="text-lg text-text font-bold">
                                         {item.title}
                                     </h4>
                                     <p className="text-text">

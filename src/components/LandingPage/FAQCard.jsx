@@ -1,6 +1,7 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 
-const FaqsCard = () => {
+const FAQCard = (props) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const handleToggle = () => {
@@ -8,26 +9,33 @@ const FaqsCard = () => {
     };
 
     return (
-        <div className="space-y-3 mt-5 overflow-hidden border-b" onClick={handleToggle}>
-            <h4 className="cursor-pointer pb-5 flex items-center justify-between text-lg text-gray-700 font-medium">
-                {/* {props.faqsList.q} */}
+        <div className="space-y-3 mt-5 overflow-hidden bg-background rounded-lg p-4 border border-secondary" onClick={handleToggle}>
+            <h4 className="cursor-pointer flex items-center justify-between text-lg text-text font-bold">
+                {props.faqsList.q}
                 {isOpen ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-text ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 12H4" />
                     </svg>
                 ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-text ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                     </svg>
                 )}
             </h4>
-            <div className={`duration-300 overflow-hidden ${isOpen ? "max-h-screen" : "max-h-0"}`}>
-                <p className="text-gray-500">
-                    {/* {props.faqsList.a} */}
+            {isOpen && <div className={`transition-all duration-500 ease-in-out ${isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"}`}>
+                <p className="text-text mt-3">
+                    {props.faqsList.a}
                 </p>
-            </div>
+            </div>}
         </div>
     );
 };
 
-export default FaqsCard;
+FAQCard.propTypes = {
+    faqsList: PropTypes.shape({
+        q: PropTypes.string.isRequired,
+        a: PropTypes.string.isRequired
+    }).isRequired,
+};
+
+export default FAQCard;

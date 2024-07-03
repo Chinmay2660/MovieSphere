@@ -69,3 +69,18 @@ export const features = [
         desc: "Everything is free, no subscription or credit card required."
     },
 ]
+
+export const faqsList = [
+    {
+        q: "What is Movie Sphere?",
+        a: "Movie Sphere's the #1 free ad-supported entertainment streamer. With the largest library in the entire streaming universe and personalised content recommendations, we've got it all—available on all your devices. Discover hit movies, bingeable shows, and award-winning Originals. No subscriptions. No credit cards. No fees."
+    },
+    {
+        q: "Is Movie Sphere really free?",
+        a: "Yes! Movie Sphere is a free (and legal) video streaming application. To keep our service free and legal, we include adverts, which monetise the content that our partners, such as MGM, Lionsgate, and Paramount, provide to us!"
+    },
+    {
+        q: "Is Movie Sphere really free?",
+        a: "Yes! Movie Sphere is a free (and legal) video streaming application. To keep our service free and legal, we include adverts, which monetise the content that our partners, such as MGM, Lionsgate, and Paramount, provide to us!"
+    },
+];
