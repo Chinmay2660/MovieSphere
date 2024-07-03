@@ -1,4 +1,4 @@
-import { features } from "../../utils/constants"
+import { features } from "../../lib/constants"
 
 const Features = () => {
     return (
@@ -6,11 +6,11 @@ const Features = () => {
             <div className="max-w-screen-xl mx-auto px-4 text-secondary md:px-8">
                 <div className="relative max-w-2xl mx-auto sm:text-center">
                     <div className="relative z-10">
-                        <h3 className="text-text text-3xl font-semibold sm:text-4xl">
-                        Features
+                        <h3 className="text-text mb-8 text-5xl font-semibold">
+                            Features
                         </h3>
                         <p className="mt-3 text-text">
-                        MovieSphere offers a host of powerful features designed to enhance your movie-watching experience.
+                            MovieSphere offers a host of powerful features designed to enhance your movie-watching experience.
                         </p>
                     </div>
                 </div>

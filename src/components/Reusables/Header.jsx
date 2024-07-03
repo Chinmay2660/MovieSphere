@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { navigation } from '../../utils/constants';
+import { navigation } from '../../lib/constants';
 import logo from '../../assets/logo.svg';
 import { IoSearchOutline } from 'react-icons/io5';
 
@@ -44,7 +44,7 @@ const Header = () => {
 
     return (
         <nav
-            className={`fixed top-0 z-50 w-full transition-all duration-300 ${
+            className={`sticky top-0 z-50 w-full transition-all duration-300 ${
                 isVisible ? 'translate-y-0' : '-translate-y-full'
             } ${isTransparent ? 'bg-transparent' : 'bg-background bg-opacity-100'}`}
         >

@@ -8,8 +8,8 @@ const LandingPageMain = () => {
   return (
     <>
       <div
-        className='absolute w-[99vw] top-0 left-0 inset-0 bg-black opacity-30 -z-10 bg-cover bg-center bg-no-repeat'
-        style={{ height: '100vh', backgroundImage: `url(${backgroundImg})` }}
+        className='absolute w-[98vw] top-0 left-0 inset-0 bg-black opacity-30 -z-10 bg-cover bg-center bg-no-repeat'
+        style={{ height: '120vh', backgroundImage: `url(${backgroundImg})` }}
       >
       </div>
       <HeroSection />

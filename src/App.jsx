@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom"
 import Footer from "./components/Reusables/Footer"
 import Header from "./components/Reusables/Header"
 import MobileNavigation from "./components/MobileNavigation"
-import axiosInstance from './utils/axiosConfig'
+import axiosInstance from './lib/axiosConfig'
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
 import { setBannerData } from "./reduxStore/Reducer/movieSlice"
