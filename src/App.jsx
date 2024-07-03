@@ -5,14 +5,24 @@ import MobileNavigation from "./components/MobileNavigation"
 import axiosInstance from './lib/axiosConfig'
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
-import { setBannerData } from "./reduxStore/Reducer/movieSlice"
+import { setBannerData, setImageURL } from "./reduxStore/Reducer/movieSlice"
 
 const App = () => {
   const dispatch = useDispatch()
   const fetchTrendingData = async () => {
     try {
-      const response = await await axiosInstance.get('/trending/all/week')
+      const response = await axiosInstance.get('/trending/all/week')
       dispatch(setBannerData(response.data.results))
+      console.log(response.data.results)
+    } catch (error) {
+      console.log("error", error)
+    }
+  }
+
+  const fetchConfigurationData = async () => {
+    try {
+      const response = await axiosInstance.get('/configuration')
+      dispatch(setImageURL(response.data.images.secure_base_url + "original"))
     } catch (error) {
       console.log("error", error)
     }
@@ -20,12 +30,13 @@ const App = () => {
 
   useEffect(() => {
     fetchTrendingData()
+    fetchConfigurationData()
   }, [])
 
   return (
     <main className="pb-14 lg:pb-0">
       <Header />
-      <div className="pt-16">
+      <div>
         <Outlet />
       </div>
       <Footer />

@@ -16,7 +16,7 @@ const HeroSection = () => {
                 </p>
 
                 <div className="mt-12 flex justify-center">
-                    <a href="/" className="flex items-center gap-2 py-3 px-6 text-center text-black text-base font-bold bg-text hover:bg-secondary active:shadow-none rounded-lg shadow">
+                    <a href="/home" className="flex items-center gap-2 py-3 px-6 text-center text-black text-base font-bold bg-text hover:bg-secondary active:shadow-none rounded-lg shadow">
                         <span>Watch Now</span>
                         <IoArrowForwardOutline className="text-black w-6 h-6" />
                     </a>
