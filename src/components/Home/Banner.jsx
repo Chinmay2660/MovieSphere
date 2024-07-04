@@ -20,7 +20,7 @@ const Banner = () => {
               />
               <div className="absolute top-0 w-full h-full bg-gradient-to-t from-neutral-900 to-transparent"></div>
               <div className="absolute bottom-20 left-8 lg:left-16 max-w-md p-4">
-                <h2 className="text-2xl font-bold lg:text-4xl text-white drop-shadow-2xl">{data?.title}</h2>
+                <h2 className="text-2xl font-bold lg:text-4xl text-white drop-shadow-2xl">{data?.title ? data?.title : data?.original_title ? data?.original_title : data?.name}</h2>
                 <p className="text-ellipsis line-clamp-3 my-2 text-white drop-shadow-lg">{data?.overview}</p>
                 <div className="flex items-center gap-4">
                   <p>Rating: {Number(data.vote_average).toFixed(1)}+</p>
