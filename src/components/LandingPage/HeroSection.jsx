@@ -3,10 +3,10 @@ import { IoArrowForwardOutline } from "react-icons/io5";
 const HeroSection = () => {
     return (
         <section
-            className="relative flex  h-[80vh] items-center justify-center mt-24 mb-24 mx-auto max-w-screen-xl sm:px-8 bg-cover bg-center"
+            className="relative flex h-[100vh] items-center justify-center mt-24 mb-24 mx-auto max-w-screen-xl sm:px-8 bg-cover bg-center"
             style={{ marginTop: '-2rem' }}
         >
-            <div className="text-center text-white">
+            <div className="text-center mt-8">
                 <h1 className="text-white font-bold text-4xl md:text-6xl mb-4">
                     <span className="block mb-2">MovieSphere</span>
                     <span className="text-tertiary">Search TV Shows, Movies Online</span>
