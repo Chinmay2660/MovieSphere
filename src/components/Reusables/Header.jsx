@@ -44,7 +44,7 @@ const Header = () => {
 
     return (
         <nav
-            className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+            className={`fixed top-0 z-50 w-full transition-all duration-300 ${
                 isVisible ? 'translate-y-0' : '-translate-y-full'
             } ${isTransparent ? 'bg-transparent' : 'bg-background bg-opacity-100'}`}
         >

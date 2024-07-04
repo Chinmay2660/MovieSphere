@@ -1,7 +1,9 @@
+import Banner from "../components/Home/Banner"
+
 const Home = () => {
   return (
-    <div>
-        
+    <div className="relative w-full h-screen">
+      <Banner />
     </div>
   )
 }
