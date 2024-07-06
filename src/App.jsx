@@ -5,7 +5,7 @@ import MobileNavigation from "./components/MobileNavigation"
 import axiosInstance from './lib/axiosConfig'
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
-import { setBannerData, setImageURL } from "./reduxStore/Reducer/movieSlice"
+import { setBannerData, setImageURL, setNowPlayingData, setTopRatedData, setUpcomingData } from "./reduxStore/Reducer/movieSlice"
 
 const App = () => {
   const dispatch = useDispatch()
@@ -13,6 +13,36 @@ const App = () => {
     try {
       const response = await axiosInstance.get('/trending/all/week')
       dispatch(setBannerData(response.data.results))
+      console.log(response.data.results)
+    } catch (error) {
+      console.log("error", error)
+    }
+  }
+
+  const fetchUpcomingData = async () => {
+    try {
+      const response = await axiosInstance.get('/movie/upcoming')
+      dispatch(setUpcomingData(response.data.results))
+      console.log(response.data.results)
+    } catch (error) {
+      console.log("error", error)
+    }
+  }
+
+  const fetchTopRatedData = async () => {
+    try {
+      const response = await axiosInstance.get('/movie/top_rated')
+      dispatch(setTopRatedData(response.data.results))
+      console.log(response.data.results)
+    } catch (error) {
+      console.log("error", error)
+    }
+  }
+
+  const fetchNowPlayingData = async () => {
+    try {
+      const response = await axiosInstance.get('/movie/now_playing')
+      dispatch(setNowPlayingData(response.data.results))
       console.log(response.data.results)
     } catch (error) {
       console.log("error", error)
@@ -30,6 +60,9 @@ const App = () => {
 
   useEffect(() => {
     fetchTrendingData()
+    fetchUpcomingData()
+    fetchTopRatedData()
+    fetchNowPlayingData()
     fetchConfigurationData()
   }, [])
 
