@@ -20,10 +20,10 @@ const CardCarousel = ({ data, heading }) => {
             <div className="overflow-hidden relative">
                 <div
                     ref={containerRef}
-                    className="flex transition-transform duration-300 ease-in-out space-x-4"
+                    className="flex overflow-x-auto space-x-4 scrollbar-none"
                 >
                     {data.map((item, index) => (
-                        <div key={item.id + "heading" + index} className="min-w-[230px]">
+                        <div key={item.id + "heading" + index} className="min-w-[230px] flex-shrink-0">
                             <Card data={item} index={index + 1} trending={true} />
                         </div>
                     ))}
