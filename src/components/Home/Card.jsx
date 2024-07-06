@@ -23,6 +23,7 @@ const Card = ({ data, trending, index }) => {
                             : data?.name
                 }
                 className="w-full h-48 object-cover rounded-md"
+                loading='lazy'
             />
             <h3 className="text-lg font-bold mt-2">
                 {data?.title
