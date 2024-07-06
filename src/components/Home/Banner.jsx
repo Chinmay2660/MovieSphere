@@ -59,16 +59,16 @@ const Banner = () => {
               <div className="flex flex-wrap gap-6 mt-8">
                 <button
                   href="/home"
-                  className="flex items-center gap-2 py-3 px-6 text-center text-black text-base font-bold bg-text hover:bg-secondary active:shadow-none rounded-lg shadow group"
+                  className="flex items-center gap-2 py-3 px-6 text-center text-black text-base font-bold bg-text hover:bg-secondary active:shadow-none rounded-lg shadow"
                 >
-                  <IoPlay className="w-6 h-6 group-hover:text-yellow-500 transition-colors duration-300" />
+                  <IoPlay className="w-6 h-6  transition-colors duration-300" />
                   <span>Play Now</span>
                 </button>
                 <button
                   href="/home"
-                  className="flex items-center gap-2 py-3 px-6 text-center text-white text-base font-bold bg-black hover:bg-secondary active:shadow-none rounded-lg shadow group"
+                  className="flex items-center gap-2 py-3 px-6 text-center text-white text-base font-bold bg-black hover:bg-secondary active:shadow-none rounded-lg shadow"
                 >
-                  <IoInformationCircleOutline className="w-6 h-6 group-hover:text-blue-500 transition-colors duration-300" />
+                  <IoInformationCircleOutline className="w-6 h-6 text-blue-500 transition-colors duration-300" />
                   <span>More Details</span>
                 </button>
               </div>
