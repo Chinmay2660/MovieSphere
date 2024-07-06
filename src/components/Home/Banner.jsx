@@ -27,22 +27,18 @@ const Banner = () => {
     return () => clearInterval(interval);
   }, [bannerData.length]);
 
-  console.log(bannerData);
   return (
-    <section className="relative top-0 w-full h-screen group">
+    <section className="relative top-0 w-full h-screen group overflow-hidden">
       <div
-        className="flex min-h-full max-h-full transition-transform duration-500"
+        className="flex transition-transform duration-500"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
       >
         {bannerData.map((data, index) => (
-          <div
-            key={index}
-            className="relative min-w-full min-h-full overflow-hidden"
-          >
+          <div key={index} className="relative w-full h-screen flex-shrink-0">
             <img
               src={imageURL + data.backdrop_path}
               alt={`Banner ${index}`}
-              className="h-full w-full object-cover"
+              className="absolute inset-0 h-full w-full object-cover"
               loading="lazy"
             />
             <div className="absolute top-0 w-full h-full bg-gradient-to-t from-neutral-900 to-transparent"></div>
