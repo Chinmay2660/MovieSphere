@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 import Card from "./Card";
 
-const CardCarousel = ({ data, heading }) => {
+const CardCarousel = ({ data, trending, heading }) => {
     const containerRef = useRef(null);
 
     const handlePrevClick = () => {
@@ -24,7 +24,7 @@ const CardCarousel = ({ data, heading }) => {
                 >
                     {data.map((item, index) => (
                         <div key={item.id + "heading" + index} className="min-w-[230px] flex-shrink-0">
-                            <Card data={item} index={index + 1} trending={true} />
+                            <Card data={item} index={index + 1} trending={trending} />
                         </div>
                     ))}
                 </div>
@@ -54,6 +54,7 @@ CardCarousel.propTypes = {
         })
     ).isRequired,
     heading: PropTypes.string.isRequired,
+    trending: PropTypes.bool.isRequired
 };
 
 export default CardCarousel;
