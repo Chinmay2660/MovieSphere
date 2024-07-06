@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { IoPlay, IoInformationCircleOutline, IoChevronBack, IoChevronForward } from "react-icons/io5";
 
@@ -18,6 +18,14 @@ const Banner = () => {
       setCurrentIndex((prevIndex) => prevIndex + 1);
     }
   };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex === bannerData.length - 1 ? 0 : prevIndex + 1));
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [bannerData.length]);
 
   console.log(bannerData);
   return (
@@ -68,18 +76,22 @@ const Banner = () => {
           </div>
         ))}
       </div>
-      <button
-        onClick={handlePrevClick}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-300 hidden group-hover:lg:flex"
-      >
-        <IoChevronBack className="w-6 h-6 hover:scale-125 transition-transform duration-300" />
-      </button>
-      <button
-        onClick={handleNextClick}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-300 hidden group-hover:lg:flex"
-      >
-        <IoChevronForward className="w-6 h-6 hover:scale-125 transition-transform duration-300" />
-      </button>
+      {currentIndex > 0 && (
+        <button
+          onClick={handlePrevClick}
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-300 hidden group-hover:lg:flex"
+        >
+          <IoChevronBack className="w-6 h-6 hover:scale-125 transition-transform duration-300" />
+        </button>
+      )}
+      {currentIndex < bannerData.length - 1 && (
+        <button
+          onClick={handleNextClick}
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-300 hidden group-hover:lg:flex"
+        >
+          <IoChevronForward className="w-6 h-6 hover:scale-125 transition-transform duration-300" />
+        </button>
+      )}
     </section>
   );
 };
