@@ -88,7 +88,7 @@ const Header = () => {
                             </div>
                         </form>
 
-                        <a
+                        {/* <a
                             href="/login"
                             className="block py-3 text-center text-text text-base font-bold hover:text-secondary border rounded-lg border-none"
                         >
@@ -99,7 +99,7 @@ const Header = () => {
                             className="block py-2 px-6 text-center text-text text-base font-bold bg-primary hover:bg-indigo-500 active:bg-indigo-700 active:shadow-none rounded-lg shadow"
                         >
                             Register
-                        </a>
+                        </a> */}
                     </div>
                 </div>
             </div>
