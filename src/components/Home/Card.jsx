@@ -8,7 +8,7 @@ const Card = ({ data, trending, index }) => {
     const navigate = useNavigate();
 
     const handleRedirection = (data) => {
-        navigate(`/+data.media_type=${data.media_type}&+data.id=${data.id}`);
+        navigate("/"+data.media_type+"/"+data.id);
     }
     return (
         <div onClick={handleRedirection(data)} className="text-text min-w-[230px] max-w-[230px] p-4 rounded-lg shadow-lg m-2 w-full relative">
