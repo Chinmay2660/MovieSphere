@@ -1,14 +1,17 @@
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import moment from 'moment';
+import { useNavigate } from 'react-router-dom';
 
 const Card = ({ data, trending, index }) => {
     const imageURL = useSelector((state) => state.movieData.imageURL);
-    const handleRedirection = () => {
-        console.log("test")
+    const navigate = useNavigate();
+
+    const handleRedirection = (data) => {
+        navigate(`/+data.media_type=${data.media_type}&+data.id=${data.id}`);
     }
     return (
-        <div onClick={handleRedirection} className="text-text min-w-[230px] max-w-[230px] p-4 rounded-lg shadow-lg m-2 w-full relative">
+        <div onClick={handleRedirection(data)} className="text-text min-w-[230px] max-w-[230px] p-4 rounded-lg shadow-lg m-2 w-full relative">
             {trending &&
                 <span className="absolute top-4 left-4 bg-yellow-500 text-black font-bold rounded-r-lg px-2 py-1">
                     Trending #{index}
@@ -49,6 +52,8 @@ Card.propTypes = {
         first_air_date: PropTypes.string,
         vote_average: PropTypes.number.isRequired,
         original_title: PropTypes.string,
+        media_type: PropTypes.string.isRequired,
+        id: PropTypes.number.isRequired,
     }).isRequired,
     index: PropTypes.number.isRequired,
     trending: PropTypes.bool.isRequired
