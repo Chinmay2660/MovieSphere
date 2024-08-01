@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { IoPlay, IoInformationCircleOutline, IoChevronBack, IoChevronForward } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 
 const Banner = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const bannerData = useSelector((state) => state.movieData.bannerData);
   const imageURL = useSelector((state) => state.movieData.imageURL);
+  const navigate = useNavigate();
 
   const handlePrevClick = () => {
     if (currentIndex > 0) {
@@ -61,7 +63,7 @@ const Banner = () => {
                   <span>Play Now</span>
                 </button>
                 <button
-                  href="/home"
+                  onClick={() => navigate("/" + data.media_type + "/" + data.id)}
                   className="flex items-center gap-2 py-3 px-6 text-center text-white text-base font-bold bg-black hover:bg-secondary active:shadow-none rounded-lg shadow"
                 >
                   <IoInformationCircleOutline className="w-6 h-6 text-blue-500 transition-colors duration-300" />
