@@ -3,11 +3,12 @@ import { useSelector } from 'react-redux';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
 
-const Card = ({ data, trending, index }) => {
+const Card = ({ data, trending, index, media_type }) => {
     const imageURL = useSelector((state) => state.movieData.imageURL);
+    const mediaType = data.media_type ?? media_type;
 
     return (
-        <Link to={"/"+data.media_type+"/"+data.id} className="text-text min-w-[230px] max-w-[230px] p-4 rounded-lg shadow-lg m-2 w-full relative">
+        <Link to={"/"+mediaType+"/"+data.id} className="text-text min-w-[230px] max-w-[230px] block p-4 rounded-lg shadow-lg m-2 w-full relative hover:scale-105 ">
             {trending &&
                 <span className="relative right-6 top-7 bg-yellow-500 text-black font-bold rounded-r-lg px-2 py-1">
                     Trending #{index}
@@ -52,6 +53,7 @@ Card.propTypes = {
         id: PropTypes.number.isRequired,
     }).isRequired,
     index: PropTypes.number.isRequired,
+    media_type: PropTypes.string.isRequired,
     trending: PropTypes.bool.isRequired
 };
 

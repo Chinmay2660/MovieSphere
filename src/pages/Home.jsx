@@ -5,7 +5,7 @@ import {
   setBannerData,
   setImageURL,
   setNowPlayingData,
-  setTopRatedData,
+  setPopularTvData,
   setUpcomingData
 } from '../reduxStore/Reducer/movieSlice';
 import Banner from '../components/Home/Banner';
@@ -20,20 +20,19 @@ const Home = () => {
         const [
           trendingResponse,
           upcomingResponse,
-          topRatedResponse,
+          popularTvResponse,
           nowPlayingResponse,
           configResponse
         ] = await Promise.all([
           axiosInstance.get('/trending/all/week'),
           axiosInstance.get('/movie/upcoming'),
-          axiosInstance.get('/movie/top_rated'),
+          axiosInstance.get('/tv/popular'),
           axiosInstance.get('/movie/now_playing'),
           axiosInstance.get('/configuration'),
         ]);
-
         dispatch(setBannerData(trendingResponse.data.results));
         dispatch(setUpcomingData(upcomingResponse.data.results));
-        dispatch(setTopRatedData(topRatedResponse.data.results));
+        dispatch(setPopularTvData(popularTvResponse.data.results));
         dispatch(setNowPlayingData(nowPlayingResponse.data.results));
         dispatch(setImageURL(configResponse.data.images.secure_base_url + "original"));
       } catch (error) {
@@ -46,14 +45,14 @@ const Home = () => {
 
   const trendingData = useSelector((state) => state.movieData.bannerData);
   const upcomingData = useSelector((state) => state.movieData.upcomingData);
-  const topRatedData = useSelector((state) => state.movieData.topRatedData);
+  const popularTvData = useSelector((state) => state.movieData.popularTvData);
   const nowPlayingData = useSelector((state) => state.movieData.nowPlayingData);
 
   const carousels = [
     { heading: "Trending Now", data: trendingData, trending: true },
-    { heading: "Upcoming Movies", data: upcomingData, trending: false },
-    { heading: "Top Rated Movies", data: topRatedData, trending: false },
-    { heading: "Now Playing", data: nowPlayingData, trending: false }
+    { heading: "Popular TV Shows", data: popularTvData, trending: false, media_type: "tv" },
+    { heading: "Upcoming Movies", data: upcomingData, trending: false, media_type: "movie" },
+    { heading: "Now Playing", data: nowPlayingData, trending: false, media_type: "movie" }
   ];
 
   return (
@@ -65,6 +64,7 @@ const Home = () => {
           data={carousel.data}
           heading={carousel.heading}
           trending={carousel.trending}
+          media_type={carousel.media_type}
         />
       ))}
     </div>
