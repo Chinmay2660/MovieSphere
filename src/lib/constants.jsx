@@ -6,7 +6,7 @@ import { FaTwitter, FaFacebookF, FaLinkedinIn, FaInstagram, FaGithub } from 'rea
 
 export const navigation = [
     { title: "TV Shows", path: "/tv", icon: <PiTelevisionFill /> },
-    { title: "Movies", path: "/movies", icon: <MdLocalMovies /> },
+    { title: "Movies", path: "/movie", icon: <MdLocalMovies /> },
 ];
 
 export const mobileNavigation = [
