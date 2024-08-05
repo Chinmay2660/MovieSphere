@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { navigation } from '../../lib/constants';
 import logo from '../../assets/logo.svg';
 import { IoSearchOutline } from 'react-icons/io5';
 
 const Header = () => {
-    const [searchInput, setSearchInput] = useState('');
+    const location = useLocation();
+    const removeSpaces = location?.search?.slice(3)?.split("%20").join(" ");
+    const [searchInput, setSearchInput] = useState(removeSpaces);
     const [isVisible, setIsVisible] = useState(true);
     const [isTransparent, setIsTransparent] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);

@@ -13,18 +13,25 @@ const Card = ({ data, trending, index, media_type }) => {
                 <span className="relative right-6 top-7 bg-yellow-500 text-black font-bold rounded-r-lg px-2 py-1">
                     Trending #{index}
                 </span>}
-            <img
-                src={imageURL + data.poster_path}
-                alt={
-                    data?.title
-                        ? data?.title
-                        : data?.original_title
-                            ? data?.original_title
-                            : data?.name
-                }
-                className="w-full h-48 object-cover rounded-md"
-                loading='lazy'
-            />
+            {data.poster_path ? (
+                <img
+                    src={imageURL + data.poster_path}
+                    alt={
+                        data?.title
+                            ? data?.title
+                            : data?.original_title
+                                ? data?.original_title
+                                : data?.name
+                    }
+                    className="w-full h-48 object-cover rounded-md"
+                    loading='lazy'
+                />
+            ) : (
+                <div className="w-full h-48 flex items-center justify-center rounded-md bg-neutral-200 animate-pulse text-">
+                    No Image Found
+                </div>
+            )}
+            
             <h3 className="text-lg font-bold mt-2">
                 {data?.title
                     ? data?.title
@@ -35,7 +42,7 @@ const Card = ({ data, trending, index, media_type }) => {
             <p className="text-secondary mt-1">
                 {moment(data.release_date ? data.release_date : data.first_air_date).format("MMMM Do YYYY")}
             </p>
-            <p className="text-tertiary mt-1">Rating: {Number(data.vote_average).toFixed(1)}</p>
+            {data.vote_average && <p className="text-tertiary mt-1">Rating: {Number(data.vote_average).toFixed(1)}</p>}
         </Link>
     );
 };
