@@ -18,7 +18,7 @@ const SearchPage = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axiosInstance.get(`/search/collection/`, {
+      const response = await axiosInstance.get(`/search/multi`, {
         params: {
           query: location?.search?.slice(3),
           page: pageNo,
@@ -73,7 +73,7 @@ const SearchPage = () => {
     <div className="pt-16">
       <div className="container mx-auto">
         <h3 className="capitalize text-2xl font-bold my-2">
-          Search Results
+          Search Results for {location?.search?.slice(3)?.split("%20").join(" ")}
         </h3>
 
         {error && (
