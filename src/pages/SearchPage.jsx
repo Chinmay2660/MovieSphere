@@ -12,7 +12,15 @@ const SearchPage = () => {
   const [totalPageNo, setTotalPageNo] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+
+  const debounce = (func, wait) => {
+    let timeout;
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -34,6 +42,8 @@ const SearchPage = () => {
     }
   };
 
+  const debouncedFetchData = debounce(fetchData, 500);
+
   const handleScroll = () => {
     if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !loading) {
       if (pageNo < totalPageNo) {
@@ -52,15 +62,15 @@ const SearchPage = () => {
   }
 
   useEffect(() => {
-    fetchConfigurationData()
-    fetchData();
-  }, [pageNo]);
+    fetchConfigurationData();
+    debouncedFetchData();
+  }, [pageNo, location?.search]);
 
   useEffect(() => {
-    setPageNo(1)
-    setData([])
-    fetchData()
-  }, [location?.search])
+    setPageNo(1);
+    setData([]);
+    debouncedFetchData();
+  }, [location?.search]);
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
