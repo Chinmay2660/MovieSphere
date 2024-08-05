@@ -27,7 +27,7 @@ const Card = ({ data, trending, index, media_type }) => {
                     loading='lazy'
                 />
             ) : (
-                <div className="w-full h-48 rounded-md bg-gray-200 animate-pulse">
+                <div className="w-full h-48 flex items-center justify-center rounded-md bg-neutral-200 animate-pulse text-">
                     No Image Found
                 </div>
             )}
@@ -42,7 +42,7 @@ const Card = ({ data, trending, index, media_type }) => {
             <p className="text-secondary mt-1">
                 {moment(data.release_date ? data.release_date : data.first_air_date).format("MMMM Do YYYY")}
             </p>
-            <p className="text-tertiary mt-1">Rating: {Number(data.vote_average).toFixed(1)}</p>
+            {data.vote_average && <p className="text-tertiary mt-1">Rating: {Number(data.vote_average).toFixed(1)}</p>}
         </Link>
     );
 };
