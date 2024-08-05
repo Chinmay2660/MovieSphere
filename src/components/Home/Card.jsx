@@ -13,18 +13,25 @@ const Card = ({ data, trending, index, media_type }) => {
                 <span className="relative right-6 top-7 bg-yellow-500 text-black font-bold rounded-r-lg px-2 py-1">
                     Trending #{index}
                 </span>}
-            <img
-                src={imageURL + data.poster_path}
-                alt={
-                    data?.title
-                        ? data?.title
-                        : data?.original_title
-                            ? data?.original_title
-                            : data?.name
-                }
-                className="w-full h-48 object-cover rounded-md"
-                loading='lazy'
-            />
+            {data.poster_path ? (
+                <img
+                    src={imageURL + data.poster_path}
+                    alt={
+                        data?.title
+                            ? data?.title
+                            : data?.original_title
+                                ? data?.original_title
+                                : data?.name
+                    }
+                    className="w-full h-48 object-cover rounded-md"
+                    loading='lazy'
+                />
+            ) : (
+                <div className="w-full h-48 rounded-md bg-gray-200 animate-pulse">
+                    No Image Found
+                </div>
+            )}
+            
             <h3 className="text-lg font-bold mt-2">
                 {data?.title
                     ? data?.title
