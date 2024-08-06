@@ -88,7 +88,7 @@ const DetailsPage = () => {
           <h2 className="text-2xl lg:text-3xl font-bold text-white">{data.title ?? data.original_title ?? data.name}</h2>
           <p className="text-neutral-400 mt-1 ">{data.tagline}</p>
 
-          <Divider/>
+          <Divider />
 
           <div className="flex items-center gap-3">
             {data.vote_average && <p className="text-tertiary mt-1">Rating: {Number(data.vote_average).toFixed(1)}+</p>}
@@ -98,13 +98,13 @@ const DetailsPage = () => {
             {data.runtime && <p className="text-tertiary mt-1">Duration: {duration[0]}h {duration[1]}m</p>}
           </div>
 
-          <Divider/>
+          <Divider />
 
           <div>
             <h3 className="text-white font-bold text-xl">Overview</h3>
             <p >{data.overview}</p>
 
-            <Divider/>
+            <Divider />
 
             <div className="flex items-center my-2 gap-3">
               <p className="text-white mt-1">Status: {data.status}</p>
@@ -114,18 +114,36 @@ const DetailsPage = () => {
               </p>
             </div>
 
-            <Divider/>
+            <Divider />
 
             <div>
               <p><span className=" text-white">Direction</span> : {castData?.crew?.find((item) => item?.job === "Director").name}</p>
-              <Divider/>
+              <Divider />
               <p><span className=" text-white">Writer</span> : {castData?.crew?.filter((item) => item?.job === "Writer").map((item) => item.name).join(", ")}</p>
-              <Divider/>
-
+              <Divider />
             </div>
+
+            <Divider />
+
+            <h2 className="text-lg mb-3 text-white">Cast :</h2>
+            <div className="grid grid-cols-2 gap-3">
+              {castData?.cast?.map((item, index) => (
+                <div key={index} className="flex flex-col items-center justify-center">
+                  <img
+                    src={imageURL + item?.profile_path}
+                    alt={`Banner`}
+                    className="h-24 w-24 object-cover rounded-full"
+                    loading="lazy"
+                  />
+                  <p className="text-white mt-1">{item?.name}</p>
+                </div>
+              ))}
+            </div>
+
           </div>
         </div>
       </div>
+
     </div>
   );
 };
