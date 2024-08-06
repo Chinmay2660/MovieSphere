@@ -14,7 +14,7 @@ const Header = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (searchInput) {
+        if (searchInput !== "") {
             navigate(`/search?q=${searchInput}`);
         }
     }, [searchInput, navigate]);
@@ -50,6 +50,7 @@ const Header = () => {
                 isVisible ? 'translate-y-0' : '-translate-y-full'
             } ${isTransparent ? 'bg-transparent' : 'bg-background bg-opacity-100'}`}
         >
+        {console.log(searchInput,"searchInput")}
             <div className="items-center max-w-screen-xl mx-auto flex px-8">
                 <div className="flex items-center justify-between py-4 w-full">
                     <div className="flex items-center gap-6">
