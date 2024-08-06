@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setImageURL } from "../reduxStore/Reducer/movieSlice";
 import moment from "moment";
+import Divider from "../components/Reusables/Divider";
 
 const DetailsPage = () => {
   const params = useParams();
@@ -78,26 +79,32 @@ const DetailsPage = () => {
           <img
             src={imageURL + data?.poster_path}
             alt={`Banner`}
-            className="h-80 w-60 object-cover rounded"
+            className="h-80 w-60 object-cover rounded min-w-60"
             loading="lazy"
           />
         </div>
 
         <div >
-          <h2 className="text-2xl font-bold text-white">{data.title ?? data.original_title ?? data.name}</h2>
+          <h2 className="text-2xl lg:text-3xl font-bold text-white">{data.title ?? data.original_title ?? data.name}</h2>
           <p className="text-neutral-400 mt-1 ">{data.tagline}</p>
-          <div className="flex items-center my-2 gap-3">
+
+          <Divider/>
+
+          <div className="flex items-center gap-3">
             {data.vote_average && <p className="text-tertiary mt-1">Rating: {Number(data.vote_average).toFixed(1)}+</p>}
             <span>|</span>
             {data.vote_count && <p className="text-tertiary mt-1">Views: {Number(data.vote_count)}+</p>}
             <span>|</span>
             {data.runtime && <p className="text-tertiary mt-1">Duration: {duration[0]}h {duration[1]}m</p>}
-
           </div>
 
+          <Divider/>
+
           <div>
-            <h3 className="text-white text-xl mt-1 mb-1">Overview</h3>
+            <h3 className="text-white font-bold text-xl">Overview</h3>
             <p >{data.overview}</p>
+
+            <Divider/>
 
             <div className="flex items-center my-2 gap-3">
               <p className="text-white mt-1">Status: {data.status}</p>
@@ -105,6 +112,16 @@ const DetailsPage = () => {
               <p className="text-white mt-1">
                 Release Date : {moment(data.release_date ? data.release_date : data.first_air_date).format("MMMM Do YYYY")}
               </p>
+            </div>
+
+            <Divider/>
+
+            <div>
+              <p><span className=" text-white">Direction</span> : {castData?.crew?.find((item) => item?.job === "Director").name}</p>
+              <Divider/>
+              <p><span className=" text-white">Writer</span> : {castData?.crew?.filter((item) => item?.job === "Writer").map((item) => item.name).join(", ")}</p>
+              <Divider/>
+
             </div>
           </div>
         </div>
