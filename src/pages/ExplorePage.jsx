@@ -3,7 +3,7 @@ import axiosInstance from "../lib/axiosConfig";
 import { useEffect, useState } from "react";
 import Card from "../components/Home/Card";
 import { setImageURL } from "../reduxStore/Reducer/movieSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const ExplorePage = () => {
   const params = useParams();
@@ -13,6 +13,7 @@ const ExplorePage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const dispatch = useDispatch()
+  const imageURL = useSelector((state) => state.movieData.imageURL);
 
   const fetchData = async () => {
     setLoading(true);
@@ -51,9 +52,11 @@ const ExplorePage = () => {
   }
 
   useEffect(() => {
-    fetchConfigurationData()
+    if(imageURL !== undefined){
+      fetchConfigurationData()
+    }
     fetchData();
-  }, [pageNo]);
+  }, [pageNo, imageURL]);
 
   useEffect(() => {
     setPageNo(1)

@@ -64,7 +64,7 @@ const SearchPage = () => {
   useEffect(() => {
     fetchConfigurationData();
     debouncedFetchData();
-  }, [pageNo, location?.search]);
+  }, [pageNo]);
 
   useEffect(() => {
     setPageNo(1);
