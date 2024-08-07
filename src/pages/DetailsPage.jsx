@@ -6,6 +6,7 @@ import { setImageURL } from "../reduxStore/Reducer/movieSlice";
 import moment from "moment";
 import Divider from "../components/Reusables/Divider";
 import CardCarousel from "../components/Home/CardCarousel";
+import { IoPlay } from "react-icons/io5";
 
 const DetailsPage = () => {
   const params = useParams();
@@ -103,6 +104,16 @@ const DetailsPage = () => {
             <span>|</span>
             {data?.runtime && <p className="text-tertiary mt-1">Duration: {duration[0]}h {duration[1]}m</p>}
           </div>
+
+          <Divider />
+
+          <button
+            href="/home"
+            className="flex items-center gap-2 py-3 px-6 text-center text-black text-base font-bold bg-text hover:bg-secondary active:shadow-none rounded-lg shadow"
+          >
+            <IoPlay className="w-6 h-6  transition-colors duration-300" />
+            <span>Play Now</span>
+          </button>
 
           <Divider />
 
