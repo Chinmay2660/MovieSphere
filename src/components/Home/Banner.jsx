@@ -27,7 +27,7 @@ const Banner = () => {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [bannerData.length]);
+  }, [bannerData.length, currentIndex]);
 
   return (
     <section className="relative top-0 w-full h-screen group overflow-hidden">
