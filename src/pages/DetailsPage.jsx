@@ -11,6 +11,7 @@ const DetailsPage = () => {
   const imageURL = useSelector((state) => state.movieData.imageURL);
   const [data, setData] = useState();
   const [castData, setCastData] = useState();
+  const [similarData, setSimilarData] = useState();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const dispatch = useDispatch()
@@ -19,13 +20,14 @@ const DetailsPage = () => {
     setLoading(true);
     setError(null);
     try {
-      const [detailsResponse, castResponse] = await Promise.all([
+      const [detailsResponse, castResponse, similarResponse] = await Promise.all([
         axiosInstance.get(`/${params?.explore}/${params?.id}`),
-        axiosInstance.get(`/${params?.explore}/${params?.id}/credits`)
+        axiosInstance.get(`/${params?.explore}/${params?.id}/credits`),
+        axiosInstance.get(`/${params?.explore}/${params?.id}/similar`)
       ]);
-
       setData(detailsResponse.data);
       setCastData(castResponse.data);
+      setSimilarData(similarResponse.data);
     } catch (error) {
       setError("Failed to fetch data");
       console.error("Failed to fetch data", error);
