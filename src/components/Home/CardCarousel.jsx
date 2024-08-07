@@ -16,7 +16,7 @@ const CardCarousel = ({ data, trending, heading, media_type }) => {
 
     return (
         <div className="relative mx-10 my-10 group">
-            <h2 className="text-xl font-bold lg:text-2xl mb-4">{heading}</h2>
+            <h2 className="text-xl font-bold lg:text-2xl mb-4 capitalize">{heading}</h2>
             <div className="overflow-hidden relative">
                 <div
                     ref={containerRef}
@@ -24,7 +24,7 @@ const CardCarousel = ({ data, trending, heading, media_type }) => {
                 >
                     {data.map((item, index) => (
                         <div key={item.id + "heading" + index} className="min-w-[230px] flex-shrink-0">
-                            <Card data={item} index={index + 1} trending={trending} media_type={media_type}/>
+                            <Card data={item} index={index + 1} trending={trending} media_type={media_type} />
                         </div>
                     ))}
                 </div>

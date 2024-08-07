@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setImageURL } from "../reduxStore/Reducer/movieSlice";
 import moment from "moment";
 import Divider from "../components/Reusables/Divider";
+import CardCarousel from "../components/Home/CardCarousel";
 
 const DetailsPage = () => {
   const params = useParams();
@@ -27,7 +28,7 @@ const DetailsPage = () => {
       ]);
       setData(detailsResponse.data);
       setCastData(castResponse.data);
-      setSimilarData(similarResponse.data);
+      setSimilarData(similarResponse.data.results);
     } catch (error) {
       setError("Failed to fetch data");
       console.error("Failed to fetch data", error);
@@ -148,6 +149,14 @@ const DetailsPage = () => {
         </div>
       </div>
 
+      <div>
+        <CardCarousel
+          data={similarData}
+          heading={"Similar " + params?.explore + (params?.explore === 'tv' ? " Shows" : "s")}
+          trending={false}
+          media_type={params?.explore}
+        />
+      </div>
     </div>
   );
 };
