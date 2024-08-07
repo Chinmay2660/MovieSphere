@@ -99,9 +99,9 @@ const DetailsPage = () => {
 
           <div className="flex items-center gap-3">
             {data?.vote_average && <p className="text-tertiary mt-1">Rating: {Number(data?.vote_average).toFixed(1)}+</p>}
-            <span>|</span>
+            {data?.vote_count && <span>|</span>}
             {data?.vote_count && <p className="text-tertiary mt-1">Views: {Number(data?.vote_count)}+</p>}
-            <span>|</span>
+            {data?.runtime && <span>|</span>}
             {data?.runtime && <p className="text-tertiary mt-1">Duration: {duration[0]}h {duration[1]}m</p>}
           </div>
 
