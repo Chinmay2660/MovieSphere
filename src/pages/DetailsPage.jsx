@@ -91,51 +91,53 @@ const DetailsPage = () => {
           <Divider />
 
           <div className="flex items-center gap-3">
-            {data.vote_average && <p className="text-tertiary mt-1">Rating: {Number(data.vote_average).toFixed(1)}+</p>}
+            {data?.vote_average && <p className="text-tertiary mt-1">Rating: {Number(data?.vote_average).toFixed(1)}+</p>}
             <span>|</span>
-            {data.vote_count && <p className="text-tertiary mt-1">Views: {Number(data.vote_count)}+</p>}
+            {data?.vote_count && <p className="text-tertiary mt-1">Views: {Number(data?.vote_count)}+</p>}
             <span>|</span>
-            {data.runtime && <p className="text-tertiary mt-1">Duration: {duration[0]}h {duration[1]}m</p>}
+            {data?.runtime && <p className="text-tertiary mt-1">Duration: {duration[0]}h {duration[1]}m</p>}
           </div>
 
           <Divider />
 
           <div>
             <h3 className="text-white font-bold text-xl">Overview</h3>
-            <p >{data.overview}</p>
+            <p >{data?.overview}</p>
 
             <Divider />
 
             <div className="flex items-center my-2 gap-3">
-              <p className="text-white mt-1">Status: {data.status}</p>
+              <p className="text-white mt-1">Status: {data?.status}</p>
               <span>|</span>
               <p className="text-white mt-1">
-                Release Date : {moment(data.release_date ? data.release_date : data.first_air_date).format("MMMM Do YYYY")}
+                Release Date : {moment(data?.release_date ? data?.release_date : data?.first_air_date).format("MMMM Do YYYY")}
               </p>
             </div>
 
             <Divider />
 
             <div>
-              <p><span className=" text-white">Direction</span> : {castData?.crew?.find((item) => item?.job === "Director").name}</p>
+              <p><span className=" text-white">Direction</span> : {castData?.crew?.find((item) => item?.job === "Director")?.name}</p>
               <Divider />
-              <p><span className=" text-white">Writer</span> : {castData?.crew?.filter((item) => item?.job === "Writer").map((item) => item.name).join(", ")}</p>
+              <p><span className=" text-white">Writer</span> : {castData?.crew?.filter((item) => item?.job === "Writer").map((item) => item?.name).join(", ")}</p>
               <Divider />
             </div>
 
             <Divider />
 
             <h2 className="text-lg mb-3 text-white">Cast :</h2>
-            <div className="grid grid-cols-2 gap-3">
-              {castData?.cast?.map((item, index) => (
+            <div className="grid grid-cols-[repeat(auto-fit,96px)] gap-5">
+              {castData?.cast?.filter((item) => item?.profile_path).map((item, index) => (
                 <div key={index} className="flex flex-col items-center justify-center">
-                  <img
-                    src={imageURL + item?.profile_path}
-                    alt={`Banner`}
-                    className="h-24 w-24 object-cover rounded-full"
-                    loading="lazy"
-                  />
-                  <p className="text-white mt-1">{item?.name}</p>
+                  <div className="">
+                    <img
+                      src={imageURL + item?.profile_path}
+                      alt={`Banner`}
+                      className="h-24 w-24 object-cover rounded-full"
+                      loading="lazy"
+                    />
+                    <p className="text-neutral-400 font-bold text-center text-sm ">{item?.name}</p>
+                  </div>
                 </div>
               ))}
             </div>
