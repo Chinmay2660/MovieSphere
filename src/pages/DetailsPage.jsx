@@ -50,7 +50,7 @@ const DetailsPage = () => {
       fetchConfigurationData()
     }
     fetchData();
-  }, [params, imageURL]);
+  }, [params]);
 
   if (loading) {
     return <div>Loading...</div>;
