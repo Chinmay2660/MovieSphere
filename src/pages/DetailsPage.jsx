@@ -18,6 +18,8 @@ const DetailsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const dispatch = useDispatch()
+  const [playVideo, setPlayVideo] = useState(false)
+  const [playVideoId, setPlayVideoId] = useState("")
 
   const fetchData = async () => {
     setLoading(true);
