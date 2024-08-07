@@ -7,6 +7,7 @@ import moment from "moment";
 import Divider from "../components/Reusables/Divider";
 import CardCarousel from "../components/Home/CardCarousel";
 import { IoPlay } from "react-icons/io5";
+import VideoPlay from "../components/VideoPlay";
 
 const DetailsPage = () => {
   const params = useParams();
@@ -58,6 +59,11 @@ const DetailsPage = () => {
     }
     fetchData();
   }, [params]);
+
+  const handlePlayVideo = (data) => {
+    setPlayVideoId(data?.id)
+    setPlayVideo(true)
+  }
 
   if (loading) {
     return <div>Loading...</div>;
@@ -111,6 +117,7 @@ const DetailsPage = () => {
 
           <button
             href="/home"
+            onClick={() => handlePlayVideo(data)}
             className="flex items-center gap-2 py-3 px-6 text-center text-black text-base font-bold bg-text hover:bg-secondary active:shadow-none rounded-lg shadow"
           >
             <IoPlay className="w-6 h-6  transition-colors duration-300" />
@@ -182,6 +189,8 @@ const DetailsPage = () => {
           media_type={params?.explore}
         />
       </div>
+
+      {playVideo && <VideoPlay playVideoId={playVideoId} close={() => setPlayVideo(false)} />}
     </div>
   );
 };
