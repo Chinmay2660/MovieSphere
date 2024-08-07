@@ -13,6 +13,7 @@ const DetailsPage = () => {
   const [data, setData] = useState();
   const [castData, setCastData] = useState();
   const [similarData, setSimilarData] = useState();
+  const [recommendtionsData, setRecommendationsData] = useState();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const dispatch = useDispatch()
@@ -21,14 +22,16 @@ const DetailsPage = () => {
     setLoading(true);
     setError(null);
     try {
-      const [detailsResponse, castResponse, similarResponse] = await Promise.all([
+      const [detailsResponse, castResponse, similarResponse, recommendationsResponse] = await Promise.all([
         axiosInstance.get(`/${params?.explore}/${params?.id}`),
         axiosInstance.get(`/${params?.explore}/${params?.id}/credits`),
-        axiosInstance.get(`/${params?.explore}/${params?.id}/similar`)
+        axiosInstance.get(`/${params?.explore}/${params?.id}/similar`),
+        axiosInstance.get(`/${params?.explore}/${params?.id}/recommendations`)
       ]);
       setData(detailsResponse.data);
       setCastData(castResponse.data);
       setSimilarData(similarResponse.data.results);
+      setRecommendationsData(recommendationsResponse.data.results);
     } catch (error) {
       setError("Failed to fetch data");
       console.error("Failed to fetch data", error);
@@ -153,6 +156,15 @@ const DetailsPage = () => {
         <CardCarousel
           data={similarData}
           heading={"Similar " + params?.explore + (params?.explore === 'tv' ? " Shows" : "s")}
+          trending={false}
+          media_type={params?.explore}
+        />
+      </div>
+
+      <div>
+        <CardCarousel
+          data={recommendtionsData}
+          heading={"Recommendation " + params?.explore + (params?.explore === 'tv' ? " Shows" : "s")}
           trending={false}
           media_type={params?.explore}
         />
