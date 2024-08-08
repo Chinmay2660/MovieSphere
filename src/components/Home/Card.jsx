@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 const Card = ({ data, trending, index, media_type }) => {
     const imageURL = useSelector((state) => state.movieData.imageURL);
-    const mediaType = data.media_type ?? media_type;
+    const mediaType = data?.media_type ?? media_type;
 
     return (
         <Link to={"/"+mediaType+"/"+data.id} className="text-text min-w-[230px] max-w-[230px] block p-4 rounded-lg shadow-lg m-2 w-full relative hover:scale-105 ">
@@ -40,9 +40,9 @@ const Card = ({ data, trending, index, media_type }) => {
                         : data?.name}
             </h3>
             <p className="text-secondary mt-1">
-                {moment(data.release_date ? data.release_date : data.first_air_date).format("MMMM Do YYYY")}
+                {moment(data?.release_date ? data?.release_date : data?.first_air_date).format("MMMM Do YYYY")}
             </p>
-            {data.vote_average && <p className="text-tertiary mt-1">Rating: {Number(data.vote_average).toFixed(1)}</p>}
+            {data?.vote_average && Number(data?.vote_average) !== 0 && <p className="text-tertiary mt-1">Rating: {Number(data?.vote_average).toFixed(1)}</p>}
         </Link>
     );
 };

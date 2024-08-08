@@ -67,9 +67,11 @@ const SearchPage = () => {
   }, [pageNo]);
 
   useEffect(() => {
-    setPageNo(1);
-    setData([]);
-    debouncedFetchData();
+    if(location?.search?.slice(3)){
+      setPageNo(1);
+      setData([]);
+      debouncedFetchData();
+    }
   }, [location?.search]);
 
   useEffect(() => {

@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { IoPlay, IoInformationCircleOutline, IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import VideoPlay from "../VideoPlay";
 
 const Banner = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const bannerData = useSelector((state) => state.movieData.bannerData);
   const imageURL = useSelector((state) => state.movieData.imageURL);
+  const [playVideo, setPlayVideo] = useState(false)
+  const [playVideoData, setPlayVideoData] = useState()
   const navigate = useNavigate();
 
   const handlePrevClick = () => {
@@ -21,13 +24,19 @@ const Banner = () => {
     }
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex === bannerData.length - 1 ? 0 : prevIndex + 1));
-    }, 5000);
+  const handleVideoPlay = (data) => {
+    setPlayVideoData(data)
+    setPlayVideo(true)
+  }
 
-    return () => clearInterval(interval);
-  }, [bannerData.length]);
+  useEffect(() => {
+    if (playVideo === false) {
+      const interval = setInterval(() => {
+        setCurrentIndex((prevIndex) => (prevIndex === bannerData.length - 1 ? 0 : prevIndex + 1));
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [bannerData.length, currentIndex, playVideo]);
 
   return (
     <section className="relative top-0 w-full h-screen group overflow-hidden">
@@ -57,6 +66,7 @@ const Banner = () => {
               <div className="flex flex-wrap gap-6 mt-8">
                 <button
                   href="/home"
+                  onClick={() => handleVideoPlay(data)}
                   className="flex items-center gap-2 py-3 px-6 text-center text-black text-base font-bold bg-text hover:bg-secondary active:shadow-none rounded-lg shadow"
                 >
                   <IoPlay className="w-6 h-6  transition-colors duration-300" />
@@ -90,6 +100,8 @@ const Banner = () => {
           <IoChevronForward className="w-6 h-6 hover:scale-125 transition-transform duration-300" />
         </button>
       )}
+
+      {playVideo && <VideoPlay playVideoId={playVideoData?.id} media_type={playVideoData?.media_type} close={() => setPlayVideo(false)} />}
     </section>
   );
 };

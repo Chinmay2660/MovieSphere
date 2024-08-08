@@ -5,6 +5,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { setImageURL } from "../reduxStore/Reducer/movieSlice";
 import moment from "moment";
 import Divider from "../components/Reusables/Divider";
+import CardCarousel from "../components/Home/CardCarousel";
+import { IoPlay } from "react-icons/io5";
+import VideoPlay from "../components/VideoPlay";
 
 const DetailsPage = () => {
   const params = useParams();
@@ -12,22 +15,26 @@ const DetailsPage = () => {
   const [data, setData] = useState();
   const [castData, setCastData] = useState();
   const [similarData, setSimilarData] = useState();
+  const [recommendtionsData, setRecommendationsData] = useState();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [playVideo, setPlayVideo] = useState(false)
   const dispatch = useDispatch()
 
   const fetchData = async () => {
     setLoading(true);
     setError(null);
     try {
-      const [detailsResponse, castResponse, similarResponse] = await Promise.all([
+      const [detailsResponse, castResponse, similarResponse, recommendationsResponse] = await Promise.all([
         axiosInstance.get(`/${params?.explore}/${params?.id}`),
         axiosInstance.get(`/${params?.explore}/${params?.id}/credits`),
-        axiosInstance.get(`/${params?.explore}/${params?.id}/similar`)
+        axiosInstance.get(`/${params?.explore}/${params?.id}/similar`),
+        axiosInstance.get(`/${params?.explore}/${params?.id}/recommendations`)
       ]);
       setData(detailsResponse.data);
       setCastData(castResponse.data);
-      setSimilarData(similarResponse.data);
+      setSimilarData(similarResponse.data.results);
+      setRecommendationsData(recommendationsResponse.data.results);
     } catch (error) {
       setError("Failed to fetch data");
       console.error("Failed to fetch data", error);
@@ -50,7 +57,7 @@ const DetailsPage = () => {
       fetchConfigurationData()
     }
     fetchData();
-  }, [params, imageURL]);
+  }, [params]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -73,7 +80,7 @@ const DetailsPage = () => {
             loading="lazy"
           />
         </div>
-        <div className="absolute w-full h-full top-0 bg-radient-to-t from-neutral-900/90 to-transparent"></div>
+        <div className="absolute w-full h-full top-0 bg-gradient-to-t from-neutral-900 to-transparent opacity-100"></div>
       </div>
 
       <div className="container mx-auto px-3 py-16 lg:py-0 flex flex-col lg:flex-row gap-5 lg:gap-10">
@@ -94,11 +101,22 @@ const DetailsPage = () => {
 
           <div className="flex items-center gap-3">
             {data?.vote_average && <p className="text-tertiary mt-1">Rating: {Number(data?.vote_average).toFixed(1)}+</p>}
-            <span>|</span>
+            {data?.vote_count && <span>|</span>}
             {data?.vote_count && <p className="text-tertiary mt-1">Views: {Number(data?.vote_count)}+</p>}
-            <span>|</span>
+            {data?.runtime && <span>|</span>}
             {data?.runtime && <p className="text-tertiary mt-1">Duration: {duration[0]}h {duration[1]}m</p>}
           </div>
+
+          <Divider />
+
+          <button
+            href="/home"
+            onClick={() => setPlayVideo(true)}
+            className="flex items-center gap-2 py-3 px-6 text-center text-black text-base font-bold bg-text hover:bg-secondary active:shadow-none rounded-lg shadow"
+          >
+            <IoPlay className="w-6 h-6  transition-colors duration-300" />
+            <span>Play Now</span>
+          </button>
 
           <Divider />
 
@@ -148,6 +166,25 @@ const DetailsPage = () => {
         </div>
       </div>
 
+      <div>
+        <CardCarousel
+          data={similarData}
+          heading={"Similar " + params?.explore + (params?.explore === 'tv' ? " Shows" : "s")}
+          trending={false}
+          media_type={params?.explore}
+        />
+      </div>
+
+      <div>
+        <CardCarousel
+          data={recommendtionsData}
+          heading={"Recommendation " + params?.explore + (params?.explore === 'tv' ? " Shows" : "s")}
+          trending={false}
+          media_type={params?.explore}
+        />
+      </div>
+
+      {playVideo && <VideoPlay playVideoId={params?.id} media_type={params?.explore} close={() => setPlayVideo(false)} />}
     </div>
   );
 };
