@@ -35,8 +35,7 @@ const HamburgerMenu = ({ isOpen, onClose }) => {
                                         navigate(item.path);
                                         onClose();
                                     }}
-                                    className={`text-lg font-semibold px-4 py-2 rounded-full transition-transform duration-300 ${isActive ? 'bg-white text-black transform scale-105' : 'text-gray-400 hover:text-white'
-                                        }`}
+                                    className={`text-lg font-semibold px-4 py-2 rounded-full transition-transform duration-300 ${isActive ? 'bg-white text-black transform scale-105' : 'text-gray-400 hover:text-white'}`}
                                 >
                                     {item.title}
                                 </button>
