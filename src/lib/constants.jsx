@@ -1,5 +1,3 @@
-import { MdHomeFilled } from "react-icons/md";
-import { IoSearchOutline } from "react-icons/io5";
 import { FaTwitter, FaFacebookF, FaLinkedinIn, FaInstagram, FaGithub } from 'react-icons/fa';
 
 
@@ -10,12 +8,6 @@ export const navigation = [
     // { title: "Login", path: "/login" },
     // { title: "Sign Up", path: "/signup" },
 ];
-
-export const mobileNavigation = [
-    { title: "Home", path: "/", icon: <MdHomeFilled /> },
-    ...navigation,
-    { title: "Search", path: "/search", icon: <IoSearchOutline /> },
-]
 
 export const features = [
     {

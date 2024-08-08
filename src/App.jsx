@@ -1,7 +1,6 @@
 import { Outlet } from "react-router-dom";
 // import Footer from "./components/Reusables/Footer"
 import Header from "./components/Reusables/Header";
-import MobileNavigation from "./components/MobileNavigation";
 
 const App = () => {
   return (
@@ -10,7 +9,6 @@ const App = () => {
       <div>
         <Outlet />
       </div>
-      <MobileNavigation />
     </main>
   )
 }
