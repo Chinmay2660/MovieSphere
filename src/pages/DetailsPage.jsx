@@ -18,9 +18,8 @@ const DetailsPage = () => {
   const [recommendtionsData, setRecommendationsData] = useState();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const dispatch = useDispatch()
   const [playVideo, setPlayVideo] = useState(false)
-  const [playVideoId, setPlayVideoId] = useState("")
+  const dispatch = useDispatch()
 
   const fetchData = async () => {
     setLoading(true);
@@ -60,11 +59,6 @@ const DetailsPage = () => {
     fetchData();
   }, [params]);
 
-  const handlePlayVideo = (data) => {
-    setPlayVideoId(data?.id)
-    setPlayVideo(true)
-  }
-
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -86,7 +80,7 @@ const DetailsPage = () => {
             loading="lazy"
           />
         </div>
-        <div className="absolute w-full h-full top-0 bg-radient-to-t from-neutral-900/90 to-transparent"></div>
+        <div className="absolute w-full h-full top-0 bg-gradient-to-t from-neutral-900 to-transparent opacity-100"></div>
       </div>
 
       <div className="container mx-auto px-3 py-16 lg:py-0 flex flex-col lg:flex-row gap-5 lg:gap-10">
@@ -117,7 +111,7 @@ const DetailsPage = () => {
 
           <button
             href="/home"
-            onClick={() => handlePlayVideo(data)}
+            onClick={() => setPlayVideo(true)}
             className="flex items-center gap-2 py-3 px-6 text-center text-black text-base font-bold bg-text hover:bg-secondary active:shadow-none rounded-lg shadow"
           >
             <IoPlay className="w-6 h-6  transition-colors duration-300" />
@@ -190,7 +184,7 @@ const DetailsPage = () => {
         />
       </div>
 
-      {playVideo && <VideoPlay playVideoId={playVideoId} close={() => setPlayVideo(false)} />}
+      {playVideo && <VideoPlay playVideoId={params?.id} media_type={params?.explore} close={() => setPlayVideo(false)} />}
     </div>
   );
 };
