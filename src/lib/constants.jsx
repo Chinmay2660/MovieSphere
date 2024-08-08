@@ -1,19 +1,13 @@
-import { MdHomeFilled, MdLocalMovies } from "react-icons/md";
-import { PiTelevisionFill } from "react-icons/pi";
-import { IoSearchOutline } from "react-icons/io5";
 import { FaTwitter, FaFacebookF, FaLinkedinIn, FaInstagram, FaGithub } from 'react-icons/fa';
 
 
 export const navigation = [
-    { title: "TV Shows", path: "/tv", icon: <PiTelevisionFill /> },
-    { title: "Movies", path: "/movie", icon: <MdLocalMovies /> },
+    { title: "Home", path: "/" },
+    { title: "TV Shows", path: "/tv" },
+    { title: "Movies", path: "/movie" },
+    // { title: "Login", path: "/login" },
+    // { title: "Sign Up", path: "/signup" },
 ];
-
-export const mobileNavigation = [
-    { title: "Home", path: "/", icon: <MdHomeFilled /> },
-    ...navigation,
-    { title: "Search", path: "/search", icon: <IoSearchOutline /> },
-]
 
 export const features = [
     {
