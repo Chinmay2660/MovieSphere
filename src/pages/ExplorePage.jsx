@@ -52,7 +52,7 @@ const ExplorePage = () => {
   }
 
   useEffect(() => {
-    if(imageURL !== undefined){
+    if (imageURL !== undefined) {
       fetchConfigurationData()
     }
     fetchData();
@@ -71,11 +71,16 @@ const ExplorePage = () => {
     };
   }, [pageNo, loading]);
 
+  const getHeading = () => {
+    const type = params.explore === 'tv' ? "TV Shows" : "Movies";
+    return `Popular ${type}`;
+  };
+
   return (
     <div className="pt-16">
       <div className="container mx-auto">
         <h3 className="capitalize text-2xl font-bold my-2">
-          Popular {params.explore}
+          {getHeading()}
         </h3>
 
         {error && (

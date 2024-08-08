@@ -65,7 +65,6 @@ const Banner = () => {
               </div>
               <div className="flex flex-wrap gap-6 mt-8">
                 <button
-                  href="/home"
                   onClick={() => handleVideoPlay(data)}
                   className="flex items-center gap-2 py-3 px-6 text-center text-black text-base font-bold bg-text hover:bg-secondary active:shadow-none rounded-lg shadow"
                 >

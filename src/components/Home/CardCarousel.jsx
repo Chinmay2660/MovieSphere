@@ -16,7 +16,7 @@ const CardCarousel = ({ data, trending, heading, media_type }) => {
 
     return (
         <div className="relative mx-10 my-10 group">
-            <h2 className="text-xl font-bold lg:text-2xl mb-4 capitalize">{heading}</h2>
+            <h2 className="text-xl font-bold lg:text-2xl mb-0 capitalize">{heading}</h2>
             <div className="overflow-hidden relative">
                 <div
                     ref={containerRef}
