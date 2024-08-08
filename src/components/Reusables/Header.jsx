@@ -64,6 +64,7 @@ const Header = () => {
 
     return (
         <AnimatePresence>
+            {/* Desktop Header */}
             <motion.div
                 initial={{ opacity: 1, y: -100 }}
                 animate={{ y: visible ? 0 : -100, opacity: visible ? 1 : 0 }}
@@ -112,22 +113,45 @@ const Header = () => {
                 )}
             </motion.div>
 
+            {/* Mobile Header */}
             <motion.div
                 initial={{ opacity: 1, y: 0 }}
                 animate={{ opacity: visible ? 1 : 0, y: visible ? 0 : -100 }}
                 exit={{ opacity: 0, y: -100 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="md:hidden fixed top-0 inset-x-0 flex justify-between items-center p-4 bg-black text-white z-50"
+                className="md:hidden fixed top-0 inset-x-0 flex items-center p-4 bg-black text-white z-50"
             >
-                <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-2xl">
-                    {isMenuOpen ? <IoCloseOutline className="text-2xl font-bold" /> : <IoMenuOutline className="text-2xl font-bold" />}
+                <button onClick={() => setIsMenuOpen(!isMenuOpen)} >
+                    {isMenuOpen ? <IoCloseOutline className="text-3xl font-bold" /> : <IoMenuOutline className="text-2xl font-bold" />}
                 </button>
-                <button
-                    onClick={() => setIsSearchOpen(true)}
-                    className={`p-2 rounded-full transition-transform duration-300 ${location.pathname === '/search' ? 'bg-white text-black transform scale-105' : 'text-gray-400 hover:text-white'}`}
-                >
-                    <IoSearchOutline className="text-2xl font-bold" />
-                </button>
+
+                <div className="relative flex-1">
+                    {!isSearchOpen ? (
+                        <button
+                            onClick={() => setIsSearchOpen(true)}
+                            className={`p-2 rounded-full transition-transform duration-300 absolute right-4 top-1/2 transform -translate-y-1/2 ${location.pathname === '/search' ? 'bg-white text-black transform scale-105' : 'text-gray-400 hover:text-white'}`}
+                        >
+                            <IoSearchOutline className="text-2xl font-bold" />
+                        </button>
+                    ) : (
+                        <motion.div
+                            ref={searchRef}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                            className=" absolute right-2 -top-5 transform -translate-y-1/2 "
+                        >
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={handleInputChange}
+                                placeholder="Search..."
+                                className="p-2 rounded-full border border-gray-700 bg-gray-800 text-white"
+                            />
+                        </motion.div>
+                    )}
+                </div>
             </motion.div>
 
             <HamburgerMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
