@@ -1,6 +1,5 @@
 import { FaTwitter, FaFacebookF, FaLinkedinIn, FaInstagram, FaGithub } from 'react-icons/fa';
 
-
 export const navigation = [
     { title: "Home", path: "/" },
     { title: "TV Shows", path: "/tv" },
