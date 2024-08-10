@@ -47,14 +47,13 @@ const ExplorePage = () => {
   const handleScroll = useCallback(
     debounce(() => {
       if (
-        window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 &&
-        !loading
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 
       ) {
         if (pageNo < totalPageNo) {
           setPageNo((prev) => prev + 1);
         }
       }
-    }, 300),
+    }, 700),
     [pageNo, totalPageNo, loading]
   );
 
@@ -86,6 +85,7 @@ const ExplorePage = () => {
   }, [params.explore]);
 
   useEffect(() => {
+    setLoading(true);
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -110,12 +110,6 @@ const ExplorePage = () => {
           </div>
         )}
 
-        {loading && (
-          <div className="text-center mb-4">
-            <span>Loading...</span>
-          </div>
-        )}
-
         <div className="grid grid-cols-[repeat(auto-fit,230px)] gap-6">
           {data.map((item) => {
             return (
@@ -123,6 +117,12 @@ const ExplorePage = () => {
             );
           })}
         </div>
+
+        {loading && (
+          <div className="text-center my-4">
+            <span>Loading...</span>
+          </div>
+        )}
       </div>
     </div>
   );
