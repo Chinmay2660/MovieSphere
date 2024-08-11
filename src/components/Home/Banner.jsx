@@ -8,8 +8,8 @@ const Banner = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const bannerData = useSelector((state) => state.movieData.bannerData);
   const imageURL = useSelector((state) => state.movieData.imageURL);
-  const [playVideo, setPlayVideo] = useState(false)
-  const [playVideoData, setPlayVideoData] = useState()
+  const [playVideo, setPlayVideo] = useState(false);
+  const [playVideoData, setPlayVideoData] = useState();
   const navigate = useNavigate();
 
   const handlePrevClick = () => {
@@ -25,9 +25,9 @@ const Banner = () => {
   };
 
   const handleVideoPlay = (data) => {
-    setPlayVideoData(data)
-    setPlayVideo(true)
-  }
+    setPlayVideoData(data);
+    setPlayVideo(true);
+  };
 
   useEffect(() => {
     if (playVideo === false) {
@@ -66,14 +66,14 @@ const Banner = () => {
               <div className="flex flex-wrap gap-6 mt-8">
                 <button
                   onClick={() => handleVideoPlay(data)}
-                  className="flex items-center gap-2 py-3 px-6 text-center text-black text-base font-bold bg-text hover:bg-secondary active:shadow-none rounded-lg shadow"
+                  className="flex items-center gap-2 justify-center w-[12rem] lg:w-[12rem] py-3 px-6 text-center text-black text-base font-bold bg-text hover:bg-secondary active:shadow-none rounded-lg shadow"
                 >
-                  <IoPlay className="w-6 h-6  transition-colors duration-300" />
+                  <IoPlay className="w-6 h-6 transition-colors duration-300" />
                   <span>Play Now</span>
                 </button>
                 <button
                   onClick={() => navigate("/" + data.media_type + "/" + data.id)}
-                  className="flex items-center gap-2 py-3 px-6 text-center text-white text-base font-bold bg-black hover:bg-secondary active:shadow-none rounded-lg shadow"
+                  className="flex items-center gap-2 justify-center w-[12rem] lg:w-[12rem] py-3 px-6 text-center text-white text-base font-bold bg-black hover:bg-secondary active:shadow-none rounded-lg shadow"
                 >
                   <IoInformationCircleOutline className="w-6 h-6 text-blue-500 transition-colors duration-300" />
                   <span>More Details</span>
