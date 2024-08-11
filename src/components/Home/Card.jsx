@@ -23,11 +23,11 @@ const Card = ({ data, trending, index, media_type }) => {
                                 ? data?.original_title
                                 : data?.name
                     }
-                    className="w-full h-full object-cover rounded-md"
+                    className="w-full h-[22rem] object-cover rounded-md"
                     loading='lazy'
                 />
             ) : (
-                <div className="w-full h-48 flex items-center justify-center rounded-md bg-neutral-200 animate-pulse text-">
+                <div className="w-full h-[22rem] flex items-center justify-center rounded-md bg-neutral-200 animate-pulse text-">
                     No Image Found
                 </div>
             )}

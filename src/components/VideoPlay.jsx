@@ -45,7 +45,7 @@ const VideoPlay = ({ playVideoId, close, media_type }) => {
                         frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
-                        onError={() => setUseFallback(true)} // Switch to YouTube if vidsrc fails
+                        onError={() => setUseFallback(true)}
                     />
                 )}
             </div>
