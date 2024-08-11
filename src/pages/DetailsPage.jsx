@@ -147,7 +147,7 @@ const DetailsPage = () => {
               {writerName && <Divider />}
             </div>
 
-            <h2 className="text-lg lg:text-xl">Cast:</h2>
+            <h2 className="text-sm lg:text-base text-white font-bold mb-6">Cast:</h2>
             <div className="grid grid-cols-[repeat(auto-fit,80px)] lg:grid-cols-[repeat(auto-fit,96px)] gap-5">
               {castData?.cast?.filter((item) => item?.profile_path).map((item, index) => (
                 <div key={index} className="flex flex-col items-center justify-start">
