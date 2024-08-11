@@ -4,6 +4,7 @@ import { IoSearchOutline, IoMenuOutline, IoCloseOutline } from 'react-icons/io5'
 import { useNavigate, useLocation } from 'react-router-dom';
 import { navigation } from '../../lib/constants';
 import HamburgerMenu from './HamburgerMenu';
+import { debounce } from "../../lib/utils";
 
 const Header = () => {
     const { scrollY } = useScroll();
@@ -38,14 +39,6 @@ const Header = () => {
             setVisible(true);
         }
     });
-
-    const debounce = (func, delay) => {
-        let timer;
-        return (...args) => {
-            clearTimeout(timer);
-            timer = setTimeout(() => func.apply(this, args), delay);
-        };
-    };
 
     const handleSearchChange = debounce((value) => {
         if (value) {
@@ -98,6 +91,7 @@ const Header = () => {
                             onChange={handleInputChange}
                             placeholder="Search..."
                             className="p-2 rounded-full border border-gray-700 bg-gray-800 text-white"
+                            autoFocus
                         />
                     </motion.div>
                 ) : (
@@ -137,7 +131,7 @@ const Header = () => {
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.9 }}
                             transition={{ duration: 0.3, ease: "easeInOut" }}
-                            className=" absolute right-2 -top-5 transform -translate-y-1/2 "
+                            className=" absolute right-2 top-1/2 transform -translate-y-1/2 "
                         >
                             <input
                                 type="text"
@@ -145,6 +139,7 @@ const Header = () => {
                                 onChange={handleInputChange}
                                 placeholder="Search..."
                                 className="p-2 rounded-full border border-gray-700 bg-gray-800 text-white"
+                                autoFocus
                             />
                         </motion.div>
                     )}
