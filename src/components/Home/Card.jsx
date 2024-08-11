@@ -8,9 +8,9 @@ const Card = ({ data, trending, index, media_type }) => {
     const mediaType = data?.media_type ?? media_type;
 
     return (
-        <Link to={"/"+mediaType+"/"+data.id} className="text-text min-w-[230px] max-w-[230px] block p-4 rounded-lg shadow-lg m-2 w-full relative hover:scale-105 ">
+        <Link to={"/" + mediaType + "/" + data.id} className="text-text min-w-[250px] max-w-[250px] block px-2 py-0 rounded-lg shadow-lg w-full relative hover:scale-105 ">
             {trending &&
-                <span className="relative right-6 top-7 bg-yellow-500 text-black font-bold rounded-r-lg px-2 py-1">
+                <span className="relative right-0 top-5 bg-yellow-500 text-black font-bold rounded-r-lg px-2 py-1 text-sm">
                     Trending #{index}
                 </span>}
             {data.poster_path ? (
@@ -23,15 +23,15 @@ const Card = ({ data, trending, index, media_type }) => {
                                 ? data?.original_title
                                 : data?.name
                     }
-                    className="w-full h-48 object-cover rounded-md"
+                    className="w-full h-[22rem] object-cover rounded-md"
                     loading='lazy'
                 />
             ) : (
-                <div className="w-full h-48 flex items-center justify-center rounded-md bg-neutral-200 animate-pulse text-">
+                <div className="w-full h-[22rem] flex items-center justify-center rounded-md bg-neutral-200 animate-pulse text-">
                     No Image Found
                 </div>
             )}
-            
+
             <h3 className="text-lg font-bold mt-2">
                 {data?.title
                     ? data?.title

@@ -23,7 +23,7 @@ const CardCarousel = ({ data, trending, heading, media_type }) => {
                     className="flex overflow-x-auto space-x-4 scrollbar-none"
                 >
                     {data.map((item, index) => (
-                        <div key={item.id + "heading" + index} className="min-w-[230px] flex-shrink-0">
+                        <div key={item.id + "heading" + index} className="min-w-[250px] flex-shrink-0 relative">
                             <Card data={item} index={index + 1} trending={trending} media_type={media_type} />
                         </div>
                     ))}
