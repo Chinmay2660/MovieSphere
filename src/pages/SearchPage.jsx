@@ -104,7 +104,7 @@ const SearchPage = () => {
           </div>
         )}
 
-        {data && data.length === 0  && !error && (
+        {data?.length === 0 && !error && (
           <div className="text-center capitalize text-white text-2xl mt-10 mb-10">
             No results found for <span className="text-yellow-500">{location?.search?.slice(3)?.split("%20").join(" ")}</span>
           </div>
@@ -118,7 +118,7 @@ const SearchPage = () => {
           ))}
         </div>
 
-        {loading && data.length > 0 && (
+        {loading && (
           <div className="text-center my-4 mt-10 mb-10">
             <span>Loading...</span>
           </div>
