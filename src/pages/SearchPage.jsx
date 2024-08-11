@@ -35,7 +35,7 @@ const SearchPage = () => {
       } finally {
         setLoading(false);
       }
-    }, 600),
+    }, 700),
     []
   );
 
