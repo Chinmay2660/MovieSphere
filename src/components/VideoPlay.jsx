@@ -5,21 +5,27 @@ import PropTypes from 'prop-types';
 
 const VideoPlay = ({ playVideoId, close, media_type }) => {
     const [videoData, setVideoData] = useState(null);
-    const [useFallback, setUseFallback] = useState(media_type === 'tv');
+    const [loading, setLoading] = useState(true);
+    const [useFallback, setUseFallback] = useState(false);
 
     const fetchVideoData = async () => {
+        setLoading(true);
         try {
             const response = await axiosInstance.get(`/${media_type}/${playVideoId}/videos`);
             const video = response.data.results.find(video =>
                 video.type === "Trailer" || video.type === "Teaser"
             );
-            setVideoData(video);
+            setVideoData(video || null);
         } catch (error) {
             console.log("error", error);
+            setVideoData(null);
+        } finally {
+            setLoading(false);
         }
     };
 
     useEffect(() => {
+        setUseFallback(media_type === 'tv'); 
         fetchVideoData();
     }, [playVideoId, media_type]);
 
@@ -37,7 +43,20 @@ const VideoPlay = ({ playVideoId, close, media_type }) => {
                 <button className="absolute top-0 right-0 p-2 text-2xl text-white rounded-full hover:bg-white hover:text-black" onClick={close}>
                     <IoClose />
                 </button>
-                {videoData?.key && (
+
+                {loading && (
+                    <div className="flex items-center justify-center h-full text-white text-lg">
+                        Loading...
+                    </div>
+                )}
+
+                {!loading && !videoData && (
+                    <div className="flex items-center justify-center h-full text-white text-lg">
+                        No Video found
+                    </div>
+                )}
+
+                {!loading && videoData && (
                     <iframe
                         title="video"
                         src={getVideoSrc()}
