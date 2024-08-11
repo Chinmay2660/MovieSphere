@@ -42,7 +42,7 @@ const Card = ({ data, trending, index, media_type }) => {
             <p className="text-secondary mt-1">
                 {moment(data?.release_date ? data?.release_date : data?.first_air_date).format("MMMM Do YYYY")}
             </p>
-            {data?.vote_average && Number(data?.vote_average) !== 0 && <p className="text-tertiary mt-1">Rating: {Number(data?.vote_average).toFixed(1)}</p>}
+            {data?.vote_average !== undefined && data?.vote_average !== null && data?.vote_average !== "" && data?.vote_average !== 0 && Number(data?.vote_average) !== 0 && <p className="text-tertiary mt-1">Rating: {Number(data?.vote_average).toFixed(1)}</p>}
         </Link>
     );
 };
