@@ -80,7 +80,7 @@ const DetailsPage = () => {
   const writerName = castData?.crew?.filter((item) => item?.job === "Writer").map((item) => item?.name).join(", ");
 
   return (
-    <div className="text-white">
+    <div className="text-white pt-16 lg:pt-0">
       <div className="w-full h-[200px] sm:h-[300px] relative hidden lg:block">
         <img
           src={imageURL + data?.backdrop_path}
