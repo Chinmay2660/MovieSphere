@@ -7,7 +7,7 @@ import Card from "../components/Home/Card";
 import { debounce } from "../lib/utils";
 
 const SearchPage = () => {
-  const location = useLocation()
+  const location = useLocation();
   const [pageNo, setPageNo] = useState(1);
   const [data, setData] = useState([]);
   const [totalPageNo, setTotalPageNo] = useState(0);
@@ -16,25 +16,28 @@ const SearchPage = () => {
   const dispatch = useDispatch();
   const imageURL = useSelector((state) => state.movieData.imageURL);
 
-  const fetchData = async (currentPage) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await axiosInstance.get(`/search/multi`, {
-        params: {
-          query: location?.search?.slice(3),
-          page: currentPage,
-        },
-      });
-      setData((prev) => [...prev, ...response.data.results]);
-      setTotalPageNo(response.data.total_pages);
-    } catch (error) {
-      setError("Failed to fetch data");
-      console.error("Failed to fetch data", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const debouncedFetchData = useCallback(
+    debounce(async (currentPage, query) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await axiosInstance.get(`/search/multi`, {
+          params: {
+            query,
+            page: currentPage,
+          },
+        });
+        setData((prev) => (currentPage === 1 ? response.data.results : [...prev, ...response.data.results]));
+        setTotalPageNo(response.data.total_pages);
+      } catch (error) {
+        setError("Failed to fetch data");
+        console.error("Failed to fetch data", error);
+      } finally {
+        setLoading(false);
+      }
+    }, 600),
+    []
+  );
 
   const handleScroll = useCallback(
     debounce(() => {
@@ -66,17 +69,19 @@ const SearchPage = () => {
 
   useEffect(() => {
     if (pageNo !== 1) {
-      fetchData(pageNo);
+      const query = location?.search?.slice(3);
+      debouncedFetchData(pageNo, query);
     }
-  }, [pageNo]);
+  }, [pageNo, debouncedFetchData]);
 
   useEffect(() => {
-    if (location?.search?.slice(3)) {
+    const query = location?.search?.slice(3);
+    if (query) {
       setPageNo(1);
       setData([]);
-      fetchData(1);
+      debouncedFetchData(1, query);
     }
-  }, [location?.search]);
+  }, [location?.search, debouncedFetchData]);
 
   useEffect(() => {
     setLoading(true);
@@ -114,7 +119,7 @@ const SearchPage = () => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SearchPage
+export default SearchPage;
