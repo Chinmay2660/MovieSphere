@@ -69,6 +69,10 @@ const DetailsPage = () => {
 
   const duration = (Number(data?.runtime) / 60).toFixed(1).split(".")
 
+  const directorName = castData?.crew?.filter((item) => item?.job === "Director").map((item) => item?.name).join(", ")
+
+  const writerName = castData?.crew?.filter((item) => item?.job === "Writer").map((item) => item?.name).join(", ")
+
   return (
     <div>
       <div className='w-full h-[300px] relative hidden lg:block'>
@@ -136,10 +140,10 @@ const DetailsPage = () => {
             <Divider />
 
             <div>
-              <p><span className=" text-white">Direction</span> : {castData?.crew?.find((item) => item?.job === "Director")?.name}</p>
-              <Divider />
-              <p><span className=" text-white">Writer</span> : {castData?.crew?.filter((item) => item?.job === "Writer").map((item) => item?.name).join(", ")}</p>
-              <Divider />
+              {directorName && <p><span className=" text-white">Direction</span> : {directorName}</p>}
+              {directorName && <Divider />}
+              {writerName && <p><span className=" text-white">Writer</span> : {writerName}</p>}
+              {writerName && <Divider />}
             </div>
 
             <Divider />
