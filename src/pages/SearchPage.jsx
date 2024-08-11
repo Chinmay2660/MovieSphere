@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom"
+import { useLocation } from "react-router-dom";
 import axiosInstance from "../lib/axiosConfig";
 import { setImageURL } from "../reduxStore/Reducer/movieSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -54,12 +54,12 @@ const SearchPage = () => {
 
   const fetchConfigurationData = async () => {
     try {
-      const response = await axiosInstance.get('/configuration')
-      dispatch(setImageURL(response.data.images.secure_base_url + "original"))
+      const response = await axiosInstance.get("/configuration");
+      dispatch(setImageURL(response.data.images.secure_base_url + "original"));
     } catch (error) {
-      console.log("error", error)
+      console.log("error", error);
     }
-  }
+  };
 
   useEffect(() => {
     if (!imageURL) {
@@ -104,6 +104,12 @@ const SearchPage = () => {
           </div>
         )}
 
+        {data && data.length === 0  && !error && (
+          <div className="text-center capitalize text-white text-2xl mt-10 mb-10">
+            No results found for <span className="text-yellow-500">{location?.search?.slice(3)?.split("%20").join(" ")}</span>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {data.map((item) => (
             <div key={item.id + "search"} className="flex justify-center items-center">
@@ -112,7 +118,7 @@ const SearchPage = () => {
           ))}
         </div>
 
-        {loading && (
+        {loading && data.length > 0 && (
           <div className="text-center my-4 mt-10 mb-10">
             <span>Loading...</span>
           </div>
