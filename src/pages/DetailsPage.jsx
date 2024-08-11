@@ -98,11 +98,11 @@ const DetailsPage = () => {
           <p className="text-neutral-400 mt-1 text-sm lg:text-base">{data.tagline}</p>
 
           <div className="flex flex-col lg:flex-row items-start lg:items-center gap-3">
-            {data?.vote_average && <p className="text-tertiary mt-1 text-sm lg:text-base">Rating: {Number(data?.vote_average).toFixed(1)}+</p>}
-            {data?.vote_count && <span className="hidden lg:inline">|</span>}
-            {data?.vote_count && <p className="text-tertiary mt-1 text-sm lg:text-base">Views: {Number(data?.vote_count)}+</p>}
-            {data?.runtime && <span className="hidden lg:inline">|</span>}
-            {data?.runtime && <p className="text-tertiary mt-1 text-sm lg:text-base">Duration: {duration[0]}h {duration[1]}m</p>}
+            {data?.vote_average !== undefined && data?.vote_average !== null && data?.vote_average !== "" && data?.vote_average !== 0 && <p className="text-tertiary mt-1 text-sm lg:text-base">Rating: {Number(data?.vote_average).toFixed(1)}+</p>}
+            {data?.vote_count !== undefined && data?.vote_count !== null && data?.vote_count !== "" && data?.vote_count !== 0 && <span className="hidden lg:inline">|</span>}
+            {data?.vote_count !== undefined && data?.vote_count !== null && data?.vote_count !== "" && data?.vote_count !== 0 && <p className="text-tertiary mt-1 text-sm lg:text-base">Views: {Number(data?.vote_count)}+</p>}
+            {data?.runtime  !== undefined && data?.runtime !== null && data?.runtime !== "" && data?.runtime !== 0 && <span className="hidden lg:inline">|</span>}
+            {data?.runtime !== undefined && data?.runtime !== null && data?.runtime !== "" && data?.runtime !== 0 && <p className="text-tertiary mt-1 text-sm lg:text-base">Duration: {duration[0]}h {duration[1]}m</p>}
           </div>
 
           {data?.genres?.length > 0 && (
