@@ -4,6 +4,7 @@ import { IoSearchOutline, IoMenuOutline, IoCloseOutline } from 'react-icons/io5'
 import { useNavigate, useLocation } from 'react-router-dom';
 import { navigation } from '../../lib/constants';
 import HamburgerMenu from './HamburgerMenu';
+import { debounce } from "../../lib/utils";
 
 const Header = () => {
     const { scrollY } = useScroll();
@@ -38,14 +39,6 @@ const Header = () => {
             setVisible(true);
         }
     });
-
-    const debounce = (func, delay) => {
-        let timer;
-        return (...args) => {
-            clearTimeout(timer);
-            timer = setTimeout(() => func.apply(this, args), delay);
-        };
-    };
 
     const handleSearchChange = debounce((value) => {
         if (value) {

@@ -4,6 +4,7 @@ import axiosInstance from "../lib/axiosConfig";
 import { setImageURL } from "../reduxStore/Reducer/movieSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Card from "../components/Home/Card";
+import { debounce } from "../lib/utils";
 
 const SearchPage = () => {
   const location = useLocation()
@@ -33,16 +34,6 @@ const SearchPage = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const debounce = (func, delay) => {
-    let timer;
-    return (...args) => {
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        func.apply(this, args);
-      }, delay);
-    };
   };
 
   const handleScroll = useCallback(

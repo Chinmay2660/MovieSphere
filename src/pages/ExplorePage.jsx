@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import Card from "../components/Home/Card";
 import { setImageURL } from "../reduxStore/Reducer/movieSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { debounce } from "../lib/utils";
 
 const ExplorePage = () => {
   const params = useParams();
@@ -32,16 +33,6 @@ const ExplorePage = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const debounce = (func, delay) => {
-    let timer;
-    return (...args) => {
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        func.apply(this, args);
-      }, delay);
-    };
   };
 
   const handleScroll = useCallback(
