@@ -47,7 +47,7 @@ const ExplorePage = () => {
   const handleScroll = useCallback(
     debounce(() => {
       if (
-        window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 100
       ) {
         if (pageNo < totalPageNo) {
           setPageNo((prev) => prev + 1);
@@ -73,7 +73,7 @@ const ExplorePage = () => {
   }, [imageURL]);
 
   useEffect(() => {
-    if(pageNo !== 1) {
+    if (pageNo !== 1) {
       fetchData(pageNo);
     }
   }, [pageNo]);
@@ -99,8 +99,8 @@ const ExplorePage = () => {
 
   return (
     <div className="pt-16">
-      <div className="container mx-auto">
-        <h3 className="capitalize text-2xl font-bold my-2">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <h3 className="capitalize text-2xl font-bold my-4 text-center lg:text-left mt-10 mb-10">
           {getHeading()}
         </h3>
 
@@ -110,16 +110,16 @@ const ExplorePage = () => {
           </div>
         )}
 
-        <div className="grid grid-cols-[repeat(auto-fit,230px)] gap-6">
-          {data.map((item) => {
-            return (
-              <Card key={item.id + "explore"} data={item} trending={false} media_type={params.explore} />
-            );
-          })}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          {data.map((item) => (
+            <div key={item.id + "explore"} className="flex justify-center items-center">
+              <Card data={item} trending={false} media_type={params.explore} />
+            </div>
+          ))}
         </div>
 
         {loading && (
-          <div className="text-center my-4">
+          <div className="text-center my-4 mt-10 mb-10">
             <span>Loading...</span>
           </div>
         )}

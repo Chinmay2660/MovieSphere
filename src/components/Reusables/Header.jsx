@@ -6,7 +6,7 @@ import { navigation } from '../../lib/constants';
 import HamburgerMenu from './HamburgerMenu';
 
 const Header = () => {
-    const { scrollYProgress } = useScroll();
+    const { scrollY } = useScroll();
     const [visible, setVisible] = useState(true);
     const [activePath, setActivePath] = useState('');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -31,14 +31,11 @@ const Header = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    useMotionValueEvent(scrollYProgress, "change", (current) => {
-        if (typeof current === "number") {
-            let direction = current - scrollYProgress.getPrevious();
-            if (scrollYProgress.get() < 0.05) {
-                setVisible(true);
-            } else {
-                setVisible(direction < 0);
-            }
+    useMotionValueEvent(scrollY, "change", (current) => {
+        if (current > 100) {
+            setVisible(false);
+        } else {
+            setVisible(true);
         }
     });
 

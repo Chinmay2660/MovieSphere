@@ -60,11 +60,19 @@ const DetailsPage = () => {
   }, [params]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="text-center my-4">
+        <span>Loading...</span>
+      </div>
+    )
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return (
+      <div className="text-center my-4">
+        <span className="text-red-500">{error}</span>
+      </div>
+    )
   }
 
   const duration = (Number(data?.runtime) / 60).toFixed(1).split(".");
@@ -79,6 +87,8 @@ const DetailsPage = () => {
           alt="Banner"
           className="h-full w-full object-cover"
           loading="lazy"
+          width="100%"
+          height="100%"
         />
         <div className="absolute w-full h-full top-0 bg-gradient-to-t from-neutral-900 to-transparent opacity-100"></div>
       </div>
@@ -90,6 +100,8 @@ const DetailsPage = () => {
             alt="Poster"
             className="h-60 w-40 lg:h-80 lg:w-60 object-cover rounded"
             loading="lazy"
+            width="100%"
+            height="100%"
           />
         </div>
 
@@ -101,7 +113,7 @@ const DetailsPage = () => {
             {data?.vote_average !== undefined && data?.vote_average !== null && data?.vote_average !== "" && data?.vote_average !== 0 && <p className="text-tertiary mt-1 text-sm lg:text-base">Rating: {Number(data?.vote_average).toFixed(1)}+</p>}
             {data?.vote_count !== undefined && data?.vote_count !== null && data?.vote_count !== "" && data?.vote_count !== 0 && <span className="hidden lg:inline">|</span>}
             {data?.vote_count !== undefined && data?.vote_count !== null && data?.vote_count !== "" && data?.vote_count !== 0 && <p className="text-tertiary mt-1 text-sm lg:text-base">Views: {Number(data?.vote_count)}+</p>}
-            {data?.runtime  !== undefined && data?.runtime !== null && data?.runtime !== "" && data?.runtime !== 0 && <span className="hidden lg:inline">|</span>}
+            {data?.runtime !== undefined && data?.runtime !== null && data?.runtime !== "" && data?.runtime !== 0 && <span className="hidden lg:inline">|</span>}
             {data?.runtime !== undefined && data?.runtime !== null && data?.runtime !== "" && data?.runtime !== 0 && <p className="text-tertiary mt-1 text-sm lg:text-base">Duration: {duration[0]}h {duration[1]}m</p>}
           </div>
 
