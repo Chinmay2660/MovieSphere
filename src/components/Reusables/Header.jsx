@@ -98,6 +98,7 @@ const Header = () => {
                             onChange={handleInputChange}
                             placeholder="Search..."
                             className="p-2 rounded-full border border-gray-700 bg-gray-800 text-white"
+                            autoFocus
                         />
                     </motion.div>
                 ) : (
@@ -137,7 +138,7 @@ const Header = () => {
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.9 }}
                             transition={{ duration: 0.3, ease: "easeInOut" }}
-                            className=" absolute right-2 -top-5 transform -translate-y-1/2 "
+                            className=" absolute right-2 top-1/2 transform -translate-y-1/2 "
                         >
                             <input
                                 type="text"
@@ -145,6 +146,7 @@ const Header = () => {
                                 onChange={handleInputChange}
                                 placeholder="Search..."
                                 className="p-2 rounded-full border border-gray-700 bg-gray-800 text-white"
+                                autoFocus
                             />
                         </motion.div>
                     )}

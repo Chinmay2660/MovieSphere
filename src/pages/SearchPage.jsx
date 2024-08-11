@@ -67,7 +67,7 @@ const SearchPage = () => {
   }, [pageNo]);
 
   useEffect(() => {
-    if(location?.search?.slice(3)){
+    if (location?.search?.slice(3)) {
       setPageNo(1);
       setData([]);
       debouncedFetchData();
@@ -83,8 +83,8 @@ const SearchPage = () => {
 
   return (
     <div className="pt-16">
-      <div className="container mx-auto">
-        <h3 className="capitalize text-2xl font-bold my-2">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <h3 className="capitalize text-2xl font-bold my-4 text-center lg:text-left mt-10 mb-10">
           Search Results for {location?.search?.slice(3)?.split("%20").join(" ")}
         </h3>
 
@@ -94,19 +94,19 @@ const SearchPage = () => {
           </div>
         )}
 
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          {data.map((item) => (
+            <div key={item.id + "search"} className="flex justify-center items-center">
+              <Card data={item} trending={false} media_type={item.media_type} />
+            </div>
+          ))}
+        </div>
+
         {loading && (
-          <div className="text-center mb-4">
+          <div className="text-center my-4 mt-10 mb-10">
             <span>Loading...</span>
           </div>
         )}
-
-        <div className="grid grid-cols-[repeat(auto-fit,230px)] gap-6">
-          {data.map((item) => {
-            return (
-              <Card key={item.id + "search"} data={item} trending={false} media_type={item.media_type} />
-            )
-          })}
-        </div>
       </div>
     </div>
   )
