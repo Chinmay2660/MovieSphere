@@ -100,7 +100,7 @@ const ExplorePage = () => {
   return (
     <div className="pt-16">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <h3 className="capitalize text-2xl font-bold my-4 text-center lg:text-left mt-6 mb-6">
+        <h3 className="capitalize text-2xl font-bold my-4 text-center lg:text-left mt-10 mb-10">
           {getHeading()}
         </h3>
 
