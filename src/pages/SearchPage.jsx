@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom"
 import axiosInstance from "../lib/axiosConfig";
 import { setImageURL } from "../reduxStore/Reducer/movieSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Card from "../components/Home/Card";
 
 const SearchPage = () => {
@@ -13,23 +13,16 @@ const SearchPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
+  const imageURL = useSelector((state) => state.movieData.imageURL);
 
-  const debounce = (func, wait) => {
-    let timeout;
-    return (...args) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(this, args), wait);
-    };
-  };
-
-  const fetchData = async () => {
+  const fetchData = async (currentPage) => {
     setLoading(true);
     setError(null);
     try {
       const response = await axiosInstance.get(`/search/multi`, {
         params: {
           query: location?.search?.slice(3),
-          page: pageNo,
+          page: currentPage,
         },
       });
       setData((prev) => [...prev, ...response.data.results]);
@@ -42,15 +35,28 @@ const SearchPage = () => {
     }
   };
 
-  const debouncedFetchData = debounce(fetchData, 500);
-
-  const handleScroll = () => {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !loading) {
-      if (pageNo < totalPageNo) {
-        setPageNo((prev) => prev + 1);
-      }
-    }
+  const debounce = (func, delay) => {
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        func.apply(this, args);
+      }, delay);
+    };
   };
+
+  const handleScroll = useCallback(
+    debounce(() => {
+      if (
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 100
+      ) {
+        if (pageNo < totalPageNo) {
+          setPageNo((prev) => prev + 1);
+        }
+      }
+    }, 700),
+    [pageNo, totalPageNo, loading]
+  );
 
   const fetchConfigurationData = async () => {
     try {
@@ -62,24 +68,32 @@ const SearchPage = () => {
   }
 
   useEffect(() => {
-    fetchConfigurationData();
-    debouncedFetchData();
+    if (!imageURL) {
+      fetchConfigurationData();
+    }
+  }, [imageURL]);
+
+  useEffect(() => {
+    if (pageNo !== 1) {
+      fetchData(pageNo);
+    }
   }, [pageNo]);
 
   useEffect(() => {
     if (location?.search?.slice(3)) {
       setPageNo(1);
       setData([]);
-      debouncedFetchData();
+      fetchData(1);
     }
   }, [location?.search]);
 
   useEffect(() => {
+    setLoading(true);
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [pageNo, loading]);
+  }, [handleScroll]);
 
   return (
     <div className="pt-16">
