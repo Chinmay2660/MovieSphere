@@ -151,15 +151,22 @@ const DetailsPage = () => {
             <h2 className="text-lg mb-3 text-white">Cast :</h2>
             <div className="grid grid-cols-[repeat(auto-fit,96px)] gap-5">
               {castData?.cast?.filter((item) => item?.profile_path).map((item, index) => (
-                <div key={index} className="flex flex-col items-center justify-center">
-                  <div className="">
+                <div key={index} className="flex flex-col items-center justify-start">
+                  <div>
                     <img
                       src={imageURL + item?.profile_path}
                       alt={`Banner`}
                       className="h-24 w-24 object-cover rounded-full"
                       loading="lazy"
                     />
-                    <p className="text-neutral-400 font-bold text-center text-sm ">{item?.name}</p>
+                  </div>
+                  <div className="text-center mt-2 leading-tight">
+                    <p className="text-neutral-400 font-bold text-sm max-w-full break-words">
+                      {item?.name.split(" ")[0]}
+                    </p>
+                    <p className="text-neutral-400 font-bold text-sm max-w-full break-words">
+                      {item?.name.split(" ")[1]}
+                    </p>
                   </div>
                 </div>
               ))}
