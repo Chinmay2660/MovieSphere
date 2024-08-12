@@ -50,6 +50,7 @@ const Banner = () => {
               height={500}
               loading="lazy"
               srcSet={`${imageURL + data?.backdrop_path} 1x, ${imageURL + data?.backdrop_path} 2x`}
+              style={{ aspectRatio: '2/1' }}
             />
             <div className="absolute top-0 w-full h-full bg-gradient-to-t from-background to-transparent"></div>
             <div className="absolute bottom-20 left-8 lg:left-16 max-w-md p-4">
@@ -86,6 +87,7 @@ const Banner = () => {
         <button
           onClick={handlePrevClick}
           className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-300 hidden group-hover:lg:flex"
+          aria-label="Previous slide"
         >
           <IoChevronBack className="w-6 h-6 hover:scale-125 transition-transform duration-300" />
         </button>
@@ -94,6 +96,7 @@ const Banner = () => {
         <button
           onClick={handleNextClick}
           className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-300 hidden group-hover:lg:flex"
+          aria-label="Next slide"
         >
           <IoChevronForward className="w-6 h-6 hover:scale-125 transition-transform duration-300" />
         </button>
