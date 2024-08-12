@@ -57,14 +57,14 @@ const DetailsPage = () => {
       fetchConfigurationData();
     }
     fetchData();
-  }, [params]);
+  }, [params, imageURL]);
 
   if (loading) {
     return (
       <div className="text-center my-4">
         <span>Loading...</span>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -72,7 +72,7 @@ const DetailsPage = () => {
       <div className="text-center my-4">
         <span className="text-red-500">{error}</span>
       </div>
-    )
+    );
   }
 
   const duration = (Number(data?.runtime) / 60).toFixed(1).split(".");
@@ -88,9 +88,10 @@ const DetailsPage = () => {
           className="h-full w-full object-cover"
           loading="lazy"
           width="100%"
-          height="100%"
+          height="300"
+          style={{ aspectRatio: '16/9' }}
         />
-       <div className="absolute w-full h-full top-0 bg-gradient-to-b from-transparent to-background opacity-100"></div>
+        <div className="absolute w-full h-full top-0 bg-gradient-to-b from-transparent to-background opacity-100"></div>
       </div>
 
       <div className="container mx-auto px-3 py-8 lg:py-16 flex flex-col lg:flex-row gap-5 lg:gap-10 max-w-screen-xl">
@@ -101,7 +102,8 @@ const DetailsPage = () => {
             className="h-60 w-40 lg:h-80 lg:w-60 object-cover rounded"
             loading="lazy"
             width="100%"
-            height="100%"
+            height="120"
+            style={{ aspectRatio: '2/3' }}
           />
         </div>
 
@@ -132,7 +134,7 @@ const DetailsPage = () => {
 
           <button
             onClick={() => setPlayVideo(true)}
-            className="flex items-center gap-2 py-2 lg:py-3 px-4 lg:px-6 text-center text-black text-sm lg:text-base font-bold bg-text mt-4 mb-4  hover:bg-secondary active:shadow-none rounded-lg shadow"
+            className="flex items-center gap-2 py-2 lg:py-3 px-4 lg:px-6 text-center text-black text-sm lg:text-base font-bold bg-text mt-4 mb-4 hover:bg-secondary active:shadow-none rounded-lg shadow"
           >
             <IoPlay className="w-5 h-5 lg:w-6 lg:h-6 transition-colors duration-300" />
             <span>Play Now</span>
@@ -167,7 +169,10 @@ const DetailsPage = () => {
                     src={imageURL + item?.profile_path}
                     alt="Cast"
                     className="h-20 w-20 lg:h-24 lg:w-24 object-cover rounded-full"
+                    width={100}
+                    height={100}
                     loading="lazy"
+                    style={{ aspectRatio: '1/1' }}
                   />
                   <div className="text-center mt-2 leading-tight">
                     <p className="text-neutral-400 font-bold text-xs lg:text-sm">{item?.name.split(" ")[0]}</p>
