@@ -90,7 +90,7 @@ const DetailsPage = () => {
           width="100%"
           height="100%"
         />
-        <div className="absolute w-full h-full top-0 bg-gradient-to-t from-neutral-900 to-transparent opacity-100"></div>
+       <div className="absolute w-full h-full top-0 bg-gradient-to-b from-transparent to-background opacity-100"></div>
       </div>
 
       <div className="container mx-auto px-3 py-8 lg:py-16 flex flex-col lg:flex-row gap-5 lg:gap-10 max-w-screen-xl">
@@ -111,8 +111,8 @@ const DetailsPage = () => {
 
           <div className="flex flex-col lg:flex-row items-start lg:items-center gap-3">
             {data?.vote_average !== undefined && data?.vote_average !== null && data?.vote_average !== "" && data?.vote_average !== 0 && <p className="text-tertiary mt-1 text-sm lg:text-base">Rating: {Number(data?.vote_average).toFixed(1)}+</p>}
-            {data?.vote_count !== undefined && data?.vote_count !== null && data?.vote_count !== "" && data?.vote_count !== 0 && <span className="hidden lg:inline">|</span>}
-            {data?.vote_count !== undefined && data?.vote_count !== null && data?.vote_count !== "" && data?.vote_count !== 0 && <p className="text-tertiary mt-1 text-sm lg:text-base">Views: {Number(data?.vote_count)}+</p>}
+            {data?.popularity !== undefined && data?.popularity !== null && data?.popularity !== "" && data?.popularity !== 0 && <span className="hidden lg:inline">|</span>}
+            {data?.popularity !== undefined && data?.popularity !== null && data?.popularity !== "" && data?.popularity !== 0 && <p className="text-tertiary mt-1 text-sm lg:text-base">Views: {Number(data?.popularity).toFixed(0)}+</p>}
             {data?.runtime !== undefined && data?.runtime !== null && data?.runtime !== "" && data?.runtime !== 0 && <span className="hidden lg:inline">|</span>}
             {data?.runtime !== undefined && data?.runtime !== null && data?.runtime !== "" && data?.runtime !== 0 && <p className="text-tertiary mt-1 text-sm lg:text-base">Duration: {duration[0]}h {duration[1]}m</p>}
           </div>
@@ -160,7 +160,7 @@ const DetailsPage = () => {
             </div>
 
             <h2 className="text-sm lg:text-base text-white font-bold mb-6">Cast:</h2>
-            <div className="grid grid-cols-[repeat(auto-fit,80px)] lg:grid-cols-[repeat(auto-fit,96px)] gap-5">
+            <div className="grid grid-cols-[repeat(auto-fit,80px)] justify-center lg:justify-start lg:grid-cols-[repeat(auto-fit,96px)] gap-5">
               {castData?.cast?.filter((item) => item?.profile_path).map((item, index) => (
                 <div key={index} className="flex flex-col items-center justify-start">
                   <img

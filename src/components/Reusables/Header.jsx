@@ -43,6 +43,8 @@ const Header = () => {
     const handleSearchChange = debounce((value) => {
         if (value) {
             navigate(`/search?q=${encodeURIComponent(value)}`);
+        } else {
+            navigate('/home');
         }
     }, 600);
 
@@ -131,14 +133,14 @@ const Header = () => {
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.9 }}
                             transition={{ duration: 0.3, ease: "easeInOut" }}
-                            className=" absolute right-2 top-1/2 transform -translate-y-1/2 "
+                            className="absolute inset-y-0 right-4 flex items-center w-[calc(100%-3.5rem)]"
                         >
                             <input
                                 type="text"
                                 value={searchQuery}
                                 onChange={handleInputChange}
                                 placeholder="Search..."
-                                className="p-2 rounded-full border border-gray-700 bg-gray-800 text-white"
+                                className="w-full p-2 rounded-full border border-gray-700 bg-gray-800 text-white"
                                 autoFocus
                             />
                         </motion.div>

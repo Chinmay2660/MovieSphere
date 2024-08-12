@@ -56,7 +56,7 @@ const Home = () => {
   ];
 
   return (
-    <div className="relative w-full h-screen">
+    <div className="relative w-full min-h-screen">
       <Banner />
       {carousels.map((carousel, index) => (
         <CardCarousel

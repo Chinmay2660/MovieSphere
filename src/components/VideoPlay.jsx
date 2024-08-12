@@ -38,7 +38,7 @@ const VideoPlay = ({ playVideoId, close, media_type }) => {
     };
 
     return (
-        <section className="fixed bg-neutral-700 top-0 right-0 bottom-0 left-0 z-40 bg-opacity-50 flex items-center justify-center">
+        <section className=" fixed bg-neutral-700 top-0 right-0 bottom-0 left-0 z-50 bg-opacity-50 flex items-center justify-center">
             <div className="w-full max-h-[80vh] max-w-screen-lg bg-black aspect-video rounded-lg overflow-hidden shadow-xl relative">
                 <button className="absolute top-0 right-0 p-2 text-2xl text-white rounded-full hover:bg-white hover:text-black" onClick={close}>
                     <IoClose />
