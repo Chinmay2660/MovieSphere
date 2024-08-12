@@ -87,7 +87,7 @@ const DetailsPage = () => {
           alt="Banner"
           className="h-full w-full object-cover"
           loading="lazy"
-          width="100%"
+          width="1000"
           height="300"
           style={{ aspectRatio: '16/9' }}
         />
@@ -101,8 +101,8 @@ const DetailsPage = () => {
             alt="Poster"
             className="h-60 w-40 lg:h-80 lg:w-60 object-cover rounded"
             loading="lazy"
-            width="100%"
-            height="120"
+            width="240"
+            height="360"
             style={{ aspectRatio: '2/3' }}
           />
         </div>
@@ -112,11 +112,11 @@ const DetailsPage = () => {
           <p className="text-neutral-400 mt-1 text-sm lg:text-base">{data.tagline}</p>
 
           <div className="flex flex-col lg:flex-row items-start lg:items-center gap-3">
-            {data?.vote_average !== undefined && data?.vote_average !== null && data?.vote_average !== "" && data?.vote_average !== 0 && <p className="text-tertiary mt-1 text-sm lg:text-base">Rating: {Number(data?.vote_average).toFixed(1)}+</p>}
-            {data?.popularity !== undefined && data?.popularity !== null && data?.popularity !== "" && data?.popularity !== 0 && <span className="hidden lg:inline">|</span>}
-            {data?.popularity !== undefined && data?.popularity !== null && data?.popularity !== "" && data?.popularity !== 0 && <p className="text-tertiary mt-1 text-sm lg:text-base">Views: {Number(data?.popularity).toFixed(0)}+</p>}
-            {data?.runtime !== undefined && data?.runtime !== null && data?.runtime !== "" && data?.runtime !== 0 && <span className="hidden lg:inline">|</span>}
-            {data?.runtime !== undefined && data?.runtime !== null && data?.runtime !== "" && data?.runtime !== 0 && <p className="text-tertiary mt-1 text-sm lg:text-base">Duration: {duration[0]}h {duration[1]}m</p>}
+            {data?.vote_average && data?.vote_average > 0 && <p className="text-tertiary mt-1 text-sm lg:text-base">Rating: {Number(data?.vote_average).toFixed(1)}+</p>}
+            {data?.popularity && data?.popularity > 0 && <span className="hidden lg:inline">|</span>}
+            {data?.popularity && data?.popularity > 0 && <p className="text-tertiary mt-1 text-sm lg:text-base">Views: {Number(data?.popularity).toFixed(0)}+</p>}
+            {data?.runtime && data?.runtime > 0 && <span className="hidden lg:inline">|</span>}
+            {data?.runtime && data?.runtime > 0 && <p className="text-tertiary mt-1 text-sm lg:text-base">Duration: {duration[0]}h {duration[1]}m</p>}
           </div>
 
           {data?.genres?.length > 0 && (
@@ -169,8 +169,8 @@ const DetailsPage = () => {
                     src={imageURL + item?.profile_path}
                     alt="Cast"
                     className="h-20 w-20 lg:h-24 lg:w-24 object-cover rounded-full"
-                    width={100}
-                    height={100}
+                    width={96}
+                    height={96}
                     loading="lazy"
                     style={{ aspectRatio: '1/1' }}
                   />
