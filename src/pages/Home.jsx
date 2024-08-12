@@ -14,6 +14,11 @@ import CardCarousel from '../components/Home/CardCarousel';
 const Home = () => {
   const dispatch = useDispatch();
 
+  const trendingData = useSelector((state) => state.movieData.bannerData);
+  const upcomingData = useSelector((state) => state.movieData.upcomingData);
+  const popularTvData = useSelector((state) => state.movieData.popularTvData);
+  const nowPlayingData = useSelector((state) => state.movieData.nowPlayingData);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -24,16 +29,25 @@ const Home = () => {
           nowPlayingResponse,
           configResponse
         ] = await Promise.all([
-          axiosInstance.get('/trending/all/week'),
-          axiosInstance.get('/movie/upcoming'),
-          axiosInstance.get('/tv/popular'),
-          axiosInstance.get('/movie/now_playing'),
+          !trendingData.length && axiosInstance.get('/trending/all/week'),
+          !upcomingData.length && axiosInstance.get('/movie/upcoming'),
+          !popularTvData.length && axiosInstance.get('/tv/popular'),
+          !nowPlayingData.length && axiosInstance.get('/movie/now_playing'),
           axiosInstance.get('/configuration'),
         ]);
-        dispatch(setBannerData(trendingResponse.data.results));
-        dispatch(setUpcomingData(upcomingResponse.data.results));
-        dispatch(setPopularTvData(popularTvResponse.data.results));
-        dispatch(setNowPlayingData(nowPlayingResponse.data.results));
+        
+        if (trendingResponse) {
+          dispatch(setBannerData(trendingResponse.data.results));
+        }
+        if (upcomingResponse) {
+          dispatch(setUpcomingData(upcomingResponse.data.results));
+        }
+        if (popularTvResponse) {
+          dispatch(setPopularTvData(popularTvResponse.data.results));
+        }
+        if (nowPlayingResponse) {
+          dispatch(setNowPlayingData(nowPlayingResponse.data.results));
+        }
         dispatch(setImageURL(configResponse.data.images.secure_base_url + "original"));
       } catch (error) {
         console.error("Failed to fetch data", error);
@@ -41,12 +55,7 @@ const Home = () => {
     };
 
     fetchData();
-  }, [dispatch]);
-
-  const trendingData = useSelector((state) => state.movieData.bannerData);
-  const upcomingData = useSelector((state) => state.movieData.upcomingData);
-  const popularTvData = useSelector((state) => state.movieData.popularTvData);
-  const nowPlayingData = useSelector((state) => state.movieData.nowPlayingData);
+  }, [dispatch, trendingData, upcomingData, popularTvData, nowPlayingData]);
 
   const carousels = [
     { heading: "Trending Now", data: trendingData, trending: true },

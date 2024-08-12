@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { IoPlay, IoInformationCircleOutline, IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
@@ -12,31 +12,27 @@ const Banner = () => {
   const [playVideoData, setPlayVideoData] = useState();
   const navigate = useNavigate();
 
-  const handlePrevClick = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex((prevIndex) => prevIndex - 1);
-    }
-  };
+  const handlePrevClick = useCallback(() => {
+    setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+  }, []);
 
-  const handleNextClick = () => {
-    if (currentIndex < bannerData.length - 1) {
-      setCurrentIndex((prevIndex) => prevIndex + 1);
-    }
-  };
+  const handleNextClick = useCallback(() => {
+    setCurrentIndex((prevIndex) => Math.min(prevIndex + 1, bannerData.length - 1));
+  }, [bannerData.length]);
 
-  const handleVideoPlay = (data) => {
+  const handleVideoPlay = useCallback((data) => {
     setPlayVideoData(data);
     setPlayVideo(true);
-  };
+  }, []);
 
   useEffect(() => {
-    if (playVideo === false) {
+    if (!playVideo) {
       const interval = setInterval(() => {
-        setCurrentIndex((prevIndex) => (prevIndex === bannerData?.length - 1 ? 0 : prevIndex + 1));
+        setCurrentIndex((prevIndex) => (prevIndex === bannerData.length - 1 ? 0 : prevIndex + 1));
       }, 5000);
       return () => clearInterval(interval);
     }
-  }, [bannerData?.length, currentIndex, playVideo]);
+  }, [bannerData.length, playVideo]);
 
   return (
     <section className="relative top-0 w-full h-screen group overflow-hidden">
@@ -50,7 +46,10 @@ const Banner = () => {
               src={imageURL + data?.backdrop_path}
               alt={`Banner ${index}`}
               className="absolute inset-0 h-full w-full object-cover"
+              width={1000}
+              height={500}
               loading="lazy"
+              srcSet={`${imageURL + data?.backdrop_path} 1x, ${imageURL + data?.backdrop_path} 2x`}
             />
             <div className="absolute top-0 w-full h-full bg-gradient-to-t from-background to-transparent"></div>
             <div className="absolute bottom-20 left-8 lg:left-16 max-w-md p-4">
