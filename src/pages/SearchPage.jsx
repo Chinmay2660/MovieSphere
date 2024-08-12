@@ -69,6 +69,7 @@ const SearchPage = () => {
 
   useEffect(() => {
     if (pageNo !== 1) {
+      setLoading(true);
       const query = location?.search?.slice(3);
       debouncedFetchData(pageNo, query);
     }
@@ -84,7 +85,6 @@ const SearchPage = () => {
   }, [location?.search, debouncedFetchData]);
 
   useEffect(() => {
-    setLoading(true);
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -104,7 +104,7 @@ const SearchPage = () => {
           </div>
         )}
 
-        {data?.length === 0 && !error && (
+        {!loading && data?.length === 0 && !error && (
           <div className="text-center capitalize text-white text-2xl mt-10 mb-10">
             No results found for <span className="text-yellow-500">{location?.search?.slice(3)?.split("%20").join(" ")}</span>
           </div>
@@ -112,7 +112,7 @@ const SearchPage = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {data.map((item) => (
-            <div key={item.id + "search"} className="flex justify-center items-center">
+            <div key={item.id + "search"} className="flex justify-center items-start">
               <Card data={item} trending={false} media_type={item.media_type} />
             </div>
           ))}
