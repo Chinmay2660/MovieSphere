@@ -1,4 +1,4 @@
-import { FaTwitter, FaFacebookF, FaLinkedinIn, FaInstagram, FaGithub } from 'react-icons/fa';
+import { FaTwitter, FaLinkedinIn, FaInstagram, FaGithub } from 'react-icons/fa';
 
 export const navigation = [
     { title: "Home", path: "/home" },
@@ -74,16 +74,15 @@ export const faqsList = [
         q: "Is Movie Sphere really free?",
         a: "Yes! Movie Sphere is a free (and legal) video streaming application. To keep our service free and legal, we include adverts, which monetise the content that our partners, such as MGM, Lionsgate, and Paramount, provide to us!"
     },
-    {
-        q: "Is Movie Sphere really free?",
-        a: "Yes! Movie Sphere is a free (and legal) video streaming application. To keep our service free and legal, we include adverts, which monetise the content that our partners, such as MGM, Lionsgate, and Paramount, provide to us!"
-    },
+    // {
+    //     q: "Is Movie Sphere really free?",
+    //     a: "Yes! Movie Sphere is a free (and legal) video streaming application. To keep our service free and legal, we include adverts, which monetise the content that our partners, such as MGM, Lionsgate, and Paramount, provide to us!"
+    // },
 ];
 
 export const socialMediaLinks = [
-    { href: 'javascript:void()', icon: FaTwitter, label: 'Twitter' },
-    { href: 'javascript:void()', icon: FaFacebookF, label: 'Facebook' },
-    { href: 'javascript:void()', icon: FaLinkedinIn, label: 'LinkedIn' },
-    { href: 'javascript:void()', icon: FaInstagram, label: 'Instagram' },
-    { href: 'javascript:void()', icon: FaGithub, label: 'GitHub' },
+    { href: 'https://x.com/ChinmayBhoir14', icon: FaTwitter, label: 'Twitter' },
+    { href: 'https://www.linkedin.com/in/chinmay2660/', icon: FaLinkedinIn, label: 'LinkedIn' },
+    { href: 'https://www.instagram.com/chinmay__bhoir?igsh=Z2hsZHczdWhxNXd6&utm_source=qr', icon: FaInstagram, label: 'Instagram' },
+    { href: 'https://github.com/Chinmay2660', icon: FaGithub, label: 'GitHub' },
 ];
