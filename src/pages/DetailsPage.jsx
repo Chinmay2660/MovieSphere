@@ -87,7 +87,7 @@ const DetailsPage = () => {
           alt="Banner"
           className="h-full w-full object-cover"
           loading="lazy"
-          width="100%"
+          width="1000"
           height="300"
           style={{ aspectRatio: '16/9' }}
         />
@@ -101,8 +101,8 @@ const DetailsPage = () => {
             alt="Poster"
             className="h-60 w-40 lg:h-80 lg:w-60 object-cover rounded"
             loading="lazy"
-            width="100%"
-            height="120"
+            width="240"
+            height="360"
             style={{ aspectRatio: '2/3' }}
           />
         </div>
@@ -169,8 +169,8 @@ const DetailsPage = () => {
                     src={imageURL + item?.profile_path}
                     alt="Cast"
                     className="h-20 w-20 lg:h-24 lg:w-24 object-cover rounded-full"
-                    width={100}
-                    height={100}
+                    width={96}
+                    height={96}
                     loading="lazy"
                     style={{ aspectRatio: '1/1' }}
                   />
