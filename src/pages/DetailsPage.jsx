@@ -90,7 +90,7 @@ const DetailsPage = () => {
           width="100%"
           height="100%"
         />
-       <div className="absolute w-full h-full top-0 bg-gradient-to-t from-transparent to-[#030c06] opacity-100"></div>
+       <div className="absolute w-full h-full top-0 bg-gradient-to-b from-transparent to-[#030c06] opacity-100"></div>
       </div>
 
       <div className="container mx-auto px-3 py-8 lg:py-16 flex flex-col lg:flex-row gap-5 lg:gap-10 max-w-screen-xl">
