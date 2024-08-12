@@ -43,6 +43,8 @@ const Header = () => {
     const handleSearchChange = debounce((value) => {
         if (value) {
             navigate(`/search?q=${encodeURIComponent(value)}`);
+        } else {
+            navigate('/home');
         }
     }, 600);
 
