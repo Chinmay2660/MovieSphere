@@ -52,7 +52,7 @@ const Banner = () => {
               className="absolute inset-0 h-full w-full object-cover"
               loading="lazy"
             />
-            <div className="absolute top-0 w-full h-full bg-gradient-to-t from-neutral-900 to-transparent"></div>
+            <div className="absolute top-0 w-full h-full bg-gradient-to-t from-[#030c06] to-transparent"></div>
             <div className="absolute bottom-20 left-8 lg:left-16 max-w-md p-4">
               <h2 className="text-2xl font-bold lg:text-4xl text-white drop-shadow-2xl">
                 {data?.title ? data?.title : data?.original_title ? data?.original_title : data?.name}
