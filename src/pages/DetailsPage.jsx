@@ -94,7 +94,7 @@ const DetailsPage = () => {
         <div className="absolute w-full h-full top-0 bg-gradient-to-b from-transparent to-background opacity-100"></div>
       </div>
 
-      <div className="container mx-auto px-3 py-8 lg:py-16 flex flex-col lg:flex-row gap-5 lg:gap-10 max-w-screen-xl">
+      <div className="container mx-auto px-3 py-8 lg:px-8 lg:py-16 flex flex-col lg:flex-row gap-5 lg:gap-10 max-w-screen-xl">
         <div className="relative mx-auto lg:-mt-40 lg:mx-0 w-fit">
           <img
             src={imageURL + data?.poster_path}
