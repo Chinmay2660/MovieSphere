@@ -8,14 +8,15 @@ import Divider from "../components/Reusables/Divider";
 import CardCarousel from "../components/Home/CardCarousel";
 import { IoPlay } from "react-icons/io5";
 import VideoPlay from "../components/VideoPlay";
+import CastCarousel from "../components/CastCarousel";
 
 const DetailsPage = () => {
   const params = useParams();
   const imageURL = useSelector((state) => state.movieData.imageURL);
-  const [data, setData] = useState();
-  const [castData, setCastData] = useState();
-  const [similarData, setSimilarData] = useState();
-  const [recommendationsData, setRecommendationsData] = useState();
+  const [data, setData] = useState(null);
+  const [castData, setCastData] = useState(null);
+  const [similarData, setSimilarData] = useState(null);
+  const [recommendationsData, setRecommendationsData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [playVideo, setPlayVideo] = useState(false);
@@ -82,29 +83,33 @@ const DetailsPage = () => {
   return (
     <div className="text-white pt-16 lg:pt-0">
       <div className="w-full h-[200px] sm:h-[300px] relative hidden lg:block">
-        <img
-          src={imageURL + data?.backdrop_path}
-          alt="Banner"
-          className="h-full w-full object-cover"
-          loading="lazy"
-          width="1000"
-          height="300"
-          style={{ aspectRatio: '16/9' }}
-        />
+        {imageURL && data?.backdrop_path && (
+          <img
+            src={imageURL + data?.backdrop_path}
+            alt="Banner"
+            className="h-full w-full object-cover"
+            loading="lazy"
+            width="1000"
+            height="300"
+            style={{ aspectRatio: '16/9' }}
+          />
+        )}
         <div className="absolute w-full h-full top-0 bg-gradient-to-b from-transparent to-background opacity-100"></div>
       </div>
 
       <div className="container mx-auto px-3 py-8 lg:px-8 lg:py-16 flex flex-col lg:flex-row gap-5 lg:gap-10 max-w-screen-xl">
         <div className="relative mx-auto lg:-mt-40 lg:mx-0 w-fit">
-          <img
-            src={imageURL + data?.poster_path}
-            alt="Poster"
-            className="h-60 w-40 lg:h-80 lg:w-60 object-cover rounded"
-            loading="lazy"
-            width="240"
-            height="360"
-            style={{ aspectRatio: '2/3' }}
-          />
+          {imageURL && data?.poster_path && (
+            <img
+              src={imageURL + data?.poster_path}
+              alt="Poster"
+              className="h-60 w-40 lg:h-80 lg:w-60 object-cover rounded"
+              loading="lazy"
+              width="240"
+              height="360"
+              style={{ aspectRatio: '2/3' }}
+            />
+          )}
         </div>
 
         <div className="flex-1">
@@ -162,24 +167,13 @@ const DetailsPage = () => {
             </div>
 
             <h2 className="text-sm lg:text-base text-white font-bold mb-6">Cast:</h2>
-            <div className="grid grid-cols-[repeat(auto-fit,80px)] justify-center lg:justify-start lg:grid-cols-[repeat(auto-fit,96px)] gap-5">
-              {castData?.cast?.filter((item) => item?.profile_path).map((item, index) => (
-                <div key={index} className="flex flex-col items-center justify-start">
-                  <img
-                    src={imageURL + item?.profile_path}
-                    alt="Cast"
-                    className="h-20 w-20 lg:h-24 lg:w-24 object-cover rounded-full"
-                    width={96}
-                    height={96}
-                    loading="lazy"
-                    style={{ aspectRatio: '1/1' }}
-                  />
-                  <div className="text-center mt-2 leading-tight">
-                    <p className="text-neutral-400 font-bold text-xs lg:text-sm">{item?.name.split(" ")[0]}</p>
-                    <p className="text-neutral-400 font-bold text-xs lg:text-sm">{item?.name.split(" ")[1]}</p>
-                  </div>
-                </div>
-              ))}
+            <div className="max-w-screen-xl">
+              <div className="relative">
+                <CastCarousel
+                  castData={castData?.cast?.filter((item) => item?.profile_path)}
+                  imageURL={imageURL}
+                />
+              </div>
             </div>
           </div>
         </div>
