@@ -1,5 +1,4 @@
 import { useState } from "react";
-import PropTypes from "prop-types";
 import { motion } from "framer-motion";
 
 const FAQCard = (props) => {
@@ -38,13 +37,6 @@ const FAQCard = (props) => {
             </motion.div>
         </div>
     );
-};
-
-FAQCard.propTypes = {
-    faqsList: PropTypes.shape({
-        q: PropTypes.string.isRequired,
-        a: PropTypes.string.isRequired
-    }).isRequired,
 };
 
 export default FAQCard;

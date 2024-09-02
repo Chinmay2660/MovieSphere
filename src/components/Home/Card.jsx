@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
@@ -45,23 +44,6 @@ const Card = ({ data, trending, index, media_type }) => {
             {data?.vote_average !== undefined && data?.vote_average !== null && data?.vote_average !== "" && data?.vote_average !== 0 && Number(data?.vote_average) !== 0 && <p className="text-tertiary mt-1">Rating: {Number(data?.vote_average).toFixed(1)}</p>}
         </Link>
     );
-};
-
-Card.propTypes = {
-    data: PropTypes.shape({
-        poster_path: PropTypes.string.isRequired,
-        title: PropTypes.string,
-        name: PropTypes.string,
-        release_date: PropTypes.string,
-        first_air_date: PropTypes.string,
-        vote_average: PropTypes.number.isRequired,
-        original_title: PropTypes.string,
-        media_type: PropTypes.string.isRequired,
-        id: PropTypes.number.isRequired,
-    }).isRequired,
-    index: PropTypes.number.isRequired,
-    media_type: PropTypes.string.isRequired,
-    trending: PropTypes.bool.isRequired
 };
 
 export default Card;

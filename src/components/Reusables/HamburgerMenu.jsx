@@ -2,7 +2,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { navigation } from '../../lib/constants';
 import { IoCloseOutline } from 'react-icons/io5';
-import PropTypes from 'prop-types';
 
 const HamburgerMenu = ({ isOpen, onClose }) => {
     const navigate = useNavigate();
@@ -46,11 +45,6 @@ const HamburgerMenu = ({ isOpen, onClose }) => {
             )}
         </AnimatePresence>
     );
-};
-
-HamburgerMenu.propTypes = {
-    isOpen: PropTypes.bool.isRequired,
-    onClose: PropTypes.func.isRequired,
 };
 
 export default HamburgerMenu;
