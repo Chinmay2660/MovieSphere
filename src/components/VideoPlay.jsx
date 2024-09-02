@@ -1,7 +1,6 @@
 import { IoClose } from "react-icons/io5";
 import axiosInstance from "../lib/axiosConfig";
 import { useEffect, useState } from "react";
-import PropTypes from 'prop-types';
 
 const VideoPlay = ({ playVideoId, close, media_type }) => {
     const [videoData, setVideoData] = useState(null);
@@ -70,12 +69,6 @@ const VideoPlay = ({ playVideoId, close, media_type }) => {
             </div>
         </section>
     );
-};
-
-VideoPlay.propTypes = {
-    playVideoId: PropTypes.number.isRequired,
-    media_type: PropTypes.string.isRequired,
-    close: PropTypes.func.isRequired
 };
 
 export default VideoPlay;

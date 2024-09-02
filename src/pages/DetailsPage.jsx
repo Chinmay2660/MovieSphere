@@ -112,7 +112,7 @@ const DetailsPage = () => {
           )}
         </div>
 
-        <div className="flex-1">
+        <div className="flex-1 lg:max-w-[75%]">
           <h2 className="text-xl lg:text-3xl font-bold">{data.title ?? data.original_title ?? data.name}</h2>
           <p className="text-neutral-400 mt-1 text-sm lg:text-base">{data.tagline}</p>
 

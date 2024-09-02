@@ -1,5 +1,4 @@
 import { useRef, useState, useEffect } from "react";
-import PropTypes from "prop-types";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 
 const CastCarousel = ({ castData, imageURL }) => {
@@ -88,17 +87,6 @@ const CastCarousel = ({ castData, imageURL }) => {
             </div>
         </div>
     );
-};
-
-CastCarousel.propTypes = {
-    castData: PropTypes.arrayOf(
-        PropTypes.shape({
-            id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-            profile_path: PropTypes.string,
-            name: PropTypes.string
-        })
-    ).isRequired,
-    imageURL: PropTypes.string.isRequired
 };
 
 export default CastCarousel;
