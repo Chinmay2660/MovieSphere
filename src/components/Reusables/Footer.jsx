@@ -1,4 +1,4 @@
-import logo from '../../assets/logo.svg';
+import logo from '../../assets/MovieSphereLogo.png';
 import { socialMediaLinks } from '../../lib/constants';
 
 const Footer = () => {
@@ -7,7 +7,7 @@ const Footer = () => {
             <div className="max-w-screen-xl mx-auto">
                 <div className="flex flex-col items-center md:flex-row md:justify-between">
                     <div className="flex items-center justify-center md:justify-start mb-4 md:mb-0">
-                        <img src={logo} className="w-32" alt="Logo" />
+                        <img src={logo} className="w-30" alt="Logo" />
                     </div>
                     <div className="flex space-x-6">
                         {socialMediaLinks.map(({ href, icon: Icon, label }) => (

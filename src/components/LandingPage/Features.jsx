@@ -48,7 +48,7 @@ const Features = () => {
                                     visible: { opacity: 1, y: 0 }
                                 }}
                             >
-                                <div className="text-primary pb-3">
+                                <div className="text-[#f8485e] pb-3">
                                     {item.icon}
                                 </div>
                                 <h4 className="text-lg text-text font-bold">
