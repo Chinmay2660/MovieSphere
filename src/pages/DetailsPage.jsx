@@ -179,23 +179,23 @@ const DetailsPage = () => {
         </div>
       </div>
 
-      <div>
+      {similarData && <div>
         <CardCarousel
           data={similarData}
           heading={"Similar " + params?.explore + (params?.explore === 'tv' ? " Shows" : "s")}
           trending={false}
           media_type={params?.explore}
         />
-      </div>
+      </div>}
 
-      <div>
+      {recommendationsData &&<div>
         <CardCarousel
           data={recommendationsData}
           heading={"Recommended " + params?.explore + (params?.explore === 'tv' ? " Shows" : "s")}
           trending={false}
           media_type={params?.explore}
         />
-      </div>
+      </div>}
 
       {playVideo && <VideoPlay playVideoId={params?.id} media_type={params?.explore} close={() => setPlayVideo(false)} />}
     </div>
