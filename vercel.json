@@ -4,6 +4,10 @@
     {
       "source": "/api/(.*)",
       "destination": "https://api-moviesphere2660.vercel.app/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
