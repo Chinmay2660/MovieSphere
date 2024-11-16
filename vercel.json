@@ -1,5 +1,9 @@
 {
-    "rewrites":  [
-      {"source": "/(.*)", "destination": "/index.html"}
-    ]
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://api-moviesphere2660.vercel.app/api/$1"
+    }
+  ]
 }
