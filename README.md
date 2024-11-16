@@ -57,7 +57,3 @@ Contributions, issues, and feature requests are welcome! Feel free to check out 
 4. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
 5. Push to the branch (`git push origin feature/AmazingFeature`).
 6. Open a pull request.
-
----
-
-**MovieSphere** - Your go-to platform for movie exploration and discovery.
