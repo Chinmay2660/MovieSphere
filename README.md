@@ -52,12 +52,8 @@ Check out the live demo: [MovieSphere](https://moviesphere2660.vercel.app/)
 
 Contributions, issues, and feature requests are welcome! Feel free to check out the [issues page](https://github.com/Chinmay2660/MovieSphere/issues).
 
-1. Fork the repository.
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`).
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
-4. Push to the branch (`git push origin feature/AmazingFeature`).
-5. Open a pull request.
-
----
-
-**MovieSphere** - Your go-to platform for movie exploration and discovery.
+1. Fork this reposiroty and api-moviesphere from [here](https://github.com/Chinmay2660/api-moviesphere).
+3. Create your feature branch (`git checkout -b feature/AmazingFeature`).
+4. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
+5. Push to the branch (`git push origin feature/AmazingFeature`).
+6. Open a pull request.
