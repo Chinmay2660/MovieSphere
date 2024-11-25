@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from "react-router-dom";
 import Footer from "./components/Reusables/Footer";
 import Header from "./components/Reusables/Header";
+import { Analytics } from "@vercel/analytics/react"
 
 const App = () => {
   const location = useLocation();
@@ -17,6 +18,7 @@ const App = () => {
         <Outlet />
       </div>
       {!shouldHideFooter && <Footer />}
+      <Analytics />
     </div>
   );
 };
