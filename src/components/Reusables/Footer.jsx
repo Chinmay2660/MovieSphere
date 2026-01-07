@@ -33,7 +33,7 @@ const Footer = () => {
                     </div>
                 </div>
                 <div className="mt-8 text-center text-sm text-gray-400">
-                    &copy; 2024 Movie Sphere. All rights reserved.
+                    &copy; 2026 MovieSphere. All rights reserved.
                 </div>
             </div>
         </footer>
