@@ -14,7 +14,7 @@ const Card = ({ data, trending, index, media_type }) => {
     return (
         <Link 
             to={"/" + mediaType + "/" + data.id} 
-            className="group block w-full max-w-[200px] relative"
+            className="group block w-full max-w-[220px] relative"
         >
             {/* Card Container */}
             <div className="relative overflow-hidden rounded-xl bg-neutral-800 transition-all duration-300 group-hover:ring-2 group-hover:ring-primary/50 group-hover:shadow-xl group-hover:shadow-primary/10">

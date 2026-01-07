@@ -38,7 +38,7 @@ const CardCarousel = ({ data, trending, heading, media_type }) => {
                     {data.map((item, index) => (
                         <div 
                             key={`${item.id}-${heading}-${index}`} 
-                            className="flex-shrink-0 w-[160px] sm:w-[180px] lg:w-[200px]"
+                            className="flex-shrink-0 w-[180px] sm:w-[200px] lg:w-[220px]"
                         >
                             <Card 
                                 data={item} 
