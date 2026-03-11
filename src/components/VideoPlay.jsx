@@ -1,69 +1,13 @@
-import { IoClose, IoChevronDown, IoChevronBack, IoChevronForward, IoServer, IoLanguage, IoExpand, IoContract, IoEye, IoEyeOff } from "react-icons/io5";
+import { IoClose, IoChevronDown, IoChevronBack, IoChevronForward, IoExpand, IoContract, IoEye, IoEyeOff } from "react-icons/io5";
 import { useEffect, useState, useRef } from "react";
 
-// Video source providers - ordered by ad-friendliness & quality
-const VIDEO_SOURCES = [
-  { 
-    id: 'autoembed', 
-    name: 'AutoEmbed', 
-    icon: '🎞️',
-    badge: 'Clean',
-    getMovieUrl: (id) => `https://player.autoembed.cc/embed/movie/${id}`,
-    getTvUrl: (id, season, episode) => `https://player.autoembed.cc/embed/tv/${id}/${season}/${episode}`,
-  },
-  { 
-    id: 'vidsrc_xyz', 
-    name: 'VidSrc Pro', 
-    icon: '⭐',
-    badge: 'HD',
-    getMovieUrl: (id) => `https://vidsrc.xyz/embed/movie/${id}`,
-    getTvUrl: (id, season, episode) => `https://vidsrc.xyz/embed/tv/${id}/${season}/${episode}`,
-  },
-  { 
-    id: 'embed_su', 
-    name: 'MultiLang', 
-    icon: '🌐',
-    badge: 'Hindi+',
-    getMovieUrl: (id) => `https://embed.su/embed/movie/${id}`,
-    getTvUrl: (id, season, episode) => `https://embed.su/embed/tv/${id}/${season}/${episode}`,
-  },
-  { 
-    id: 'vidsrc_cc', 
-    name: 'VidSrc', 
-    icon: '🎬',
-    getMovieUrl: (id) => `https://vidsrc.cc/v2/embed/movie/${id}`,
-    getTvUrl: (id, season, episode) => `https://vidsrc.cc/v2/embed/tv/${id}/${season}/${episode}`,
-  },
-  { 
-    id: 'vidsrc_to', 
-    name: 'VidSrc Alt', 
-    icon: '🎥',
-    getMovieUrl: (id) => `https://vidsrc.to/embed/movie/${id}`,
-    getTvUrl: (id, season, episode) => `https://vidsrc.to/embed/tv/${id}/${season}/${episode}`,
-  },
-  { 
-    id: 'moviesapi', 
-    name: 'MoviesAPI', 
-    icon: '📺',
-    getMovieUrl: (id) => `https://moviesapi.club/movie/${id}`,
-    getTvUrl: (id, season, episode) => `https://moviesapi.club/tv/${id}-${season}-${episode}`,
-  },
-  { 
-    id: 'multiembed', 
-    name: 'Multi Embed', 
-    icon: '🎭',
-    badge: 'Subs',
-    getMovieUrl: (id) => `https://multiembed.mov/?video_id=${id}&tmdb=1`,
-    getTvUrl: (id, season, episode) => `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${season}&e=${episode}`,
-  },
-  { 
-    id: '2embed', 
-    name: '2Embed', 
-    icon: '🔷',
-    getMovieUrl: (id) => `https://www.2embed.cc/embed/${id}`,
-    getTvUrl: (id, season, episode) => `https://www.2embed.cc/embedtv/${id}&s=${season}&e=${episode}`,
-  },
-];
+const VIDSRC = {
+  id: 'vidsrc_cc',
+  name: 'VidSrc',
+  icon: '🎬',
+  getMovieUrl: (id) => `https://vidsrc.cc/v2/embed/movie/${id}`,
+  getTvUrl: (id, season, episode) => `https://vidsrc.cc/v2/embed/tv/${id}/${season}/${episode}`,
+};
 
 const VideoPlay = ({ 
     playVideoId, 
@@ -77,10 +21,9 @@ const VideoPlay = ({
     const [selectedEpisode, setSelectedEpisode] = useState(initialEpisode);
     const [showSeasonDropdown, setShowSeasonDropdown] = useState(false);
     const [showEpisodeDropdown, setShowEpisodeDropdown] = useState(false);
-    const [showSourceDropdown, setShowSourceDropdown] = useState(false);
     const [episodeCount, setEpisodeCount] = useState(1);
     const [videoKey, setVideoKey] = useState(0);
-    const [selectedSource, setSelectedSource] = useState(VIDEO_SOURCES[0]);
+    const selectedSource = VIDSRC;
     const [isLoading, setIsLoading] = useState(true);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [showControls, setShowControls] = useState(true);
@@ -102,7 +45,6 @@ const VideoPlay = ({
         setIsLoading(true);
     }, [selectedSeason, selectedEpisode, selectedSource]);
 
-    // Fullscreen handling
     useEffect(() => {
         const handleFullscreenChange = () => {
             setIsFullscreen(!!document.fullscreenElement);
@@ -112,7 +54,6 @@ const VideoPlay = ({
         return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
     }, []);
 
-    // Keyboard shortcuts
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === 'Escape' && !document.fullscreenElement) {
@@ -136,14 +77,13 @@ const VideoPlay = ({
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [selectedEpisode, episodeCount, selectedSeason]);
 
-    // Auto-hide controls
     const handleMouseMove = () => {
         setShowControls(true);
         if (controlsTimeoutRef.current) {
             clearTimeout(controlsTimeoutRef.current);
         }
         controlsTimeoutRef.current = setTimeout(() => {
-            if (!showSeasonDropdown && !showEpisodeDropdown && !showSourceDropdown) {
+            if (!showSeasonDropdown && !showEpisodeDropdown) {
                 setShowControls(false);
             }
         }, 3000);
@@ -199,7 +139,6 @@ const VideoPlay = ({
     const closeAllDropdowns = () => {
         setShowSeasonDropdown(false);
         setShowEpisodeDropdown(false);
-        setShowSourceDropdown(false);
     };
 
     const canGoPrev = selectedEpisode > 1 || selectedSeason > 1;
@@ -217,9 +156,8 @@ const VideoPlay = ({
                 ref={containerRef}
                 className={`relative w-full h-full flex flex-col ${isTheaterMode ? 'bg-black' : ''}`}
                 onMouseMove={handleMouseMove}
-                onMouseLeave={() => !showSeasonDropdown && !showEpisodeDropdown && !showSourceDropdown && setShowControls(false)}
+                onMouseLeave={() => !showSeasonDropdown && !showEpisodeDropdown && setShowControls(false)}
             >
-                {/* Top Controls Bar */}
                 <div 
                     className={`absolute top-0 left-0 right-0 z-20 transition-all duration-300 ${
                         showControls ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'
@@ -227,9 +165,7 @@ const VideoPlay = ({
                 >
                     <div className="bg-gradient-to-b from-black/90 via-black/60 to-transparent p-4 pb-8">
                         <div className="flex items-center justify-between max-w-screen-2xl mx-auto">
-                            {/* Left Controls */}
                             <div className="flex items-center gap-2 sm:gap-3">
-                                {/* Close Button */}
                                 <button 
                                     onClick={close}
                                     className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-full transition-all"
@@ -239,27 +175,21 @@ const VideoPlay = ({
                 </button>
 
                                 <div className="h-6 w-px bg-white/20 hidden sm:block"></div>
-
-                                {/* Title */}
                                 <div className="hidden sm:block">
                                     <span className="text-white font-medium">
                                         {media_type === "tv" ? `S${selectedSeason} E${selectedEpisode}` : "Now Playing"}
                                     </span>
                                 </div>
                             </div>
-
-                            {/* Center Controls - Season/Episode */}
                             <div className="flex items-center gap-2">
                                 {media_type === "tv" && validSeasons.length > 0 && (
                                     <>
-                                        {/* Season Selector */}
                                         <div className="relative">
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     setShowSeasonDropdown(!showSeasonDropdown);
                                                     setShowEpisodeDropdown(false);
-                                                    setShowSourceDropdown(false);
                                                 }}
                                                 className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm px-3 py-2 rounded-lg text-white text-sm transition-all border border-white/10"
                                             >
@@ -267,7 +197,7 @@ const VideoPlay = ({
                                                 <IoChevronDown className={`w-4 h-4 transition-transform ${showSeasonDropdown ? 'rotate-180' : ''}`} />
                                             </button>
                                             {showSeasonDropdown && (
-                                                <div className="absolute top-full left-0 mt-2 bg-neutral-900/95 backdrop-blur-xl rounded-xl shadow-2xl max-h-64 overflow-y-auto z-30 min-w-[160px] border border-white/10">
+                                                <div className="absolute top-full left-0 mt-2 bg-black/95 backdrop-blur-xl rounded-xl shadow-2xl max-h-64 overflow-y-auto z-30 min-w-[160px] border border-white/10">
                                                     {validSeasons.map((season) => (
                                                         <button
                                                             key={season.season_number}
@@ -276,26 +206,26 @@ const VideoPlay = ({
                                                                 setSelectedEpisode(1);
                                                                 setShowSeasonDropdown(false);
                                                             }}
-                                                            className={`w-full text-left px-4 py-3 text-sm hover:bg-white/10 transition-colors flex items-center justify-between ${
-                                                                selectedSeason === season.season_number ? 'bg-primary text-white' : 'text-white/80'
+                                                            className={`w-full text-left px-4 py-3 text-sm transition-colors flex items-center justify-between ${
+                                                                selectedSeason === season.season_number
+                                                                    ? 'bg-white hover:bg-white'
+                                                                    : 'text-white/80 hover:bg-white/25 hover:text-white'
                                                             }`}
+                                                            style={selectedSeason === season.season_number ? { color: '#000' } : undefined}
                                                         >
                                                             <span>Season {season.season_number}</span>
-                                                            <span className="text-white/50 text-xs">{season.episode_count} ep</span>
+                                                            <span className={`text-xs ${selectedSeason === season.season_number ? 'text-black/70' : 'text-white/50'}`}>{season.episode_count} ep</span>
                                                         </button>
                                                     ))}
                                                 </div>
                                             )}
                                         </div>
-
-                                        {/* Episode Selector */}
                                         <div className="relative">
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     setShowEpisodeDropdown(!showEpisodeDropdown);
                                                     setShowSeasonDropdown(false);
-                                                    setShowSourceDropdown(false);
                                                 }}
                                                 className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm px-3 py-2 rounded-lg text-white text-sm transition-all border border-white/10"
                                             >
@@ -303,7 +233,7 @@ const VideoPlay = ({
                                                 <IoChevronDown className={`w-4 h-4 transition-transform ${showEpisodeDropdown ? 'rotate-180' : ''}`} />
                                             </button>
                                             {showEpisodeDropdown && (
-                                                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-neutral-900/95 backdrop-blur-xl rounded-xl shadow-2xl max-h-64 overflow-y-auto z-30 min-w-[140px] border border-white/10">
+                                                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-black/95 backdrop-blur-xl rounded-xl shadow-2xl max-h-64 overflow-y-auto z-30 min-w-[140px] border border-white/10">
                                                     {episodes.map((ep) => (
                                                         <button
                                                             key={ep}
@@ -311,9 +241,12 @@ const VideoPlay = ({
                                                                 setSelectedEpisode(ep);
                                                                 setShowEpisodeDropdown(false);
                                                             }}
-                                                            className={`w-full text-left px-4 py-2.5 text-sm hover:bg-white/10 transition-colors ${
-                                                                selectedEpisode === ep ? 'bg-primary text-white' : 'text-white/80'
+                                                            className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                                                                selectedEpisode === ep
+                                                                    ? 'bg-white text-black hover:bg-white'
+                                                                    : 'text-white/80 hover:bg-white/25 hover:text-white'
                                                             }`}
+                                                            style={selectedEpisode === ep ? { color: '#000' } : undefined}
                                                         >
                                                             Episode {ep}
                                                         </button>
@@ -324,69 +257,15 @@ const VideoPlay = ({
                                     </>
                                 )}
 
-                                {/* Source Selector */}
-                                <div className="relative">
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setShowSourceDropdown(!showSourceDropdown);
-                                            setShowSeasonDropdown(false);
-                                            setShowEpisodeDropdown(false);
-                                        }}
-                                        className="flex items-center gap-1.5 bg-gradient-to-r from-primary/80 to-red-500/80 hover:from-primary hover:to-red-500 backdrop-blur-sm px-3 py-2 rounded-lg text-white text-sm transition-all"
-                                    >
-                                        <IoServer className="w-4 h-4" />
-                                        <span className="hidden sm:inline">{selectedSource.icon} {selectedSource.name}</span>
-                                        <span className="sm:hidden">{selectedSource.icon}</span>
-                                        <IoChevronDown className={`w-4 h-4 transition-transform ${showSourceDropdown ? 'rotate-180' : ''}`} />
-                                    </button>
-                                    {showSourceDropdown && (
-                                        <div className="absolute top-full right-0 mt-2 bg-neutral-900/95 backdrop-blur-xl rounded-xl shadow-2xl z-30 min-w-[220px] border border-white/10 overflow-hidden">
-                                            <div className="px-4 py-3 bg-white/5 border-b border-white/10">
-                                                <div className="flex items-center gap-2 text-xs text-white/60">
-                                                    <IoLanguage className="w-4 h-4" />
-                                                    <span>Switch for different languages</span>
-                                                </div>
-                                            </div>
-                                            {VIDEO_SOURCES.map((source) => (
-                                                <button
-                                                    key={source.id}
-                                                    onClick={() => {
-                                                        setSelectedSource(source);
-                                                        setShowSourceDropdown(false);
-                                                    }}
-                                                    className={`w-full text-left px-4 py-3 text-sm hover:bg-white/10 transition-colors flex items-center justify-between ${
-                                                        selectedSource.id === source.id ? 'bg-primary text-white' : 'text-white/80'
-                                                    }`}
-                                                >
-                                                    <span className="flex items-center gap-2">
-                                                        <span className="text-lg">{source.icon}</span>
-                                                        <span>{source.name}</span>
-                                                    </span>
-                                                    {source.badge && (
-                                                        <span className="bg-green-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">
-                                                            {source.badge}
-                                                        </span>
-                                                    )}
-                                                </button>
-                                            ))}
-                    </div>
-                )}
-                                </div>
                             </div>
-
-                            {/* Right Controls */}
                             <div className="flex items-center gap-1">
-                                {/* Theater Mode */}
                                 <button 
                                     onClick={() => setIsTheaterMode(!isTheaterMode)}
-                                    className={`p-2 rounded-full transition-all ${isTheaterMode ? 'text-primary bg-white/10' : 'text-white/80 hover:text-white hover:bg-white/10'}`}
+                                    className={`p-2 rounded-full transition-all ${isTheaterMode ? 'text-white bg-white/10' : 'text-white/80 hover:text-white hover:bg-white/10'}`}
                                     title="Theater Mode (T)"
                                 >
                                     {isTheaterMode ? <IoEyeOff className="w-5 h-5" /> : <IoEye className="w-5 h-5" />}
                                 </button>
-
-                                {/* Fullscreen */}
                                 <button 
                                     onClick={toggleFullscreen}
                                     className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-full transition-all"
@@ -398,9 +277,7 @@ const VideoPlay = ({
                         </div>
                     </div>
                 </div>
-
-                {/* Video Player - Full Screen */}
-                <div className="flex-1 relative">
+                <div className="flex-1 min-h-0 relative bg-black">
                     {isLoading && (
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black z-10 gap-4">
                             <div className="relative">
@@ -421,8 +298,6 @@ const VideoPlay = ({
                         onLoad={() => setIsLoading(false)}
                     />
                 </div>
-
-                {/* Bottom Controls Bar */}
                 <div 
                     className={`absolute bottom-0 left-0 right-0 z-20 transition-all duration-300 ${
                         showControls ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
@@ -430,7 +305,6 @@ const VideoPlay = ({
                 >
                     <div className="bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 pt-8">
                         <div className="flex items-center justify-between max-w-screen-2xl mx-auto">
-                            {/* Episode Navigation */}
                             {media_type === "tv" ? (
                                 <>
                                     <button
@@ -467,11 +341,8 @@ const VideoPlay = ({
                         </div>
                     </div>
                 </div>
-
-                {/* Quick Episode Navigation Overlay (for TV) */}
                 {media_type === "tv" && showControls && (
                     <>
-                        {/* Left Arrow */}
                         {canGoPrev && (
                             <button
                                 onClick={handlePrevEpisode}
@@ -480,8 +351,6 @@ const VideoPlay = ({
                                 <IoChevronBack className="w-8 h-8" />
                             </button>
                         )}
-                        
-                        {/* Right Arrow */}
                         {canGoNext && (
                             <button
                                 onClick={handleNextEpisode}

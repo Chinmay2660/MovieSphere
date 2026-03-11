@@ -60,8 +60,8 @@ const CastCarousel = ({ castData, imageURL }) => {
                                 />
                             )}
                             <div className="text-center mt-2">
-                                <p className="text-neutral-400 font-bold text-xs lg:text-sm">{item?.name.split(" ")[0]}</p>
-                                <p className="text-neutral-400 font-bold text-xs lg:text-sm">{item?.name.split(" ")[1]}</p>
+                                <p className="text-white/70 font-bold text-xs lg:text-sm">{item?.name.split(" ")[0]}</p>
+                                <p className="text-white/70 font-bold text-xs lg:text-sm">{item?.name.split(" ")[1]}</p>
                             </div>
                         </div>
                     ))}

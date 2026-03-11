@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { IoChevronDown } from "react-icons/io5";
 
 const FAQCard = (props) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -10,20 +11,14 @@ const FAQCard = (props) => {
 
     return (
         <div
-            className="space-y-3 mt-5 overflow-hidden bg-background rounded-lg p-4 border border-secondary cursor-pointer"
+            className="space-y-3 overflow-hidden bg-background rounded-lg p-4 border border-white/20 hover:border-primary cursor-pointer mb-0 transition-colors duration-300"  
             onClick={handleToggle}
         >
-            <h4 className="flex items-center justify-between text-lg text-text font-bold">
+            <h4 className="flex items-center justify-between text-lg text-text font-bold mb-0">
                 {props.faqsList.q}
-                {isOpen ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-text ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 12H4" />
-                    </svg>
-                ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-text ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                )}
+                <IoChevronDown
+                    className={`h-5 w-5 text-text ml-2 flex-shrink-0 transition-transform duration-300 ${isOpen ? '' : '-rotate-90'}`}
+                />
             </h4>
             <motion.div
                 initial={{ height: 0, opacity: 0 }}

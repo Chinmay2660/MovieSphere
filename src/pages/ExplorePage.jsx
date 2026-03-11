@@ -1,6 +1,7 @@
 import { useParams, useSearchParams } from "react-router-dom";
 import axiosInstance from "../lib/axiosConfig";
 import { useEffect, useState, useCallback, useRef } from "react";
+import { motion } from "framer-motion";
 import Card from "../components/Home/Card";
 import { setImageURL, setGenres } from "../reduxStore/Reducer/movieSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,14 +18,12 @@ const ExplorePage = () => {
   const [error, setError] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
   
-  // Applied filters (actually used for fetching)
   const [appliedSortBy, setAppliedSortBy] = useState(searchParams.get('sort_by') || 'popularity.desc');
   const [appliedGenres, setAppliedGenres] = useState(() => {
     const genreParam = searchParams.get('genres');
     return genreParam ? genreParam.split(',') : [];
   });
   
-  // Temporary filters (in the popover, not yet applied)
   const [tempSortBy, setTempSortBy] = useState(appliedSortBy);
   const [tempGenres, setTempGenres] = useState(appliedGenres);
   
@@ -46,7 +45,6 @@ const ExplorePage = () => {
     { value: 'revenue.desc', label: 'Highest Revenue' },
   ];
 
-  // Sync temp filters when popover opens
   useEffect(() => {
     if (showFilters) {
       setTempSortBy(appliedSortBy);
@@ -54,7 +52,6 @@ const ExplorePage = () => {
     }
   }, [showFilters, appliedSortBy, appliedGenres]);
 
-  // Close popover when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (filterRef.current && !filterRef.current.contains(event.target)) {
@@ -66,7 +63,6 @@ const ExplorePage = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Close genre dropdown when clicking outside of it (but inside the filter popover)
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (genreDropdownRef.current && !genreDropdownRef.current.contains(event.target)) {
@@ -142,7 +138,6 @@ const ExplorePage = () => {
   };
 
   const applyFilters = () => {
-    // Apply temp filters to actual filters
     setAppliedSortBy(tempSortBy);
     setAppliedGenres([...tempGenres]);
     setPageNo(1);
@@ -151,7 +146,6 @@ const ExplorePage = () => {
     setShowFilters(false);
     setGenreDropdownOpen(false);
     
-    // Update URL params
     const newParams = new URLSearchParams();
     if (tempSortBy !== 'popularity.desc') newParams.set('sort_by', tempSortBy);
     if (tempGenres.length > 0) newParams.set('genres', tempGenres.join(','));
@@ -174,13 +168,10 @@ const ExplorePage = () => {
   const handleGenreQuickFilter = (genreId) => {
     let newGenres;
     if (!genreId) {
-      // "All" button - clear all genres
       newGenres = [];
     } else if (appliedGenres.includes(genreId)) {
-      // Remove genre if already selected
       newGenres = appliedGenres.filter(g => g !== genreId);
     } else {
-      // Add genre
       newGenres = [...appliedGenres, genreId];
     }
     
@@ -280,40 +271,36 @@ const ExplorePage = () => {
   return (
     <div className="pt-16 min-h-screen">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="flex flex-row justify-between items-center gap-4 mt-10 mb-6">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold truncate">{getHeading()}</h1>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold truncate text-white">{getHeading()}</h1>
           
-          {/* Filter Button & Popover */}
           <div className="relative flex-shrink-0" ref={filterRef}>
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all shadow-lg ${
                 showFilters || hasActiveFilters
-                  ? 'bg-primary text-white shadow-primary/25'
-                  : 'bg-neutral-800/80 backdrop-blur-sm text-white hover:bg-neutral-700 border border-neutral-700'
+                  ? 'bg-white text-black shadow-lg'
+                  : 'bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 border border-white/20'
               }`}
             >
               <IoFilter className="w-5 h-5" />
               <span>Filters</span>
               {activeFilterCount > 0 && (
-                <span className="flex items-center justify-center w-5 h-5 text-xs font-bold bg-white text-primary rounded-full">
+                <span className="flex items-center justify-center w-5 h-5 text-xs font-bold bg-black text-white rounded-full">
                   {activeFilterCount}
                 </span>
               )}
               <IoChevronDown className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
             </button>
 
-            {/* Filter Popover with Dropdowns */}
             {showFilters && (
-              <div className="absolute right-0 top-full mt-2 w-72 max-w-[calc(100vw-2rem)] bg-neutral-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-neutral-700/50 z-50">
-                {/* Popover Header */}
-                <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-700/50 bg-neutral-800/50 rounded-t-2xl">
+              <div className="absolute right-0 top-full mt-2 w-72 max-w-[calc(100vw-2rem)] bg-black/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 z-50">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-white/20 bg-white/5 rounded-t-2xl">
                   <h3 className="font-semibold text-white text-sm">Filters</h3>
                   {(hasActiveFilters || hasPendingChanges) && (
                     <button
                       onClick={clearFilters}
-                      className="text-xs text-neutral-400 hover:text-white transition-colors flex items-center gap-1"
+                      className="text-xs text-white/70 hover:text-white transition-colors flex items-center gap-1"
                     >
                       <IoClose className="w-3.5 h-3.5" />
                       Clear
@@ -321,41 +308,37 @@ const ExplorePage = () => {
                   )}
                 </div>
 
-                {/* Popover Content - Dropdowns */}
                 <div className="p-4 space-y-4 overflow-visible">
-                  {/* Sort By Dropdown */}
                   <div>
-                    <label className="block text-xs font-medium text-neutral-400 mb-1.5">
+                    <label className="block text-xs font-medium text-white/60 mb-1.5">
                       Sort By
                     </label>
                     <div className="relative">
                       <select
                         value={tempSortBy}
                         onChange={(e) => setTempSortBy(e.target.value)}
-                        className="w-full appearance-none bg-neutral-800 text-white text-sm rounded-lg px-4 py-2.5 pr-10 border border-neutral-700 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all cursor-pointer"
+                        className="w-full appearance-none bg-black/60 text-white text-sm rounded-lg px-4 py-2.5 pr-10 border border-white/20 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all cursor-pointer"
                       >
-                        {sortOptions.map((option) => (
-                          <option key={option.value} value={option.value}>
+                        {sortOptions.map((option, optIdx) => (
+                          <option key={option.value || `sort-${optIdx}`} value={option.value}>
                             {option.label}
                           </option>
                         ))}
                       </select>
-                      <IoChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
+                      <IoChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
                     </div>
                   </div>
 
-                  {/* Genre Multi-Select Dropdown */}
                   <div className="relative" ref={genreDropdownRef}>
-                    <label className="block text-xs font-medium text-neutral-400 mb-1.5">
+                    <label className="block text-xs font-medium text-white/60 mb-1.5">
                       Genres
                     </label>
-                    {/* Dropdown Trigger */}
                     <button
                       type="button"
                       onClick={() => setGenreDropdownOpen(!genreDropdownOpen)}
-                      className="w-full flex items-center justify-between bg-neutral-800 text-white text-sm rounded-lg px-4 py-2.5 border border-neutral-700 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all cursor-pointer text-left"
+                      className="w-full flex items-center justify-between bg-black/60 text-white text-sm rounded-lg px-4 py-2.5 border border-white/20 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all cursor-pointer text-left"
                     >
-                      <span className={tempGenres.length > 0 ? 'text-white' : 'text-neutral-400'}>
+                      <span className={tempGenres.length > 0 ? 'text-white' : 'text-white/60'}>
                         {tempGenres.length === 0 
                           ? 'Select genres...' 
                           : tempGenres.length === 1
@@ -363,21 +346,19 @@ const ExplorePage = () => {
                             : `${tempGenres.length} genres selected`
                         }
                       </span>
-                      <IoChevronDown className={`w-4 h-4 text-neutral-400 transition-transform ${genreDropdownOpen ? 'rotate-180' : ''}`} />
+                      <IoChevronDown className={`w-4 h-4 text-white/60 transition-transform ${genreDropdownOpen ? 'rotate-180' : ''}`} />
                     </button>
 
-                    {/* Dropdown Menu */}
                     {genreDropdownOpen && (
-                      <div className="absolute left-0 right-0 top-full mt-1 bg-neutral-900 rounded-lg border border-neutral-700 shadow-2xl z-[60]">
-                        {/* Genre list with checkboxes */}
+                      <div className="absolute left-0 right-0 top-full mt-1 bg-black/95 rounded-lg border border-white/20 shadow-2xl z-[60]">
                         <div className="max-h-56 overflow-y-auto py-2">
                           {genres.map((genre) => (
                             <label 
                               key={genre.id} 
                               className={`flex items-center gap-2.5 px-3 py-2 cursor-pointer transition-colors ${
                                 tempGenres.includes(genre.id.toString()) 
-                                  ? 'bg-primary/10 text-primary' 
-                                  : 'hover:bg-neutral-800 text-white'
+                                  ? 'bg-white/20 text-white' 
+                                  : 'hover:bg-white/10 text-white'
                               }`}
                             >
                               <input
@@ -390,20 +371,18 @@ const ExplorePage = () => {
                                     setTempGenres(tempGenres.filter(g => g !== genre.id.toString()));
                                   }
                                 }}
-                                className="w-4 h-4 rounded border-neutral-600 text-primary bg-neutral-700 focus:ring-primary focus:ring-offset-0 cursor-pointer accent-primary"
+                                className="w-4 h-4 rounded border-white/30 text-primary bg-black/40 focus:ring-primary focus:ring-offset-0 cursor-pointer accent-primary"
                               />
                               <span className="text-sm">{genre.name}</span>
                             </label>
                           ))}
                         </div>
-                        
-                        {/* Clear selection button */}
                         {tempGenres.length > 0 && (
-                          <div className="px-3 py-2 border-t border-neutral-700">
+                          <div className="px-3 py-2 border-t border-white/20">
                             <button
                               type="button"
                               onClick={() => setTempGenres([])}
-                              className="text-xs text-neutral-400 hover:text-primary transition-colors"
+                              className="text-xs text-white/70 hover:text-white transition-colors"
                             >
                               Clear all ({tempGenres.length})
                             </button>
@@ -413,34 +392,32 @@ const ExplorePage = () => {
                     )}
                   </div>
                 </div>
-
-                {/* Popover Footer */}
-                <div className="px-4 py-3 border-t border-neutral-700/50 bg-neutral-800/30 rounded-b-2xl">
-                  <button
+                <div className="px-4 py-3 border-t border-white/20 bg-white/5 rounded-b-2xl">
+                  <motion.button
                     onClick={applyFilters}
                     disabled={!hasPendingChanges}
-                    className={`w-full font-medium py-2.5 px-4 rounded-lg transition-all text-sm ${
+                    whileHover={hasPendingChanges ? { scale: 1.1 } : undefined}
+                    whileTap={hasPendingChanges ? { scale: 0.9 } : undefined}
+                    className={`w-full font-medium py-2.5 px-4 rounded-xl shadow-lg transition-all duration-200 text-sm ${
                       hasPendingChanges
-                        ? 'bg-primary hover:bg-primary/90 text-white'
-                        : 'bg-neutral-700 text-neutral-400 cursor-not-allowed'
+                        ? 'bg-white hover:bg-white/90 text-black active:scale-[0.98]'
+                        : 'bg-white/10 text-white/50 cursor-not-allowed'
                     }`}
                   >
                     {hasPendingChanges ? 'Apply Filters' : 'No Changes'}
-                  </button>
+                  </motion.button>
                 </div>
               </div>
             )}
           </div>
         </div>
-
-        {/* Genre Quick Filters */}
         <div className="flex gap-2 overflow-x-auto pb-4 mb-6 scrollbar-none">
           <button
             onClick={() => handleGenreQuickFilter('')}
             className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
               appliedGenres.length === 0
-                ? 'bg-primary text-white shadow-lg shadow-primary/25'
-                : 'bg-neutral-800/80 text-neutral-300 hover:bg-neutral-700 border border-neutral-700/50'
+                ? 'bg-white text-black shadow-lg'
+                : 'bg-white/10 text-white hover:bg-white/20 border border-white/20'
             }`}
           >
             All
@@ -451,21 +428,19 @@ const ExplorePage = () => {
               onClick={() => handleGenreQuickFilter(genre.id.toString())}
               className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
                 appliedGenres.includes(genre.id.toString())
-                  ? 'bg-primary text-white shadow-lg shadow-primary/25'
-                  : 'bg-neutral-800/80 text-neutral-300 hover:bg-neutral-700 border border-neutral-700/50'
+                  ? 'bg-white text-black shadow-lg'
+                  : 'bg-white/10 text-white hover:bg-white/20 border border-white/20'
               }`}
             >
               {genre.name}
             </button>
           ))}
         </div>
-
-        {/* Active Filters Display */}
         {hasActiveFilters && (
           <div className="flex items-center gap-2 mb-6 flex-wrap">
-            <span className="text-neutral-500 text-sm">Active:</span>
+            <span className="text-white/70 text-sm">Active:</span>
             {appliedSortBy !== 'popularity.desc' && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/20 text-primary rounded-full text-sm border border-primary/30">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 text-white rounded-full text-sm border border-white/30">
                 {sortOptions.find(o => o.value === appliedSortBy)?.label}
                 <button 
                   onClick={removeAppliedSort}
@@ -475,8 +450,8 @@ const ExplorePage = () => {
                 </button>
               </span>
             )}
-            {appliedGenres.map(genreId => (
-              <span key={genreId} className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/20 text-primary rounded-full text-sm border border-primary/30">
+            {appliedGenres.map((genreId, gIdx) => (
+              <span key={`genre-${String(genreId)}-${gIdx}`} className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 text-white rounded-full text-sm border border-white/30">
                 {genres.find(g => g.id.toString() === genreId)?.name}
                 <button 
                   onClick={() => removeAppliedGenre(genreId)}
@@ -490,12 +465,10 @@ const ExplorePage = () => {
         )}
 
         {error && (
-          <div className="text-red-500 text-center mb-4 p-4 bg-red-500/10 rounded-lg">
+          <div className="text-tertiary text-center mb-4 p-4 bg-tertiary/10 rounded-lg">
             {error}
           </div>
         )}
-
-        {/* Results Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 lg:gap-6">
           {data.map((item, index) => (
             <div key={`${item.id}-${index}`} className="flex justify-center">
@@ -503,31 +476,25 @@ const ExplorePage = () => {
             </div>
           ))}
         </div>
-
-        {/* Loading State */}
         {loading && (
           <div className="flex justify-center my-8">
             <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary"></div>
           </div>
         )}
-
-        {/* No Results */}
         {!loading && data.length === 0 && (
           <div className="text-center py-16">
-            <p className="text-neutral-400 text-lg">No results found</p>
+            <p className="text-white/70 text-lg">No results found</p>
             <button
               onClick={clearFilters}
-              className="mt-4 text-primary hover:underline"
+              className="mt-4 text-white hover:underline"
             >
               Clear filters and try again
             </button>
           </div>
         )}
-
-        {/* End of Results */}
         {!loading && pageNo >= totalPageNo && data.length > 0 && (
           <div className="text-center py-8">
-            <p className="text-neutral-500">You've reached the end</p>
+            <p className="text-white/50">You've reached the end</p>
           </div>
         )}
       </div>

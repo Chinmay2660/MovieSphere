@@ -3,7 +3,8 @@ import App from "../App";
 import LandingPage from "../pages/LandingPage";
 import DetailsPage from "../pages/DetailsPage";
 import ExplorePage from "../pages/ExplorePage";
-import SearchPage from '../pages/SearchPage'
+import SearchPage from '../pages/SearchPage';
+import WatchlistPage from '../pages/WatchlistPage';
 import Home from "../pages/Home";
 
 const router = createBrowserRouter([
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
             {
                 path: "/search",
                 element: <SearchPage />,
+            },
+            {
+                path: "/watchlist",
+                element: <WatchlistPage />,
             },
         ]
     },

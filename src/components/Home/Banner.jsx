@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
 import { IoPlay, IoInformationCircleOutline, IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import VideoPlay from "../VideoPlay";
+import { getRatingColor } from "../../lib/utils";
 
 const Banner = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -58,24 +60,26 @@ const Banner = () => {
                 {data?.title ? data?.title : data?.original_title ? data?.original_title : data?.name}
               </h2>
               <p className="text-ellipsis line-clamp-3 my-2 text-white drop-shadow-lg">{data?.overview}</p>
-              <div className="flex items-center gap-4">
-                {data?.vote_average && data?.vote_average > 0 && <p>Rating: {Number(data?.vote_average).toFixed(1)}+</p>}
+              <div className="flex items-center gap-4 text-white">
+                {data?.vote_average && data?.vote_average > 0 && <p className={getRatingColor(data.vote_average).text}>Rating: {Number(data?.vote_average).toFixed(1)}+</p>}
                 {data?.popularity && data?.popularity > 0 && <span>|</span>}
-                {data?.popularity && data?.popularity > 0 && <p>Views: {Number(data?.popularity).toFixed(0)}+</p>}
+                {data?.popularity && data?.popularity > 0 && <p className="text-green-400">Views: {Number(data?.popularity).toFixed(0)}+</p>}
               </div>
               <div className="flex flex-wrap gap-6 mt-8">
-                <button
+                <motion.button
                   onClick={() => handleVideoPlay(data)}
-                  className="flex items-center gap-2 justify-center w-[12rem] lg:w-[12rem] py-3 px-6 text-center text-black text-base font-bold bg-text hover:bg-secondary active:shadow-none rounded-lg shadow"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="flex items-center gap-2 justify-center w-[12rem] lg:w-[12rem] py-3 px-6 text-center text-black text-base font-bold bg-white hover:bg-white/90 active:scale-[0.98] rounded-xl shadow-lg transition-all duration-200"
                 >
-                  <IoPlay className="w-6 h-6 transition-colors duration-300" />
+                  <IoPlay className="w-6 h-6" />
                   <span>Play Now</span>
-                </button>
+                </motion.button>
                 <button
                   onClick={() => navigate("/" + data?.media_type + "/" + data?.id)}
-                  className="flex items-center gap-2 justify-center w-[12rem] lg:w-[12rem] py-3 px-6 text-center text-white text-base font-bold bg-black hover:bg-secondary active:shadow-none rounded-lg shadow"
+                  className="flex items-center gap-2 justify-center w-[12rem] lg:w-[12rem] py-3 px-6 text-center text-white text-base font-bold bg-black border border-white/30 hover:border-white/60 hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] rounded-xl shadow-lg transition-all duration-200"
                 >
-                  <IoInformationCircleOutline className="w-6 h-6 text-blue-500 transition-colors duration-300" />
+                  <IoInformationCircleOutline className="w-6 h-6 text-blue-400" />
                   <span>More Details</span>
                 </button>
               </div>

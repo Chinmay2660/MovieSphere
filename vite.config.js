@@ -12,6 +12,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      '/tmdb-images': {
+        target: 'https://image.tmdb.org',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/tmdb-images/, ''),
+      },
     },
   },
 })

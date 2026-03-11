@@ -4,7 +4,7 @@ import { IoSearchOutline, IoMenuOutline, IoCloseOutline } from 'react-icons/io5'
 import { useNavigate, useLocation } from 'react-router-dom';
 import { navigation } from '../../lib/constants';
 import HamburgerMenu from './HamburgerMenu';
-import { debounce } from "../../lib/utils";
+import { debounce, sanitizeSearchQuery } from "../../lib/utils";
 
 const Header = () => {
     const { scrollY } = useScroll();
@@ -42,7 +42,8 @@ const Header = () => {
 
     const handleSearchChange = debounce((value) => {
         if (value) {
-            navigate(`/search?q=${encodeURIComponent(value)}`);
+            const sanitized = sanitizeSearchQuery(String(value).trim() || value);
+            if (sanitized) navigate(`/search?q=${encodeURIComponent(sanitized)}`);
         } else {
             navigate('/home');
         }
@@ -56,7 +57,6 @@ const Header = () => {
 
     return (
         <AnimatePresence>
-            {/* Desktop Header */}
             <motion.div
                 initial={{ opacity: 1, y: -100 }}
                 animate={{ y: visible ? 0 : -100, opacity: visible ? 1 : 0 }}
@@ -70,7 +70,7 @@ const Header = () => {
                             <button
                                 key={idx}
                                 onClick={() => navigate(item.path)}
-                                className={`text-sm font-semibold px-3 py-1 rounded-full transition-transform duration-300 ${isActive ? 'bg-white text-black transform scale-105' : 'text-gray-400 hover:text-white'}`}
+                                className={`text-sm font-semibold px-3 py-1 rounded-full transition-transform duration-300 ${isActive ? 'bg-white text-black transform scale-105' : 'text-white/70 hover:text-white'}`}
                             >
                                 {item.title}
                             </button>
@@ -92,21 +92,20 @@ const Header = () => {
                             value={searchQuery}
                             onChange={handleInputChange}
                             placeholder="Search..."
-                            className="p-2 rounded-full border border-gray-700 bg-gray-800 text-white"
+                            className="p-2 rounded-full border border-white/20 bg-black/60 text-white"
                             autoFocus
                         />
                     </motion.div>
                 ) : (
                     <button
                         onClick={() => setIsSearchOpen(true)}
-                        className={`p-2 rounded-full transition-transform duration-300 ${location.pathname === '/search' ? 'bg-white text-black transform scale-105' : 'text-gray-400 hover:text-white'}`}
+                        className={`p-2 rounded-full transition-transform duration-300 ${location.pathname === '/search' ? 'bg-white text-black transform scale-105' : 'text-white/70 hover:text-white'}`}
                     >
                         <IoSearchOutline className="text-xl font-bold" />
                     </button>
                 )}
             </motion.div>
 
-            {/* Mobile Header */}
             <motion.div
                 initial={{ opacity: 1, y: 0 }}
                 animate={{ opacity: visible ? 1 : 0, y: visible ? 0 : -100 }}
@@ -122,7 +121,7 @@ const Header = () => {
                     {!isSearchOpen ? (
                         <button
                             onClick={() => setIsSearchOpen(true)}
-                            className={`p-2 rounded-full transition-transform duration-300 absolute right-4 top-1/2 transform -translate-y-1/2 ${location.pathname === '/search' ? 'bg-white text-black transform scale-105' : 'text-gray-400 hover:text-white'}`}
+                            className={`p-2 rounded-full transition-transform duration-300 absolute right-4 top-1/2 transform -translate-y-1/2 ${location.pathname === '/search' ? 'bg-white text-black transform scale-105' : 'text-white/70 hover:text-white'}`}
                         >
                             <IoSearchOutline className="text-2xl font-bold" />
                         </button>
@@ -140,7 +139,7 @@ const Header = () => {
                                 value={searchQuery}
                                 onChange={handleInputChange}
                                 placeholder="Search..."
-                                className="w-full p-2 rounded-full border border-gray-700 bg-gray-800 text-white"
+                                className="w-full p-2 rounded-full border border-white/20 bg-black/60 text-white"
                                 autoFocus
                             />
                         </motion.div>

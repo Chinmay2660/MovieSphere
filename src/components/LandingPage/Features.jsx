@@ -8,7 +8,7 @@ const Features = () => {
 
     return (
         <section ref={ref} className="pt-14 bg-background">
-            <div className="max-w-screen-xl mx-auto px-4 text-secondary md:px-8">
+            <div className="max-w-screen-xl mx-auto px-4 text-text md:px-8">
                 <div className="relative max-w-2xl mx-auto sm:text-center">
                     <motion.div
                         className="relative z-10"
@@ -42,13 +42,13 @@ const Features = () => {
                         {features.map((item, idx) => (
                             <motion.li
                                 key={idx}
-                                className="bg-background space-y-3 p-4 border border-secondary rounded-lg"
+                                className="group bg-background space-y-3 p-4 border border-white/20 rounded-lg transition-all duration-300 hover:border-primary hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02]"
                                 variants={{
                                     hidden: { opacity: 0, y: 20 },
                                     visible: { opacity: 1, y: 0 }
                                 }}
                             >
-                                <div className="text-[#f8485e] pb-3">
+                                <div className="text-white/70 pb-3 transition-colors duration-300 group-hover:text-primary">
                                     {item.icon}
                                 </div>
                                 <h4 className="text-lg text-text font-bold">

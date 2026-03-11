@@ -4,6 +4,7 @@ const initialState = {
   bannerData: [],
   imageURL: '',
   upcomingData: [],
+  popularMoviesData: [],
   popularTvData: [],
   nowPlayingData: [],
   topRatedMovies: [],
@@ -26,10 +27,19 @@ export const movieSlice = createSlice({
       state.bannerData = action.payload
     },
     setImageURL: (state, action) => {
-      state.imageURL = action.payload
+      const url = action.payload
+      state.imageURL =
+        typeof import.meta !== 'undefined' &&
+        import.meta.env?.DEV &&
+        url.startsWith('https://image.tmdb.org')
+          ? url.replace('https://image.tmdb.org', '/tmdb-images')
+          : url
     },
     setUpcomingData: (state, action) => {
       state.upcomingData = action.payload
+    },
+    setPopularMoviesData: (state, action) => {
+      state.popularMoviesData = action.payload
     },
     setPopularTvData: (state, action) => {
       state.popularTvData = action.payload
@@ -65,6 +75,7 @@ export const {
   setBannerData, 
   setImageURL, 
   setUpcomingData, 
+  setPopularMoviesData,
   setPopularTvData, 
   setNowPlayingData,
   setTopRatedMovies,

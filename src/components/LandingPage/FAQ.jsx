@@ -8,14 +8,14 @@ const FAQ = () => {
     const isInView = useInView(ref, { once: true });
 
     return (
-        <section ref={ref} className="leading-relaxed max-w-screen-xl mt-10 mb-10 mx-auto px-4 md:px-8">
+        <section ref={ref} className="leading-relaxed max-w-screen-xl mt-10 mb-6 pb-6 mx-auto px-4 md:px-8">
             <div className="space-y-3 text-center">
                 <h1 className="text-5xl text-text font-semibold">
                     Frequently Asked Questions
                 </h1>
             </div>
             <motion.div
-                className="mt-14 max-w-2xl mx-auto"
+                className="mt-8 max-w-2xl mx-auto space-y-3"
                 initial="hidden"
                 animate={isInView ? "visible" : "hidden"}
                 variants={{

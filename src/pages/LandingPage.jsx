@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import Features from "../components/LandingPage/Features";
 import HeroSection from "../components/LandingPage/HeroSection";
+import HowItWorks from "../components/LandingPage/HowItWorks";
 import FAQ from "../components/LandingPage/FAQ";
-// import CTA from "../components/LandingPage/CTA";
 import backgroundImg from '../assets/background.webp';
 
 const LandingPageMain = () => {
@@ -26,8 +26,8 @@ const LandingPageMain = () => {
       )}
       <HeroSection />
       <Features />
+      <HowItWorks />
       <FAQ />
-      {/* <CTA /> */}
     </>
   );
 };

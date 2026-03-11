@@ -19,11 +19,11 @@ const HeroSection = () => {
                     transition={{ delay: 0.2, duration: 1, ease: "easeOut" }}
                     className="text-white font-bold text-4xl md:text-6xl mb-4"
                 >
-                    <span className="block mb-2">MovieSphere</span>
+                    <span className="block mb-2 text-primary">MovieSphere</span>
                     <motion.span
-                        className="text-tertiary"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
+                        className="text-white/85"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                     >
                         Search TV Shows, Movies Online
                     </motion.span>
@@ -36,9 +36,9 @@ const HeroSection = () => {
                     whileTap={{ scale: 0.9 }}
                     className="flex justify-center"
                 >
-                    <a href="/home" className="flex items-center gap-2 py-3 px-6 text-center text-black text-base font-bold bg-text hover:bg-secondary active:shadow-none rounded-lg shadow">
+                    <a href="/home" className="flex items-center gap-2 py-3 px-6 text-center text-base font-bold bg-white hover:bg-white/90 active:scale-[0.98] rounded-xl shadow-lg transition-all duration-200 !text-black">
                         <span>Watch Now</span>
-                        <IoArrowForwardOutline className="text-black w-6 h-6" />
+                        <IoArrowForwardOutline className="w-6 h-6 shrink-0" style={{ color: 'black' }} />
                     </a>
                 </motion.div>
             </motion.div>

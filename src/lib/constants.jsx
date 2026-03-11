@@ -4,8 +4,7 @@ export const navigation = [
     { title: "Home", path: "/home" },
     { title: "TV Shows", path: "/tv" },
     { title: "Movies", path: "/movie" },
-    // { title: "Login", path: "/login" },
-    // { title: "Sign Up", path: "/signup" },
+    { title: "Watchlist", path: "/watchlist" },
 ];
 
 export const features = [
@@ -74,10 +73,6 @@ export const faqsList = [
         q: "Is Movie Sphere really free?",
         a: "Yes! Movie Sphere is a free (and legal) video streaming application. To keep our service free and legal, we include adverts, which monetise the content that our partners, such as MGM, Lionsgate, and Paramount, provide to us!"
     },
-    // {
-    //     q: "Is Movie Sphere really free?",
-    //     a: "Yes! Movie Sphere is a free (and legal) video streaming application. To keep our service free and legal, we include adverts, which monetise the content that our partners, such as MGM, Lionsgate, and Paramount, provide to us!"
-    // },
 ];
 
 export const socialMediaLinks = [
