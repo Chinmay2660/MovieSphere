@@ -4,63 +4,52 @@ import { useRef } from 'react';
 
 const Features = () => {
     const ref = useRef(null);
-    const isInView = useInView(ref, { once: true });
+    const isInView = useInView(ref, { once: true, margin: "-80px" });
 
     return (
-        <section ref={ref} className="pt-14 bg-background">
-            <div className="max-w-screen-xl mx-auto px-4 text-text md:px-8">
-                <div className="relative max-w-2xl mx-auto sm:text-center">
-                    <motion.div
-                        className="relative z-10"
-                        initial={{ opacity: 0 }}
-                        animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-                        transition={{ duration: 0.8 }}
-                    >
-                        <h3 className="text-text mb-8 text-5xl font-semibold text-center">
-                            Features
-                        </h3>
-                        <p className="mt-3 text-text text-center">
-                            MovieSphere offers a host of powerful features designed to enhance your movie-watching experience.
-                        </p>
-                    </motion.div>
-                </div>
+        <section ref={ref} className="relative z-10 apple-section">
+            <div className="apple-container">
                 <motion.div
-                    className="relative mt-12"
+                    className="mx-auto max-w-2xl text-center"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.6 }}
+                >
+                    <span className="section-label">Why MovieSphere</span>
+                    <h2 className="apple-title-1 mt-3 text-text sm:apple-large-title">
+                        Streaming, India-style
+                    </h2>
+                    <p className="apple-subheadline mt-3">
+                        No clutter. No paywalls. Bollywood, regional cinema, and web series — polished for how you watch.
+                    </p>
+                </motion.div>
+
+                <motion.ul
+                    className="mt-10 grid gap-3 sm:mt-12 sm:grid-cols-2 lg:grid-cols-3"
                     initial="hidden"
                     animate={isInView ? "visible" : "hidden"}
                     variants={{
                         hidden: { opacity: 0 },
-                        visible: {
-                            opacity: 1,
-                            transition: {
-                                staggerChildren: 0.3,
-                            }
-                        }
+                        visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
                     }}
                 >
-                    <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                        {features.map((item, idx) => (
-                            <motion.li
-                                key={idx}
-                                className="group bg-background space-y-3 p-4 border border-white/20 rounded-lg transition-all duration-300 hover:border-primary hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02]"
-                                variants={{
-                                    hidden: { opacity: 0, y: 20 },
-                                    visible: { opacity: 1, y: 0 }
-                                }}
-                            >
-                                <div className="text-white/70 pb-3 transition-colors duration-300 group-hover:text-primary">
-                                    {item.icon}
-                                </div>
-                                <h4 className="text-lg text-text font-bold">
-                                    {item.title}
-                                </h4>
-                                <p className="text-text">
-                                    {item.desc}
-                                </p>
-                            </motion.li>
-                        ))}
-                    </ul>
-                </motion.div>
+                    {features.map((item, idx) => (
+                        <motion.li
+                            key={idx}
+                            className="group bento-card"
+                            variants={{
+                                hidden: { opacity: 0, y: 16 },
+                                visible: { opacity: 1, y: 0 },
+                            }}
+                        >
+                            <div className="mb-3 inline-flex glass-pill p-3 text-secondary transition-colors group-hover:text-accent">
+                                {item.icon}
+                            </div>
+                            <h3 className="apple-headline text-text">{item.title}</h3>
+                            <p className="apple-footnote mt-1.5">{item.desc}</p>
+                        </motion.li>
+                    ))}
+                </motion.ul>
             </div>
         </section>
     );

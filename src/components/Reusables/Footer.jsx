@@ -1,36 +1,37 @@
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/MovieSphereLogo.png';
+import { useLocale } from '../../context/LocaleContext';
 
 const PORTFOLIO_URL = 'https://chinmaybhoir.vercel.app/';
 
 const Footer = () => {
-
-    const navigate = useNavigate()
-
-    const handleNavigate = () => {
-        navigate('/')
-    }
+    const navigate = useNavigate();
+    const { t } = useLocale();
 
     return (
-        <footer className="bg-background px-4 py-8 md:px-8 text-white/60">
-            <div className="max-w-screen-xl mx-auto">
+        <footer className="apple-container pb-4 pt-2 md:pb-6">
+            <div className="liquid-glass rounded-[1.25rem] px-5 py-6 sm:rounded-[1.5rem] sm:px-8 sm:py-8">
                 <div className="flex flex-col items-center md:flex-row md:justify-between">
-                    <div className="flex items-center justify-center md:justify-start mb-4 md:mb-0 cursor-pointer" onClick={handleNavigate}>
-                        <img src={logo} className="w-30" alt="Logo" style={{ filter: 'brightness(0) invert(1)' }} />
-                    </div>
+                    <button
+                        type="button"
+                        onClick={() => navigate('/')}
+                        className="mb-4 flex items-center justify-center md:mb-0 md:justify-start"
+                    >
+                        <img src={logo} className="w-30 opacity-70" alt="MovieSphere logo" style={{ filter: 'brightness(0) invert(1)' }} />
+                    </button>
                     <a
                         href={PORTFOLIO_URL}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-white/70 hover:text-white transition-colors duration-300 font-medium underline"
+                        className="apple-footnote transition-colors hover:text-accent"
                         aria-label="Check my portfolio"
                     >
-                        Check my portfolio
+                        {t('footer.portfolio')}
                     </a>
                 </div>
-                <div className="mt-8 text-center text-sm text-white/60">
-                    &copy; 2026 MovieSphere. All rights reserved.
-                </div>
+                <p className="apple-caption-1 mt-6 text-center">
+                    {t('footer.copyright')}
+                </p>
             </div>
         </footer>
     );

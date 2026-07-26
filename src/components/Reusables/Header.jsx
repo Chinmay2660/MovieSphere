@@ -1,16 +1,17 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
-import { IoSearchOutline, IoMenuOutline, IoCloseOutline } from 'react-icons/io5';
+import { IoSearchOutline, IoSettingsOutline } from 'react-icons/io5';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { navigation } from '../../lib/constants';
-import HamburgerMenu from './HamburgerMenu';
-import { debounce, sanitizeSearchQuery } from "../../lib/utils";
+import logo from '../../assets/MovieSphereLogo.png';
+import { debounce, getSearchQueryFromSearch, sanitizeSearchQuery } from "../../lib/utils";
+import { useLocale } from '../../context/LocaleContext';
 
 const Header = () => {
+    const { t } = useLocale();
     const { scrollY } = useScroll();
     const [visible, setVisible] = useState(true);
     const [activePath, setActivePath] = useState('');
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
@@ -22,57 +23,80 @@ const Header = () => {
     }, [location]);
 
     useEffect(() => {
+        const urlQuery = getSearchQueryFromSearch(location.search);
+        if (location.pathname === "/search" && urlQuery) {
+            setSearchQuery(urlQuery);
+            setIsSearchOpen(true);
+            return;
+        }
+        if (location.pathname !== "/search") {
+            setSearchQuery("");
+            setIsSearchOpen(false);
+        }
+    }, [location.pathname, location.search]);
+
+    useEffect(() => {
         const handleClickOutside = (event) => {
             if (searchRef.current && !searchRef.current.contains(event.target)) {
                 setIsSearchOpen(false);
-                setSearchQuery('');
+                if (location.pathname !== "/search") {
+                    setSearchQuery("");
+                }
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    }, [location.pathname]);
 
     useMotionValueEvent(scrollY, "change", (current) => {
-        if (current > 100) {
-            setVisible(false);
-        } else {
-            setVisible(true);
-        }
+        setVisible(current <= 100);
     });
 
-    const handleSearchChange = debounce((value) => {
+    const navigateToSearch = useCallback((value) => {
         if (value) {
             const sanitized = sanitizeSearchQuery(String(value).trim() || value);
             if (sanitized) navigate(`/search?q=${encodeURIComponent(sanitized)}`);
         } else {
             navigate('/home');
         }
-    }, 600);
+    }, [navigate]);
+
+    const debouncedSearch = useMemo(
+        () => debounce(navigateToSearch, 600),
+        [navigateToSearch]
+    );
 
     const handleInputChange = (e) => {
         const value = e.target.value;
         setSearchQuery(value);
-        handleSearchChange(value);
+        debouncedSearch(value);
     };
+
+    const navButtonClass = (isActive) =>
+        `apple-footnote min-h-[2.75rem] px-3.5 py-1.5 rounded-full font-medium transition-all duration-200 ${
+            isActive
+                ? 'bg-primary text-primary-fg'
+                : 'text-secondary hover:text-text hover:bg-white/8'
+        }`;
 
     return (
         <AnimatePresence>
             <motion.div
                 initial={{ opacity: 1, y: -100 }}
                 animate={{ y: visible ? 0 : -100, opacity: visible ? 1 : 0 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="hidden md:flex max-w-fit fixed top-10 inset-x-0 mx-auto border border-transparent rounded-full bg-black text-white shadow z-50 px-4 py-1 items-center justify-center space-x-4"
+                transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="liquid-glass-strong hidden md:flex max-w-fit fixed top-5 inset-x-0 mx-auto rounded-full z-50 px-2 py-1.5 items-center justify-center gap-0.5"
             >
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center">
                     {navigation.map((item, idx) => {
                         const isActive = activePath === item.path;
                         return (
                             <button
                                 key={idx}
                                 onClick={() => navigate(item.path)}
-                                className={`text-sm font-semibold px-3 py-1 rounded-full transition-transform duration-300 ${isActive ? 'bg-white text-black transform scale-105' : 'text-white/70 hover:text-white'}`}
+                                className={navButtonClass(isActive)}
                             >
-                                {item.title}
+                                {t(item.titleKey)}
                             </button>
                         );
                     })}
@@ -81,73 +105,102 @@ const Header = () => {
                 {isSearchOpen ? (
                     <motion.div
                         ref={searchRef}
-                        initial={{ opacity: 0, scale: 0.9 }}
+                        initial={{ opacity: 0, scale: 0.92 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
-                        className="flex items-center space-x-2"
+                        exit={{ opacity: 0, scale: 0.92 }}
+                        transition={{ duration: 0.2 }}
+                        className="flex items-center ml-1"
                     >
                         <input
                             type="text"
                             value={searchQuery}
                             onChange={handleInputChange}
-                            placeholder="Search..."
-                            className="p-2 rounded-full border border-white/20 bg-black/60 text-white"
+                            placeholder={t('search.placeholder')}
+                            className="glass-pill p-1.5 text-text text-xs w-36 bg-transparent focus:outline-none placeholder:text-muted"
                             autoFocus
                         />
                     </motion.div>
                 ) : (
                     <button
                         onClick={() => setIsSearchOpen(true)}
-                        className={`p-2 rounded-full transition-transform duration-300 ${location.pathname === '/search' ? 'bg-white text-black transform scale-105' : 'text-white/70 hover:text-white'}`}
+                        className={`ml-0.5 ${navButtonClass(location.pathname === '/search')}`}
                     >
-                        <IoSearchOutline className="text-xl font-bold" />
+                        <IoSearchOutline className="text-base" />
                     </button>
                 )}
+
+                <button
+                    type="button"
+                    onClick={() => navigate('/settings')}
+                    className={`ml-0.5 ${navButtonClass(location.pathname === '/settings')}`}
+                    aria-label={t('settings.title')}
+                >
+                    <IoSettingsOutline className="text-base" />
+                </button>
             </motion.div>
 
             <motion.div
                 initial={{ opacity: 1, y: 0 }}
-                animate={{ opacity: visible ? 1 : 0, y: visible ? 0 : -100 }}
-                exit={{ opacity: 0, y: -100 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="md:hidden fixed top-0 inset-x-0 flex items-center p-4 bg-black text-white z-50"
+                animate={{ opacity: 1, y: 0 }}
+                className="md:hidden fixed top-0 inset-x-0 z-50 flex items-center gap-3 px-4 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] ios-nav-bar"
             >
-                <button onClick={() => setIsMenuOpen(!isMenuOpen)} >
-                    {isMenuOpen ? <IoCloseOutline className="text-3xl font-bold" /> : <IoMenuOutline className="text-2xl font-bold" />}
+                <button
+                    type="button"
+                    onClick={() => navigate('/home')}
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full active:bg-white/10"
+                    aria-label="Go to home"
+                >
+                    <img
+                        src={logo}
+                        className="h-6 w-auto opacity-90"
+                        alt=""
+                        style={{ filter: 'brightness(0) invert(1)' }}
+                    />
                 </button>
 
-                <div className="relative flex-1">
+                <div className="min-w-0 flex-1" ref={searchRef}>
                     {!isSearchOpen ? (
                         <button
+                            type="button"
                             onClick={() => setIsSearchOpen(true)}
-                            className={`p-2 rounded-full transition-transform duration-300 absolute right-4 top-1/2 transform -translate-y-1/2 ${location.pathname === '/search' ? 'bg-white text-black transform scale-105' : 'text-white/70 hover:text-white'}`}
+                            className="ios-search-field w-full text-secondary active:opacity-80"
+                            aria-label={t('search.aria')}
                         >
-                            <IoSearchOutline className="text-2xl font-bold" />
+                            <IoSearchOutline className="shrink-0 text-lg" aria-hidden />
+                            <span className="truncate text-left text-[1.0625rem]">{t('search.title')}</span>
                         </button>
                     ) : (
                         <motion.div
-                            ref={searchRef}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            transition={{ duration: 0.3, ease: "easeInOut" }}
-                            className="absolute inset-y-0 right-4 flex items-center w-[calc(100%-3.5rem)]"
+                            initial={{ opacity: 0.85 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.15 }}
+                            className="ios-search-field w-full"
                         >
+                            <IoSearchOutline className="shrink-0 text-lg text-secondary" aria-hidden />
                             <input
-                                type="text"
+                                type="search"
                                 value={searchQuery}
                                 onChange={handleInputChange}
-                                placeholder="Search..."
-                                className="w-full p-2 rounded-full border border-white/20 bg-black/60 text-white"
+                                placeholder={t('search.placeholderLong')}
+                                className="min-w-0"
                                 autoFocus
+                                enterKeyHint="search"
                             />
                         </motion.div>
                     )}
                 </div>
-            </motion.div>
 
-            <HamburgerMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+                <button
+                    type="button"
+                    onClick={() => navigate('/settings')}
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full active:bg-white/10 ${
+                        location.pathname === '/settings' ? 'text-accent' : 'text-secondary'
+                    }`}
+                    aria-label={t('settings.title')}
+                >
+                    <IoSettingsOutline className="text-xl" aria-hidden />
+                </button>
+            </motion.div>
         </AnimatePresence>
     );
 };

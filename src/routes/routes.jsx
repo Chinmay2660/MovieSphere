@@ -5,6 +5,8 @@ import DetailsPage from "../pages/DetailsPage";
 import ExplorePage from "../pages/ExplorePage";
 import SearchPage from '../pages/SearchPage';
 import WatchlistPage from '../pages/WatchlistPage';
+import DownloadsPage from '../pages/DownloadsPage';
+import SettingsPage from '../pages/SettingsPage';
 import Home from "../pages/Home";
 
 const router = createBrowserRouter([
@@ -35,6 +37,14 @@ const router = createBrowserRouter([
             {
                 path: "/watchlist",
                 element: <WatchlistPage />,
+            },
+            {
+                path: "/downloads",
+                element: <DownloadsPage />,
+            },
+            {
+                path: "/settings",
+                element: <SettingsPage />,
             },
         ]
     },

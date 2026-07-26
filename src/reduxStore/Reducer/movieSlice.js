@@ -13,6 +13,9 @@ const initialState = {
   trendingTv: [],
   airingToday: [],
   onTheAir: [],
+  bollywoodData: [],
+  marathiMoviesData: [],
+  englishMoviesData: [],
   genres: {
     movie: [],
     tv: []
@@ -65,9 +68,19 @@ export const movieSlice = createSlice({
     setOnTheAir: (state, action) => {
       state.onTheAir = action.payload
     },
+    setBollywoodData: (state, action) => {
+      state.bollywoodData = action.payload
+    },
+    setMarathiMoviesData: (state, action) => {
+      state.marathiMoviesData = action.payload
+    },
+    setEnglishMoviesData: (state, action) => {
+      state.englishMoviesData = action.payload
+    },
     setGenres: (state, action) => {
       state.genres[action.payload.type] = action.payload.genres
-    }
+    },
+    resetMovieData: () => initialState,
   },
 })
 
@@ -84,7 +97,11 @@ export const {
   setTrendingTv,
   setAiringToday,
   setOnTheAir,
-  setGenres
+  setBollywoodData,
+  setMarathiMoviesData,
+  setEnglishMoviesData,
+  setGenres,
+  resetMovieData,
 } = movieSlice.actions
 
 export default movieSlice.reducer

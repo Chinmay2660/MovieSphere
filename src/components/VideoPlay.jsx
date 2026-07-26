@@ -1,5 +1,7 @@
 import { IoClose, IoChevronDown, IoChevronBack, IoChevronForward, IoExpand, IoContract, IoEye, IoEyeOff } from "react-icons/io5";
 import { useEffect, useState, useRef } from "react";
+import Loader from "./Reusables/Loader";
+import { useLocale } from "../context/LocaleContext";
 
 const VIDSRC = {
   id: 'vidsrc_cc',
@@ -17,6 +19,7 @@ const VideoPlay = ({
     initialSeason = 1,
     initialEpisode = 1 
 }) => {
+    const { t } = useLocale();
     const [selectedSeason, setSelectedSeason] = useState(initialSeason);
     const [selectedEpisode, setSelectedEpisode] = useState(initialEpisode);
     const [showSeasonDropdown, setShowSeasonDropdown] = useState(false);
@@ -89,6 +92,18 @@ const VideoPlay = ({
         }, 3000);
     };
 
+    const handleTouchStart = () => {
+        setShowControls(true);
+        if (controlsTimeoutRef.current) {
+            clearTimeout(controlsTimeoutRef.current);
+        }
+        controlsTimeoutRef.current = setTimeout(() => {
+            if (!showSeasonDropdown && !showEpisodeDropdown) {
+                setShowControls(false);
+            }
+        }, 4000);
+    };
+
     const toggleFullscreen = async () => {
         try {
             if (!document.fullscreenElement) {
@@ -146,7 +161,7 @@ const VideoPlay = ({
 
     return (
         <section 
-            className="fixed inset-0 z-50 bg-black"
+            className="fixed inset-0 z-50 bg-surface"
             onClick={(e) => {
                 if (e.target === e.currentTarget) close();
                 closeAllDropdowns();
@@ -154,8 +169,9 @@ const VideoPlay = ({
         >
             <div 
                 ref={containerRef}
-                className={`relative w-full h-full flex flex-col ${isTheaterMode ? 'bg-black' : ''}`}
+                className={`relative w-full h-full flex flex-col ${isTheaterMode ? 'bg-surface' : ''}`}
                 onMouseMove={handleMouseMove}
+                onTouchStart={handleTouchStart}
                 onMouseLeave={() => !showSeasonDropdown && !showEpisodeDropdown && setShowControls(false)}
             >
                 <div 
@@ -163,25 +179,25 @@ const VideoPlay = ({
                         showControls ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'
                     }`}
                 >
-                    <div className="bg-gradient-to-b from-black/90 via-black/60 to-transparent p-4 pb-8">
-                        <div className="flex items-center justify-between max-w-screen-2xl mx-auto">
+                    <div className="bg-gradient-to-b from-background/90 via-background/60 to-transparent p-3 sm:p-4 pb-6 sm:pb-8 pt-[max(0.75rem,env(safe-area-inset-top))]">
+                        <div className="flex flex-wrap items-center justify-between gap-2 max-w-screen-2xl mx-auto">
                             <div className="flex items-center gap-2 sm:gap-3">
                                 <button 
                                     onClick={close}
-                                    className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-full transition-all"
+                                    className="p-2 text-text/80 hover:text-text hover:bg-surface-elevated rounded-full transition-all"
                                     title="Close (Esc)"
                                 >
                                     <IoClose className="w-6 h-6" />
                 </button>
 
-                                <div className="h-6 w-px bg-white/20 hidden sm:block"></div>
+                                <div className="h-6 w-px bg-surface-elevated hidden sm:block"></div>
                                 <div className="hidden sm:block">
-                                    <span className="text-white font-medium">
+                                    <span className="text-text font-medium">
                                         {media_type === "tv" ? `S${selectedSeason} E${selectedEpisode}` : "Now Playing"}
                                     </span>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5 sm:gap-2 order-3 sm:order-none w-full sm:w-auto justify-center sm:justify-start">
                                 {media_type === "tv" && validSeasons.length > 0 && (
                                     <>
                                         <div className="relative">
@@ -191,13 +207,14 @@ const VideoPlay = ({
                                                     setShowSeasonDropdown(!showSeasonDropdown);
                                                     setShowEpisodeDropdown(false);
                                                 }}
-                                                className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm px-3 py-2 rounded-lg text-white text-sm transition-all border border-white/10"
+                                                className="flex items-center gap-1 bg-surface-elevated hover:bg-surface-elevated backdrop-blur-sm px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-text text-xs sm:text-sm transition-all border border-accent/15"
                                             >
-                                                <span>Season {selectedSeason}</span>
+                                                <span className="sm:hidden">S{selectedSeason}</span>
+                                                <span className="hidden sm:inline">Season {selectedSeason}</span>
                                                 <IoChevronDown className={`w-4 h-4 transition-transform ${showSeasonDropdown ? 'rotate-180' : ''}`} />
                                             </button>
                                             {showSeasonDropdown && (
-                                                <div className="absolute top-full left-0 mt-2 bg-black/95 backdrop-blur-xl rounded-xl shadow-2xl max-h-64 overflow-y-auto z-30 min-w-[160px] border border-white/10">
+                                                <div className="absolute top-full left-0 mt-2 bg-surface backdrop-blur-xl rounded-xl shadow-2xl max-h-64 overflow-y-auto z-30 min-w-[160px] border border-accent/15">
                                                     {validSeasons.map((season) => (
                                                         <button
                                                             key={season.season_number}
@@ -208,13 +225,13 @@ const VideoPlay = ({
                                                             }}
                                                             className={`w-full text-left px-4 py-3 text-sm transition-colors flex items-center justify-between ${
                                                                 selectedSeason === season.season_number
-                                                                    ? 'bg-white hover:bg-white'
-                                                                    : 'text-white/80 hover:bg-white/25 hover:text-white'
+                                                                    ? 'bg-primary text-primary-fg hover:bg-primary'
+                                                                    : 'text-text/80 hover:bg-accent/20 hover:text-text'
                                                             }`}
                                                             style={selectedSeason === season.season_number ? { color: '#000' } : undefined}
                                                         >
                                                             <span>Season {season.season_number}</span>
-                                                            <span className={`text-xs ${selectedSeason === season.season_number ? 'text-black/70' : 'text-white/50'}`}>{season.episode_count} ep</span>
+                                                            <span className={`text-xs ${selectedSeason === season.season_number ? 'text-primary-fg/70' : 'text-muted'}`}>{season.episode_count} ep</span>
                                                         </button>
                                                     ))}
                                                 </div>
@@ -227,13 +244,14 @@ const VideoPlay = ({
                                                     setShowEpisodeDropdown(!showEpisodeDropdown);
                                                     setShowSeasonDropdown(false);
                                                 }}
-                                                className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm px-3 py-2 rounded-lg text-white text-sm transition-all border border-white/10"
+                                                className="flex items-center gap-1 bg-surface-elevated hover:bg-surface-elevated backdrop-blur-sm px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-text text-xs sm:text-sm transition-all border border-accent/15"
                                             >
-                                                <span>Episode {selectedEpisode}</span>
+                                                <span className="sm:hidden">E{selectedEpisode}</span>
+                                                <span className="hidden sm:inline">Episode {selectedEpisode}</span>
                                                 <IoChevronDown className={`w-4 h-4 transition-transform ${showEpisodeDropdown ? 'rotate-180' : ''}`} />
                                             </button>
                                             {showEpisodeDropdown && (
-                                                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-black/95 backdrop-blur-xl rounded-xl shadow-2xl max-h-64 overflow-y-auto z-30 min-w-[140px] border border-white/10">
+                                                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-surface backdrop-blur-xl rounded-xl shadow-2xl max-h-64 overflow-y-auto z-30 min-w-[140px] border border-accent/15">
                                                     {episodes.map((ep) => (
                                                         <button
                                                             key={ep}
@@ -243,8 +261,8 @@ const VideoPlay = ({
                                                             }}
                                                             className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
                                                                 selectedEpisode === ep
-                                                                    ? 'bg-white text-black hover:bg-white'
-                                                                    : 'text-white/80 hover:bg-white/25 hover:text-white'
+                                                                    ? 'bg-primary text-primary-fg hover:bg-primary'
+                                                                    : 'text-text/80 hover:bg-accent/20 hover:text-text'
                                                             }`}
                                                             style={selectedEpisode === ep ? { color: '#000' } : undefined}
                                                         >
@@ -258,17 +276,17 @@ const VideoPlay = ({
                                 )}
 
                             </div>
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-1 order-2 sm:order-none ml-auto sm:ml-0">
                                 <button 
                                     onClick={() => setIsTheaterMode(!isTheaterMode)}
-                                    className={`p-2 rounded-full transition-all ${isTheaterMode ? 'text-white bg-white/10' : 'text-white/80 hover:text-white hover:bg-white/10'}`}
+                                    className={`hidden sm:block p-2 rounded-full transition-all ${isTheaterMode ? 'text-text bg-surface-elevated' : 'text-text/80 hover:text-text hover:bg-surface-elevated'}`}
                                     title="Theater Mode (T)"
                                 >
                                     {isTheaterMode ? <IoEyeOff className="w-5 h-5" /> : <IoEye className="w-5 h-5" />}
                                 </button>
                                 <button 
                                     onClick={toggleFullscreen}
-                                    className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-full transition-all"
+                                    className="p-2 text-text/80 hover:text-text hover:bg-surface-elevated rounded-full transition-all"
                                     title="Fullscreen (F)"
                                 >
                                     {isFullscreen ? <IoContract className="w-5 h-5" /> : <IoExpand className="w-5 h-5" />}
@@ -277,16 +295,19 @@ const VideoPlay = ({
                         </div>
                     </div>
                 </div>
-                <div className="flex-1 min-h-0 relative bg-black">
+                <div className="flex-1 min-h-0 relative bg-surface">
                     {isLoading && (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black z-10 gap-4">
-                            <div className="relative">
-                                <div className="w-16 h-16 border-4 border-primary/30 rounded-full"></div>
-                                <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-primary rounded-full animate-spin"></div>
-                            </div>
-                            <p className="text-white/60 text-sm">Loading {selectedSource.name}...</p>
-                    </div>
-                )}
+                        <div className="absolute inset-0 flex items-center justify-center bg-surface z-10">
+                            <Loader
+                                size="lg"
+                                label={
+                                    media_type === 'tv'
+                                        ? t('loading.playbackEpisode')
+                                        : t('loading.playbackMovie')
+                                }
+                            />
+                        </div>
+                    )}
                     <iframe
                         key={videoKey}
                         title="video"
@@ -303,38 +324,38 @@ const VideoPlay = ({
                         showControls ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
                     }`}
                 >
-                    <div className="bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 pt-8">
-                        <div className="flex items-center justify-between max-w-screen-2xl mx-auto">
+                    <div className="bg-gradient-to-t from-background/90 via-background/60 to-transparent p-3 sm:p-4 pt-6 sm:pt-8 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+                        <div className="flex items-center justify-between max-w-screen-2xl mx-auto gap-2">
                             {media_type === "tv" ? (
                                 <>
                                     <button
                                         onClick={handlePrevEpisode}
                                         disabled={!canGoPrev}
-                                        className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg text-white text-sm transition-all backdrop-blur-sm"
+                                        className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-surface-elevated hover:bg-surface-elevated disabled:opacity-30 disabled:cursor-not-allowed rounded-lg text-text text-sm transition-all backdrop-blur-sm"
                                     >
                                         <IoChevronBack className="w-5 h-5" />
                                         <span className="hidden sm:inline">Previous</span>
                                     </button>
                                     
-                                    <div className="text-center">
-                                        <p className="text-white/50 text-xs">
-                                            Press <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-white/70">←</kbd> <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-white/70">→</kbd> for episodes • <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-white/70">F</kbd> fullscreen
+                                    <div className="text-center hidden sm:block">
+                                        <p className="text-muted text-xs">
+                                            Press <kbd className="px-1.5 py-0.5 bg-surface-elevated rounded text-secondary">←</kbd> <kbd className="px-1.5 py-0.5 bg-surface-elevated rounded text-secondary">→</kbd> for episodes • <kbd className="px-1.5 py-0.5 bg-surface-elevated rounded text-secondary">F</kbd> fullscreen
                                         </p>
                                     </div>
                                     
                                     <button
                                         onClick={handleNextEpisode}
                                         disabled={!canGoNext}
-                                        className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg text-white text-sm transition-all backdrop-blur-sm"
+                                        className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-surface-elevated hover:bg-surface-elevated disabled:opacity-30 disabled:cursor-not-allowed rounded-lg text-text text-sm transition-all backdrop-blur-sm"
                                     >
                                         <span className="hidden sm:inline">Next</span>
                                         <IoChevronForward className="w-5 h-5" />
                                     </button>
                                 </>
                             ) : (
-                                <div className="w-full text-center">
-                                    <p className="text-white/50 text-xs">
-                                        Press <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-white/70">F</kbd> for fullscreen • <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-white/70">Esc</kbd> to close
+                                <div className="w-full text-center hidden sm:block">
+                                    <p className="text-muted text-xs">
+                                        Press <kbd className="px-1.5 py-0.5 bg-surface-elevated rounded text-secondary">F</kbd> for fullscreen • <kbd className="px-1.5 py-0.5 bg-surface-elevated rounded text-secondary">Esc</kbd> to close
                                     </p>
                                 </div>
                             )}
@@ -346,17 +367,17 @@ const VideoPlay = ({
                         {canGoPrev && (
                             <button
                                 onClick={handlePrevEpisode}
-                                className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-black/50 hover:bg-black/70 rounded-full text-white transition-all opacity-0 hover:opacity-100 sm:opacity-100"
+                                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 p-2.5 sm:p-3 bg-surface hover:bg-surface-elevated rounded-full text-text transition-all opacity-70 sm:opacity-100"
                             >
-                                <IoChevronBack className="w-8 h-8" />
+                                <IoChevronBack className="w-6 h-6 sm:w-8 sm:h-8" />
                             </button>
                         )}
                         {canGoNext && (
                             <button
                                 onClick={handleNextEpisode}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-black/50 hover:bg-black/70 rounded-full text-white transition-all opacity-0 hover:opacity-100 sm:opacity-100"
+                                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 p-2.5 sm:p-3 bg-surface hover:bg-surface-elevated rounded-full text-text transition-all opacity-70 sm:opacity-100"
                             >
-                                <IoChevronForward className="w-8 h-8" />
+                                <IoChevronForward className="w-6 h-6 sm:w-8 sm:h-8" />
                             </button>
                         )}
                     </>

@@ -1,76 +1,77 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { IoCompassOutline, IoPlayOutline, IoPhonePortraitOutline } from "react-icons/io5";
 
 const steps = [
     {
-        step: "1",
-        title: "Browse",
-        description: "Explore thousands of movies and TV shows across genres. Search or filter to find what you love.",
+        step: "01",
+        icon: IoCompassOutline,
+        title: "Discover",
+        description: "Browse Hindi, Marathi, English, and regional collections — or search for exactly what you're in the mood for.",
     },
     {
-        step: "2",
-        title: "Pick & Watch",
-        description: "Choose what to watch and start streaming instantly. No sign-up required to get started.",
+        step: "02",
+        icon: IoPlayOutline,
+        title: "Press Play",
+        description: "Tap any title for trailers, cast info, and similar picks. Hit play and streaming starts immediately.",
     },
     {
-        step: "3",
-        title: "Enjoy Anywhere",
-        description: "Watch on any device—phone, tablet, laptop, or TV. Your picks sync across devices.",
+        step: "03",
+        icon: IoPhonePortraitOutline,
+        title: "Watch Your Way",
+        description: "Save to your watchlist, download for offline, and switch between phone, tablet, or desktop seamlessly.",
     },
 ];
 
 const HowItWorks = () => {
     const ref = useRef(null);
-    const isInView = useInView(ref, { once: true });
+    const isInView = useInView(ref, { once: true, margin: "-80px" });
 
     return (
-        <section ref={ref} className="pt-14 pb-14 bg-background">
-            <div className="max-w-screen-xl mx-auto px-4 md:px-8">
+        <section ref={ref} className="relative z-10 apple-section">
+            <div className="apple-container">
                 <motion.div
-                    className="text-center max-w-2xl mx-auto"
-                    initial={{ opacity: 0 }}
-                    animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-                    transition={{ duration: 0.8 }}
+                    className="mx-auto max-w-xl text-center"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.6 }}
                 >
-                    <h3 className="text-text text-5xl font-semibold mb-3">
-                        How it works
-                    </h3>
-                    <p className="text-text text-muted">
-                        Start watching in three simple steps. No subscriptions, no hassle.
-                    </p>
+                    <span className="section-label">How it works</span>
+                    <h2 className="apple-title-1 mt-3 text-text">From open to watching in under a minute</h2>
+                    <p className="apple-subheadline mt-3">No onboarding flows. No credit card forms. Just cinema.</p>
                 </motion.div>
+
                 <motion.div
-                    className="mt-12 grid gap-8 sm:grid-cols-3"
+                    className="relative mt-10 grid gap-3 sm:mt-12 sm:grid-cols-3 sm:gap-4"
                     initial="hidden"
                     animate={isInView ? "visible" : "hidden"}
                     variants={{
                         hidden: { opacity: 0 },
-                        visible: {
-                            opacity: 1,
-                            transition: { staggerChildren: 0.2 },
-                        },
+                        visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
                     }}
                 >
-                    {steps.map((item, idx) => (
-                        <motion.div
-                            key={idx}
-                            className="group text-center p-6 border border-white/20 rounded-lg bg-background transition-all duration-300 hover:border-primary hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02]"
-                            variants={{
-                                hidden: { opacity: 0, y: 20 },
-                                visible: { opacity: 1, y: 0 },
-                            }}
-                        >
-                            <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/10 text-white/80 text-xl font-bold mb-4 transition-all duration-300 group-hover:bg-primary/20 group-hover:text-primary">
-                                {item.step}
-                            </span>
-                            <h4 className="text-lg text-text font-bold mb-2">
-                                {item.title}
-                            </h4>
-                            <p className="text-text text-muted text-sm">
-                                {item.description}
-                            </p>
-                        </motion.div>
-                    ))}
+                    <div className="pointer-events-none absolute top-12 right-[16%] left-[16%] hidden h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent sm:block" aria-hidden />
+
+                    {steps.map((item, idx) => {
+                        const Icon = item.icon;
+                        return (
+                            <motion.div
+                                key={idx}
+                                className="bento-card relative text-center sm:text-left"
+                                variants={{
+                                    hidden: { opacity: 0, y: 16 },
+                                    visible: { opacity: 1, y: 0 },
+                                }}
+                            >
+                                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl glass-pill text-accent sm:mx-0">
+                                    <Icon className="h-6 w-6" />
+                                </div>
+                                <span className="apple-caption-1 font-semibold text-accent">{item.step}</span>
+                                <h3 className="apple-headline mt-2 text-text">{item.title}</h3>
+                                <p className="apple-footnote mt-1.5">{item.description}</p>
+                            </motion.div>
+                        );
+                    })}
                 </motion.div>
             </div>
         </section>

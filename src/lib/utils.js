@@ -10,6 +10,11 @@ export function sanitizeSearchQuery(raw) {
   }
 }
 
+export function getSearchQueryFromSearch(search) {
+  const q = new URLSearchParams(search).get("q");
+  return q ? sanitizeSearchQuery(q) : "";
+}
+
 export const debounce = (func, delay) => {
     let timer;
     return (...args) => {

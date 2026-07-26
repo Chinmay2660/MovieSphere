@@ -1,12 +1,15 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { removeFromWatchlist } from "../reduxStore/Reducer/watchlistSlice";
+import { selectAutoPlayFromWatchlist } from "../reduxStore/Reducer/settingsSlice";
 import { IoPlay, IoTrashOutline } from "react-icons/io5";
 import moment from "moment";
+import LazyImage from "../components/Reusables/LazyImage";
 
 const WatchlistPage = () => {
   const items = useSelector((state) => state.watchlist);
   const imageURL = useSelector((state) => state.movieData.imageURL);
+  const autoPlayFromWatchlist = useSelector(selectAutoPlayFromWatchlist);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -26,12 +29,13 @@ const WatchlistPage = () => {
   };
 
   const handlePlay = (item) => {
+    const playState = autoPlayFromWatchlist ? { autoPlay: true } : {};
     if (item.type === "movie") {
-      navigate(`/movie/${item.id}`, { state: { autoPlay: true } });
+      navigate(`/movie/${item.id}`, { state: playState });
     } else {
       navigate(`/tv/${item.tv_id}`, {
         state: {
-          autoPlay: true,
+          ...playState,
           initialSeason: item.season_number,
           initialEpisode: item.episode_number,
         },
@@ -40,23 +44,29 @@ const WatchlistPage = () => {
   };
 
   return (
-    <div className="pt-16 min-h-screen text-white">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-6xl">
-        <h1 className="text-3xl font-bold mb-2">Watchlist</h1>
-        <p className="text-white/70 mb-8">
-          Movies and episodes you added. Click a card to start watching.
-        </p>
+    <div className="apple-page">
+      <div
+        className={`apple-container py-6 sm:py-8${
+          items.length === 0 ? " flex flex-1 flex-col justify-center" : ""
+        }`}
+      >
+        <header className="apple-section-header">
+          <h1 className="apple-large-title text-text">Watchlist</h1>
+          <p className="apple-subheadline mt-2">
+            Movies and episodes you added. Tap a card to start watching.
+          </p>
+        </header>
 
         {items.length === 0 && (
-          <div className="text-center py-16 rounded-xl bg-white/5 border border-white/10">
-            <p className="text-white/70 text-lg">Your watchlist is empty</p>
-            <p className="text-white/50 text-sm mt-1">
-              Add movies from their detail page, or add episodes individually from a TV show&apos;s Seasons & Episodes section.
+          <div className="apple-content-box apple-empty-state">
+            <p className="apple-headline text-secondary">Your watchlist is empty</p>
+            <p className="apple-footnote mx-auto mt-2 max-w-sm">
+              Add movies from their detail page, or add episodes from a TV show&apos;s Seasons & Episodes section.
             </p>
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
           {items.map((item, idx) => (
             <div
               key={
@@ -64,63 +74,48 @@ const WatchlistPage = () => {
                   ? `movie-${item.id ?? idx}`
                   : `ep-${item.tv_id ?? ""}-${item.season_number ?? ""}-${item.episode_number ?? ""}-${idx}`
               }
-              className="relative flex flex-col h-full bg-white/5 rounded-lg overflow-hidden hover:bg-white/10 hover:scale-[1.02] transition-all text-left group border border-white/10"
+              className="apple-content-box flex flex-col overflow-hidden p-0"
             >
               <button
                 onClick={() => handlePlay(item)}
-                className="flex-1 min-h-0 flex flex-col w-full text-left"
+                className="flex min-h-0 flex-1 flex-col text-left"
               >
                 <div className="relative">
-                  {(item.type === "movie" ? item.poster_path : item.still_path) &&
-                  imageURL ? (
-                    <img
-                      src={
-                        imageURL +
-                        (item.type === "movie"
-                          ? item.poster_path
-                          : item.still_path)
-                      }
+                  {(item.type === "movie" ? item.poster_path : item.still_path) && imageURL ? (
+                    <LazyImage
+                      src={imageURL + (item.type === "movie" ? item.poster_path : item.still_path)}
                       alt={item.type === "movie" ? item.title : item.episode_name}
-                      className="w-full h-28 sm:h-32 object-cover"
-                      loading="lazy"
+                      className="h-32 w-full object-cover sm:h-36"
                     />
                   ) : (
-                    <div className="w-full h-28 sm:h-32 bg-black/40 flex items-center justify-center">
-                      <span className="text-white/40 text-sm">No image</span>
+                    <div className="flex h-32 items-center justify-center sm:h-36">
+                      <span className="apple-footnote">No image</span>
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <div className="bg-white rounded-full p-3">
-                      <IoPlay className="w-6 h-6 text-black" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                    <div className="liquid-glass-strong rounded-full p-3">
+                      <IoPlay className="h-6 w-6 text-text" />
                     </div>
                   </div>
-                  <div className="absolute top-2 left-2 bg-black/70 text-white text-xs font-bold px-2 py-1 rounded">
-                    {item.type === "movie"
-                      ? "Movie"
-                      : `E${item.episode_number}`}
+                  <div className="glass-pill absolute top-2 left-2 apple-caption-2 font-semibold text-text">
+                    {item.type === "movie" ? "Movie" : `E${item.episode_number}`}
                   </div>
                 </div>
-                <div className="p-3">
+                <div className="p-4">
                   {item.type === "movie" ? (
                     <>
-                      <h5 className="font-medium text-white text-sm line-clamp-1">
-                        {item.title}
-                      </h5>
+                      <h2 className="apple-headline line-clamp-1">{item.title}</h2>
                       {item.release_date && (
-                        <span className="text-xs text-white/50 mt-1 block">
+                        <span className="apple-caption-1 mt-1 block">
                           {moment(item.release_date).format("YYYY")}
                         </span>
                       )}
                     </>
                   ) : (
                     <>
-                      <p className="text-white/50 text-xs line-clamp-1">
-                        {item.show_name}
-                      </p>
-                      <h5 className="font-medium text-white text-sm line-clamp-1 mt-0.5">
-                        {item.episode_name}
-                      </h5>
-                      <span className="text-xs text-white/50 mt-1 block">
+                      <p className="apple-caption-1 line-clamp-1">{item.show_name}</p>
+                      <h2 className="apple-headline mt-0.5 line-clamp-1">{item.episode_name}</h2>
+                      <span className="apple-caption-1 mt-1 block">
                         S{item.season_number} E{item.episode_number}
                       </span>
                     </>
@@ -129,10 +124,10 @@ const WatchlistPage = () => {
               </button>
               <button
                 onClick={(e) => handleRemove(e, item)}
-                className="mt-auto w-full py-1.5 px-2 rounded-lg text-xs font-medium bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-colors flex items-center justify-center gap-1.5 flex-shrink-0"
+                className="btn-secondary mx-4 mb-4 gap-1.5"
               >
-                <IoTrashOutline className="w-3.5 h-3.5" />
-                Remove from Watchlist
+                <IoTrashOutline className="h-4 w-4" />
+                Remove
               </button>
             </div>
           ))}

@@ -1,35 +1,38 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { IoChevronDown } from "react-icons/io5";
 
-const FAQCard = (props) => {
+const FAQCard = ({ faqsList }) => {
     const [isOpen, setIsOpen] = useState(false);
-
-    const handleToggle = () => {
-        setIsOpen(!isOpen);
-    };
 
     return (
         <div
-            className="space-y-3 overflow-hidden bg-background rounded-lg p-4 border border-white/20 hover:border-primary cursor-pointer mb-0 transition-colors duration-300"  
-            onClick={handleToggle}
+            className={`bento-card cursor-pointer transition-all duration-200 ${isOpen ? "border-accent/30" : ""}`}
+            onClick={() => setIsOpen(!isOpen)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === "Enter" && setIsOpen(!isOpen)}
+            aria-expanded={isOpen}
         >
-            <h4 className="flex items-center justify-between text-lg text-text font-bold mb-0">
-                {props.faqsList.q}
+            <div className="flex items-center justify-between gap-4">
+                <h3 className="apple-headline text-left text-text">{faqsList.q}</h3>
                 <IoChevronDown
-                    className={`h-5 w-5 text-text ml-2 flex-shrink-0 transition-transform duration-300 ${isOpen ? '' : '-rotate-90'}`}
+                    className={`h-4 w-4 shrink-0 text-muted transition-transform duration-200 ${isOpen ? "rotate-180 text-accent" : ""}`}
                 />
-            </h4>
-            <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: isOpen ? "auto" : 0, marginTop: 0, opacity: isOpen ? 1 : 0 }}
-                transition={{ duration: 0.5, ease: "easeInOut" }}
-                className="overflow-hidden"
-            >
-                <p className="text-text mt-3">
-                    {props.faqsList.a}
-                </p>
-            </motion.div>
+            </div>
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.p
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25, ease: "easeInOut" }}
+                        className="apple-footnote overflow-hidden"
+                    >
+                        <span className="block pt-3 text-secondary">{faqsList.a}</span>
+                    </motion.p>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

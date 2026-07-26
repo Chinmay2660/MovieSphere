@@ -3,18 +3,26 @@ import axiosInstance from "../lib/axiosConfig";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
-import { setImageURL } from "../reduxStore/Reducer/movieSlice";
 import moment from "moment";
 import Divider from "../components/Reusables/Divider";
+import LazyImage from "../components/Reusables/LazyImage";
+import Loader from "../components/Reusables/Loader";
 import CardCarousel from "../components/Home/CardCarousel";
-import { IoPlay, IoStar, IoCalendar, IoTime, IoTv, IoExpand, IoAddOutline, IoCheckmarkOutline } from "react-icons/io5";
+import { IoPlay, IoStar, IoCalendar, IoTime, IoTv, IoExpand, IoAddOutline, IoCheckmarkOutline, IoDownloadOutline } from "react-icons/io5";
 import VideoPlay from "../components/VideoPlay";
 import CastCarousel from "../components/CastCarousel";
 import { getRatingColor } from "../lib/utils";
 import { addToWatchlist, removeFromWatchlist } from "../reduxStore/Reducer/watchlistSlice";
+import { getDownloadKey, selectDownloadByKey } from "../reduxStore/Reducer/downloadsSlice";
+import { startDownload } from "../lib/downloadService";
+import { Link } from "react-router-dom";
+import { USER_MESSAGES } from "../lib/userFriendlyError";
+import { useLocale } from "../context/LocaleContext";
 
 const DetailsPage = () => {
+  const { t } = useLocale();
   const params = useParams();
+  const isTV = params?.explore === 'tv';
   const location = useLocation();
   const navigate = useNavigate();
   const imageURL = useSelector((state) => state.movieData.imageURL);
@@ -31,13 +39,78 @@ const DetailsPage = () => {
   const [playConfig, setPlayConfig] = useState({ season: 1, episode: 1 });
   const dispatch = useDispatch();
   const watchlist = useSelector((state) => state.watchlist);
+  const downloads = useSelector((state) => state.downloads);
   const movieInWatchlist = useSelector((state) =>
     state.watchlist.some(
       (i) => i.type === "movie" && i.id === data?.id
     )
   );
 
-  const isTV = params?.explore === 'tv';
+  const movieDownloadKey = data && !isTV ? getDownloadKey({ type: "movie", id: data.id }) : null;
+  const movieDownloadFromStore = useSelector((state) =>
+    movieDownloadKey ? selectDownloadByKey(state, movieDownloadKey) : null
+  );
+  const tvDownload = isTV && data
+    ? downloads.find(
+        (d) =>
+          d.type === "episode" &&
+          String(d.tv_id) === String(params?.id) &&
+          d.season_number === (selectedSeason || 1) &&
+          d.episode_number === 1
+      )
+    : null;
+  const movieDownload = isTV ? tvDownload : movieDownloadFromStore;
+
+  const handleDownloadMovie = () => {
+    if (!data || movieDownload?.status === "downloading" || movieDownload?.status === "queued") return;
+    if (isTV) {
+      const season = selectedSeason || 1;
+      const firstEp = seasonDetails?.episodes?.find((e) => e.episode_number === 1) ?? {
+        episode_number: 1,
+        name: "Episode 1",
+        still_path: null,
+      };
+      handleDownloadEpisode(firstEp, season);
+      return;
+    }
+    startDownload({
+      type: "movie",
+      id: data.id,
+      title: data?.title ?? data?.original_title ?? data?.name,
+      poster_path: data?.poster_path ?? null,
+      media_type: "movie",
+    }, dispatch);
+  };
+
+  const handleDownloadEpisode = (episode, seasonNum) => {
+    const key = getDownloadKey({
+      type: "episode",
+      tv_id: params?.id,
+      season_number: seasonNum,
+      episode_number: episode.episode_number,
+    });
+    const existing = downloads.find((d) => d.key === key);
+    if (existing?.status === "downloading" || existing?.status === "queued") return;
+    startDownload({
+      type: "episode",
+      tv_id: params?.id,
+      season_number: seasonNum,
+      episode_number: episode.episode_number,
+      show_name: data?.name,
+      episode_name: episode.name,
+      still_path: episode.still_path ?? null,
+      media_type: "tv",
+    }, dispatch);
+  };
+
+  const getEpisodeDownload = (seasonNum, episodeNum) =>
+    downloads.find(
+      (d) =>
+        d.type === "episode" &&
+        String(d.tv_id) === String(params?.id) &&
+        d.season_number === seasonNum &&
+        d.episode_number === episodeNum
+    );
 
   const fetchData = async () => {
     setLoading(true);
@@ -61,7 +134,7 @@ const DetailsPage = () => {
         }
       }
     } catch (error) {
-      setError("Failed to fetch data");
+      setError(USER_MESSAGES.loadContent);
       console.error("Failed to fetch data", error);
     } finally {
       setLoading(false);
@@ -78,36 +151,10 @@ const DetailsPage = () => {
     }
   };
 
-  const fetchConfigurationData = async () => {
-    try {
-      const response = await axiosInstance.get('/configuration');
-      dispatch(setImageURL(response?.data?.images?.secure_base_url + "original"));
-    } catch (error) {
-      console.log("error", error);
-    }
-  };
-
-  const handlePlayEpisode = (seasonNum, episodeNum) => {
-    setPlayConfig({ season: seasonNum, episode: episodeNum });
-    setPlayVideo(true);
-  };
-
-  const handlePlayClick = () => {
-    if (isTV) {
-      setPlayConfig({ season: selectedSeason || 1, episode: 1 });
-    } else {
-      setPlayConfig({ season: 1, episode: 1 });
-    }
-    setPlayVideo(true);
-  };
-
   useEffect(() => {
-    if (imageURL !== undefined) {
-      fetchConfigurationData();
-    }
     fetchData();
     setShowAllEpisodes(false);
-  }, [params, imageURL]);
+  }, [params?.explore, params?.id]);
 
   useEffect(() => {
     if (selectedSeason) {
@@ -131,10 +178,27 @@ const DetailsPage = () => {
     }
   }, [loading, data, location.state, location.pathname, params?.explore, navigate]);
 
+  const handlePlayEpisode = (seasonNum, episodeNum) => {
+    setPlayConfig({ season: seasonNum, episode: episodeNum });
+    setPlayVideo(true);
+  };
+
+  const handlePlayClick = () => {
+    if (isTV) {
+      setPlayConfig({ season: selectedSeason || 1, episode: 1 });
+    } else {
+      setPlayConfig({ season: 1, episode: 1 });
+    }
+    setPlayVideo(true);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <Loader
+          size="lg"
+          label={isTV ? t('loading.tvDetails') : t('loading.movieDetails')}
+        />
       </div>
     );
   }
@@ -157,14 +221,14 @@ const DetailsPage = () => {
     : seasonDetails?.episodes?.slice(0, 8);
 
   return (
-    <div className="text-white pt-16 lg:pt-0">
+    <div className="apple-page text-text lg:pt-0">
       <div className="w-full h-[300px] sm:h-[400px] relative hidden lg:block">
         {imageURL && data?.backdrop_path && (
-          <img
+          <LazyImage
             src={imageURL + data?.backdrop_path}
             alt="Banner"
+            eager
             className="h-full w-full object-cover"
-            loading="lazy"
             width="1920"
             height="400"
           />
@@ -172,28 +236,28 @@ const DetailsPage = () => {
         <div className="absolute w-full h-full top-0 bg-gradient-to-t from-background via-background/60 to-transparent"></div>
       </div>
 
-      <div className="container mx-auto px-4 py-8 lg:px-8 lg:py-12 flex flex-col lg:flex-row gap-6 lg:gap-10 max-w-screen-xl">
+      <div className="apple-container flex max-w-screen-xl flex-col gap-6 py-6 sm:gap-8 sm:py-8 lg:flex-row lg:gap-10">
         <div className="relative mx-auto lg:-mt-48 lg:mx-0 flex-shrink-0">
           {imageURL && data?.poster_path ? (
-            <img
+            <LazyImage
               src={imageURL + data?.poster_path}
               alt="Poster"
+              eager
               className="h-72 w-48 lg:h-96 lg:w-64 object-cover rounded-xl shadow-2xl"
-              loading="lazy"
             />
           ) : (
-            <div className="h-72 w-48 lg:h-96 lg:w-64 bg-black/50 rounded-xl flex items-center justify-center">
-              <span className="text-white/50">No Image</span>
+            <div className="h-72 w-48 lg:h-96 lg:w-64 bg-surface rounded-xl flex items-center justify-center">
+              <span className="text-muted">No Image</span>
             </div>
           )}
         </div>
 
         <div className="flex-1">
-          <h1 className="text-2xl lg:text-4xl font-bold">
+          <h1 className="apple-title-1 lg:apple-large-title">
             {data?.title ?? data?.original_title ?? data?.name}
           </h1>
           {data?.tagline && (
-            <p className="text-white/70 mt-1.5 italic text-lg">"{data.tagline}"</p>
+            <p className="apple-callout mt-2 italic text-secondary">"{data.tagline}"</p>
           )}
 
           <div className="flex flex-wrap items-center gap-4 mt-3">
@@ -207,25 +271,25 @@ const DetailsPage = () => {
               );
             })()}
             {(data?.release_date || data?.first_air_date) && (
-              <div className="flex items-center gap-1 text-white/70">
+              <div className="flex items-center gap-1 text-secondary">
                 <IoCalendar className="w-4 h-4" />
                 <span>{moment(data?.release_date || data?.first_air_date).format("YYYY")}</span>
               </div>
             )}
             {duration && (
-              <div className="flex items-center gap-1 text-white/70">
+              <div className="flex items-center gap-1 text-secondary">
                 <IoTime className="w-4 h-4" />
                 <span>{duration[0]}h {duration[1]}m</span>
               </div>
             )}
             {isTV && data?.number_of_seasons && (
-              <div className="flex items-center gap-1 text-white/70">
+              <div className="flex items-center gap-1 text-secondary">
                 <IoTv className="w-4 h-4" />
                 <span>{data.number_of_seasons} Season{data.number_of_seasons > 1 ? 's' : ''}</span>
               </div>
             )}
             {isTV && data?.number_of_episodes && (
-              <div className="flex items-center gap-1 text-white/70">
+              <div className="flex items-center gap-1 text-secondary">
                 <span>{data.number_of_episodes} Episodes</span>
               </div>
             )}
@@ -236,7 +300,7 @@ const DetailsPage = () => {
               {data.genres.map((genre) => (
                 <span
                   key={genre.id}
-                  className="text-sm font-medium text-white/90 bg-white/10 border border-white/20 px-3 py-1.5 rounded-lg"
+                  className="text-sm font-medium text-text/90 bg-surface-elevated border border-accent/20 px-3 py-1.5 rounded-lg"
                 >
                   {genre.name}
                 </span>
@@ -249,11 +313,35 @@ const DetailsPage = () => {
               onClick={handlePlayClick}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="flex items-center gap-2.5 py-3 px-6 text-black font-semibold bg-white hover:bg-white/90 active:scale-[0.98] rounded-xl shadow-lg transition-all duration-200"
+              className="btn-primary flex items-center gap-2.5 py-3 px-6 active:scale-[0.98]"
             >
-              <IoPlay className="w-5 h-5 text-black" />
+              <IoPlay className="w-5 h-5 text-primary-fg" />
               <span>{isTV ? "Watch S1 E1" : "Play Now"}</span>
             </motion.button>
+            <button
+              onClick={handleDownloadMovie}
+              disabled={movieDownload?.status === "downloading" || movieDownload?.status === "queued"}
+              className="flex items-center justify-center gap-1.5 py-3 px-4 rounded-xl text-sm font-medium bg-primary/20 border border-primary/40 text-primary hover:bg-primary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <IoDownloadOutline className="w-4 h-4" />
+              <span>
+                {movieDownload?.status === "completed"
+                  ? "Downloaded"
+                  : movieDownload?.status === "downloading" || movieDownload?.status === "queued"
+                    ? `Downloading ${movieDownload.progress}%`
+                    : isTV
+                      ? `Download S${selectedSeason || 1} E1`
+                      : "Download"}
+              </span>
+            </button>
+            {movieDownload && (movieDownload.status === "downloading" || movieDownload.status === "queued") && (
+              <Link
+                to="/downloads"
+                className="text-xs text-primary hover:text-primary/80 underline"
+              >
+                View progress
+              </Link>
+            )}
             {!isTV && (
               <button
                 onClick={() => {
@@ -273,7 +361,7 @@ const DetailsPage = () => {
                     }));
                   }
                 }}
-                className="flex items-center justify-center gap-1.5 py-3 px-4 rounded-lg text-sm font-medium bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-colors"
+                className="flex items-center justify-center gap-1.5 py-3 px-4 rounded-lg text-sm font-medium bg-surface-elevated border border-accent/20 text-text hover:bg-surface-elevated transition-colors"
               >
                 {movieInWatchlist ? (
                   <>
@@ -291,93 +379,93 @@ const DetailsPage = () => {
           </div>
 
           <div className="mt-6">
-            <h3 className="text-xl font-bold text-white mb-2">Overview</h3>
-            <p className="text-white/80 leading-relaxed">{data?.overview}</p>
+            <h3 className="text-xl font-bold text-text mb-2">Overview</h3>
+            <p className="text-text/80 leading-relaxed">{data?.overview}</p>
             </div>
 
             <Divider />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <span className="text-white/50">Status</span>
-              <p className="text-white font-medium">{data?.status}</p>
+              <span className="text-muted">Status</span>
+              <p className="text-text font-medium">{data?.status}</p>
             </div>
             <div>
-              <span className="text-white/50">{isTV ? "First Air Date" : "Release Date"}</span>
-              <p className="text-white font-medium">
+              <span className="text-muted">{isTV ? "First Air Date" : "Release Date"}</span>
+              <p className="text-text font-medium">
                 {moment(data?.release_date || data?.first_air_date).format("MMMM Do, YYYY")}
               </p>
             </div>
             {isTV && data?.last_air_date && (
               <div>
-                <span className="text-white/50">Last Air Date</span>
-                <p className="text-white font-medium">
+                <span className="text-muted">Last Air Date</span>
+                <p className="text-text font-medium">
                   {moment(data.last_air_date).format("MMMM Do, YYYY")}
                 </p>
               </div>
             )}
             {directorName && (
               <div>
-                <span className="text-white/50">Director</span>
-                <p className="text-white font-medium">{directorName}</p>
+                <span className="text-muted">Director</span>
+                <p className="text-text font-medium">{directorName}</p>
               </div>
             )}
             {creatorName && (
               <div>
-                <span className="text-white/50">Creator</span>
-                <p className="text-white font-medium">{creatorName}</p>
+                <span className="text-muted">Creator</span>
+                <p className="text-text font-medium">{creatorName}</p>
               </div>
             )}
             {writerName && (
               <div>
-                <span className="text-white/50">Writer</span>
-                <p className="text-white font-medium">{writerName}</p>
+                <span className="text-muted">Writer</span>
+                <p className="text-text font-medium">{writerName}</p>
               </div>
             )}
             {data?.networks?.length > 0 && (
               <div>
-                <span className="text-white/50">Network</span>
-                <p className="text-white font-medium">
+                <span className="text-muted">Network</span>
+                <p className="text-text font-medium">
                   {data.networks.map(n => n.name).join(", ")}
                 </p>
               </div>
             )}
             {data?.production_companies?.length > 0 && (
               <div>
-                <span className="text-white/50">Production</span>
-                <p className="text-white font-medium">
+                <span className="text-muted">Production</span>
+                <p className="text-text font-medium">
                   {data.production_companies.slice(0, 3).map(c => c.name).join(", ")}
                 </p>
               </div>
             )}
             {!isTV && data?.budget > 0 && (
               <div>
-                <span className="text-white/50">Budget</span>
-                <p className="text-white font-medium">
+                <span className="text-muted">Budget</span>
+                <p className="text-text font-medium">
                   ${(data.budget / 1_000_000).toFixed(1)}M
                 </p>
               </div>
             )}
             {!isTV && data?.revenue > 0 && (
               <div>
-                <span className="text-white/50">Revenue</span>
-                <p className="text-white font-medium">
+                <span className="text-muted">Revenue</span>
+                <p className="text-text font-medium">
                   ${(data.revenue / 1_000_000).toFixed(1)}M
                 </p>
               </div>
             )}
             {data?.spoken_languages?.length > 0 && (
               <div>
-                <span className="text-white/50">Language(s)</span>
-                <p className="text-white font-medium">
+                <span className="text-muted">Language(s)</span>
+                <p className="text-text font-medium">
                   {data.spoken_languages.map((l) => l.english_name || l.name).join(", ")}
                 </p>
               </div>
             )}
             {data?.production_countries?.length > 0 && (
               <div>
-                <span className="text-white/50">Country</span>
-                <p className="text-white font-medium">
+                <span className="text-muted">Country</span>
+                <p className="text-text font-medium">
                   {data.production_countries.map((c) => c.name).join(", ")}
                 </p>
               </div>
@@ -388,7 +476,7 @@ const DetailsPage = () => {
 
       {isTV && data?.seasons?.filter(s => s.season_number > 0).length > 0 && (
         <div className="container mx-auto px-4 lg:px-8 max-w-screen-xl mb-8">
-          <h3 className="text-xl font-bold text-white mb-4">Seasons & Episodes</h3>
+          <h3 className="text-xl font-bold text-text mb-4">Seasons & Episodes</h3>
           
           <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-none">
             {data.seasons
@@ -399,8 +487,8 @@ const DetailsPage = () => {
                   onClick={() => setSelectedSeason(season.season_number)}
                   className={`flex-shrink-0 px-4 py-2 rounded-lg font-medium transition-all ${
                     selectedSeason === season.season_number
-                      ? 'bg-white text-black shadow-lg'
-                      : 'bg-white/10 text-white hover:bg-white/20 border border-white/20'
+                      ? 'bg-primary text-primary-fg shadow-lg shadow-primary/25'
+                      : 'bg-surface-elevated text-text hover:bg-surface-elevated border border-accent/20'
                   }`}
                 >
                   Season {season.season_number}
@@ -414,9 +502,9 @@ const DetailsPage = () => {
           {seasonDetails && (
             <div className="mt-6">
               <div className="flex items-center justify-between mb-4">
-                <h4 className="text-lg font-semibold text-white">
+                <h4 className="text-lg font-semibold text-text">
                   {seasonDetails.name}
-                  <span className="text-white/60 font-normal ml-2">
+                  <span className="text-muted font-normal ml-2">
                     • {seasonDetails.episodes?.length || 0} Episodes
                   </span>
                 </h4>
@@ -440,10 +528,11 @@ const DetailsPage = () => {
                       i.season_number === selectedSeason &&
                       i.episode_number === episode.episode_number
                   );
+                  const episodeDownload = getEpisodeDownload(selectedSeason, episode.episode_number);
                   return (
                     <div
                       key={episode.id}
-                      className="relative flex flex-col h-full bg-white/5 rounded-lg overflow-hidden hover:bg-white/10 hover:scale-[1.02] transition-all text-left group border border-white/10"
+                      className="relative flex flex-col h-full bg-surface-elevated rounded-lg overflow-hidden hover:bg-surface-elevated hover:scale-[1.02] transition-all text-left group border border-accent/15"
                     >
                       <button
                         onClick={() => handlePlayEpisode(selectedSeason, episode.episode_number)}
@@ -451,28 +540,27 @@ const DetailsPage = () => {
                       >
                         <div className="relative">
                           {episode.still_path ? (
-                            <img
+                            <LazyImage
                               src={imageURL + episode.still_path}
                               alt={episode.name}
                               className="w-full h-28 sm:h-32 object-cover"
-                              loading="lazy"
                             />
                           ) : (
-                            <div className="w-full h-28 sm:h-32 bg-black/40 flex items-center justify-center">
-                              <IoTv className="w-8 h-8 text-white/40" />
+                            <div className="w-full h-28 sm:h-32 bg-surface flex items-center justify-center">
+                              <IoTv className="w-8 h-8 text-muted" />
                             </div>
                           )}
-                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <div className="bg-white rounded-full p-3">
-                              <IoPlay className="w-6 h-6 text-black" />
+                          <div className="absolute inset-0 bg-surface opacity-60 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <div className="bg-primary rounded-full p-3">
+                              <IoPlay className="w-6 h-6 text-primary-fg" />
                             </div>
                           </div>
-                          <div className="absolute top-2 left-2 bg-black/70 text-white text-xs font-bold px-2 py-1 rounded">
+                          <div className="absolute top-2 left-2 bg-surface-elevated text-text text-xs font-bold px-2 py-1 rounded">
                             E{episode.episode_number}
                           </div>
                         </div>
                         <div className="p-3">
-                          <h5 className="font-medium text-white text-sm line-clamp-1">
+                          <h5 className="font-medium text-text text-sm line-clamp-1">
                             {episode.name}
                           </h5>
                           <div className="flex items-center gap-2 mt-1">
@@ -483,11 +571,11 @@ const DetailsPage = () => {
                               </div>
                             )}
                             {episode.runtime && (
-                              <span className="text-xs text-white/50">{episode.runtime}m</span>
+                              <span className="text-xs text-muted">{episode.runtime}m</span>
                             )}
                           </div>
                           {episode.overview && (
-                            <p className="text-xs text-white/60 mt-2 line-clamp-2">{episode.overview}</p>
+                            <p className="text-xs text-muted mt-2 line-clamp-2">{episode.overview}</p>
                           )}
                         </div>
                       </button>
@@ -500,7 +588,7 @@ const DetailsPage = () => {
                             dispatch(addToWatchlist(episodeItem));
                           }
                         }}
-                        className="mt-auto w-full py-1.5 px-2 rounded-lg text-xs font-medium bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-colors flex items-center justify-center gap-1.5 flex-shrink-0"
+                        className="w-full py-1.5 px-2 rounded-lg text-xs font-medium bg-surface-elevated border border-accent/20 text-text hover:bg-surface-elevated transition-colors flex items-center justify-center gap-1.5 flex-shrink-0"
                       >
                         {inWatchlist ? (
                           <>
@@ -513,6 +601,24 @@ const DetailsPage = () => {
                             Add to Watchlist
                           </>
                         )}
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDownloadEpisode(episode, selectedSeason);
+                        }}
+                        disabled={
+                          episodeDownload?.status === "downloading" ||
+                          episodeDownload?.status === "queued"
+                        }
+                        className="w-full py-1.5 px-2 rounded-lg text-xs font-medium bg-primary/20 border border-primary/30 text-primary hover:bg-primary/30 transition-colors flex items-center justify-center gap-1.5 flex-shrink-0 disabled:opacity-50"
+                      >
+                        <IoDownloadOutline className="w-3.5 h-3.5" />
+                        {episodeDownload?.status === "completed"
+                          ? "Downloaded"
+                          : episodeDownload?.status === "downloading" || episodeDownload?.status === "queued"
+                            ? `${episodeDownload.progress}%`
+                            : "Download"}
                       </button>
                     </div>
                   );
@@ -538,7 +644,7 @@ const DetailsPage = () => {
 
       {castData?.cast?.filter((item) => item?.profile_path).length > 0 && (
         <div className="container mx-auto px-4 lg:px-8 max-w-screen-xl">
-          <h3 className="text-xl font-bold text-white mb-4">Cast</h3>
+          <h3 className="text-xl font-bold text-text mb-4">Cast</h3>
           <CastCarousel
             castData={castData?.cast?.filter((item) => item?.profile_path)}
             imageURL={imageURL}

@@ -3,6 +3,7 @@ import moment from 'moment';
 import { Link } from 'react-router-dom';
 import { IoStar, IoPlay } from 'react-icons/io5';
 import { getRatingColor } from '../../lib/utils';
+import LazyImage from '../Reusables/LazyImage';
 
 const Card = ({ data, trending, index, media_type }) => {
     const imageURL = useSelector((state) => state.movieData.imageURL);
@@ -13,65 +14,48 @@ const Card = ({ data, trending, index, media_type }) => {
     const year = releaseDate ? moment(releaseDate).format("YYYY") : null;
 
     return (
-        <Link 
-            to={"/" + mediaType + "/" + data.id} 
-            className="group block w-full max-w-[220px] relative"
-        >
-            <div className="relative overflow-hidden rounded-xl bg-black/80 transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl">
+        <Link to={"/" + mediaType + "/" + data.id} className="group relative block w-full">
+            <div className="relative liquid-glass shadow-none overflow-hidden rounded-[1.25rem] transition-all duration-500 group-hover:scale-[1.02]">
                 {trending && index && (
-                    <div className="absolute top-2 left-2 z-20 bg-yellow-400 text-black font-bold rounded-lg px-2.5 py-1 text-xs shadow-lg">
+                    <div className="glass-pill absolute top-2.5 left-2.5 z-20 apple-caption-1 font-semibold text-text">
                         #{index}
                     </div>
                 )}
 
                 {mediaType && (
-                    <div className={`absolute top-2 right-2 z-20 text-black text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
-                        mediaType === 'tv' 
-                            ? 'bg-white/90' 
-                            : 'bg-white/90'
-                    }`}>
-                        {mediaType === 'tv' ? 'TV' : 'Movie'}
+                    <div className="glass-pill absolute top-2.5 right-2.5 z-20 apple-caption-2 font-semibold uppercase tracking-wider text-text/90">
+                        {mediaType === 'tv' ? 'Series' : 'Movie'}
                     </div>
                 )}
 
                 <div className="relative aspect-[2/3] overflow-hidden">
                     {data.poster_path ? (
-                        <img
+                        <LazyImage
                             src={imageURL + data.poster_path}
                             alt={title}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                            loading="lazy"
+                            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-black/40 text-white/50 text-sm text-center p-4">
+                        <div className="flex h-full w-full items-center justify-center apple-footnote p-4 text-center">
                             No Image Available
                         </div>
                     )}
 
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                        <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                            <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
-                                <IoPlay className="w-8 h-8 text-white" />
-                            </div>
+                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-70 transition-opacity duration-500 sm:opacity-0 sm:group-hover:opacity-100">
+                        <div className="liquid-glass-strong rounded-full p-3 transition-transform duration-500 sm:translate-y-4 sm:group-hover:translate-y-0">
+                            <IoPlay className="h-6 w-6 text-text sm:h-7 sm:w-7" />
                         </div>
                     </div>
-
-                    <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/80 to-transparent"></div>
                 </div>
-                <div className="p-3 space-y-1.5 bg-black/95">
-                    <h3 className="font-semibold text-white text-sm line-clamp-1 transition-colors">
-                        {title}
-                    </h3>
 
-                    <div className="flex items-center justify-between text-xs">
-                        {year && (
-                            <span className="text-white/60">{year}</span>
-                        )}
-
+                <div className="space-y-1 p-3">
+                    <h3 className="apple-headline line-clamp-1 text-text">{title}</h3>
+                    <div className="flex items-center justify-between">
+                        {year && <span className="apple-caption-1">{year}</span>}
                         {data?.vote_average > 0 && (
-                            <div className={`flex items-center gap-1 ${getRatingColor(data.vote_average).text}`}>
-                                <IoStar className="w-3 h-3 fill-current" />
-                                <span className="font-medium">{Number(data.vote_average).toFixed(1)}</span>
+                            <div className={`flex items-center gap-1 apple-caption-1 ${getRatingColor(data.vote_average).text}`}>
+                                <IoStar className="h-3 w-3 fill-current" />
+                                <span>{Number(data.vote_average).toFixed(1)}</span>
                             </div>
                         )}
                     </div>

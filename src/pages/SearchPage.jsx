@@ -1,79 +1,69 @@
 import { useCallback, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import axiosInstance from "../lib/axiosConfig";
-import { setImageURL } from "../reduxStore/Reducer/movieSlice";
-import { useDispatch, useSelector } from "react-redux";
 import Card from "../components/Home/Card";
-import { debounce, sanitizeSearchQuery } from "../lib/utils";
-
-const getSearchQuery = (search) => {
-  const q = new URLSearchParams(search).get("q");
-  return q ? sanitizeSearchQuery(q) : "";
-};
+import LoadMoreIndicator from "../components/Reusables/LoadMoreIndicator";
+import Loader from "../components/Reusables/Loader";
+import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
+import { getSearchQueryFromSearch } from "../lib/utils";
+import { USER_MESSAGES } from "../lib/userFriendlyError";
+import { useLocale } from "../context/LocaleContext";
 
 const SearchPage = () => {
+  const { language, t } = useLocale();
   const location = useLocation();
-  const query = getSearchQuery(location?.search || "");
+  const query = getSearchQueryFromSearch(location?.search || "");
   const [pageNo, setPageNo] = useState(1);
   const [data, setData] = useState([]);
   const [totalPageNo, setTotalPageNo] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState(null);
-  const dispatch = useDispatch();
-  const imageURL = useSelector((state) => state.movieData.imageURL);
+  const [resolvedQuery, setResolvedQuery] = useState("");
 
-  const debouncedFetchData = useCallback(
-    debounce(async (currentPage, searchQuery) => {
-      if (!searchQuery) return;
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await axiosInstance.get(`/search/multi`, {
-          params: { query: searchQuery, page: currentPage },
-        });
-        const results = response.data.results || [];
-        const filtered = results.filter(
-          (item) => item.media_type === "movie" || item.media_type === "tv"
-        );
-        setData((prev) =>
-          currentPage === 1 ? filtered : [...prev, ...filtered]
-        );
-        setTotalPageNo(response.data.total_pages ?? 0);
-      } catch (err) {
-        setError("Failed to load search results. Please try again.");
-        console.error("Search fetch error", err);
-      } finally {
-        setLoading(false);
-      }
-    }, 500),
-    []
-  );
+  const fetchPage = useCallback(async (currentPage, searchQuery) => {
+    if (!searchQuery) return;
+    const isFirstPage = currentPage === 1;
+    if (isFirstPage) setIsInitialLoading(true);
+    else setIsLoadingMore(true);
+    setError(null);
+    try {
+      const response = await axiosInstance.get(`/search/multi`, {
+        params: { query: searchQuery, page: currentPage },
+      });
+      const results = response.data.results || [];
+      const filtered = results.filter(
+        (item) => item.media_type === "movie" || item.media_type === "tv"
+      );
+      setData((prev) =>
+        currentPage === 1 ? filtered : [...prev, ...filtered]
+      );
+      setTotalPageNo(response.data.total_pages ?? 0);
+      if (isFirstPage) setResolvedQuery(searchQuery);
+    } catch (err) {
+      setError(USER_MESSAGES.search);
+      console.error("Search fetch error", err);
+      if (isFirstPage) setResolvedQuery(searchQuery);
+    } finally {
+      if (isFirstPage) setIsInitialLoading(false);
+      else setIsLoadingMore(false);
+    }
+  }, []);
 
-  const handleScroll = useCallback(() => {
-    if (
-      window.innerHeight + window.scrollY >= document.body.offsetHeight - 200 &&
-      pageNo < totalPageNo &&
-      !loading &&
-      query
-    ) {
+  const hasMore = totalPageNo > 0 && pageNo < totalPageNo;
+  const isLoading = isInitialLoading || isLoadingMore;
+
+  const loadMore = useCallback(() => {
+    if (query && hasMore && !isLoading) {
       setPageNo((prev) => prev + 1);
     }
-  }, [pageNo, totalPageNo, loading, query]);
+  }, [query, hasMore, isLoading]);
 
-  const fetchConfigurationData = useCallback(async () => {
-    try {
-      const response = await axiosInstance.get("/configuration");
-      dispatch(
-        setImageURL(response.data.images.secure_base_url + "original")
-      );
-    } catch (err) {
-      console.error("Config fetch error", err);
-    }
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (!imageURL) fetchConfigurationData();
-  }, [imageURL, fetchConfigurationData]);
+  const sentinelRef = useInfiniteScroll({
+    onLoadMore: loadMore,
+    hasMore: Boolean(query) && hasMore,
+    isLoading,
+  });
 
   useEffect(() => {
     if (!query) {
@@ -81,65 +71,64 @@ const SearchPage = () => {
       setTotalPageNo(0);
       setError(null);
       setPageNo(1);
+      setResolvedQuery("");
+      setIsInitialLoading(false);
       return;
     }
     setPageNo(1);
     setData([]);
-    debouncedFetchData(1, query);
-  }, [query]);
+    setTotalPageNo(0);
+    setError(null);
+    setResolvedQuery("");
+    setIsInitialLoading(true);
+    fetchPage(1, query);
+  }, [query, language, fetchPage]);
 
   useEffect(() => {
     if (query && pageNo > 1) {
-      debouncedFetchData(pageNo, query);
+      fetchPage(pageNo, query);
     }
-  }, [pageNo]);
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
+  }, [pageNo, query, fetchPage]);
 
   const hasSearched = query.length > 0;
   const showNoResults =
-    !loading && hasSearched && data.length === 0 && !error;
-  const showInitialEmpty = !loading && !hasSearched && !error;
+    !isLoading &&
+    hasSearched &&
+    data.length === 0 &&
+    !error &&
+    resolvedQuery === query;
+  const showInitialEmpty = !isLoading && !hasSearched && !error;
 
   return (
-    <div className="pt-16 min-h-screen">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-        <h1 className="text-2xl font-bold text-white mt-10 mb-6 text-center lg:text-left">
-          {hasSearched
-            ? `Search results for "${query}"`
-            : "Search"}
+    <div className="apple-page">
+      <div className="apple-container pb-12">
+        <h1 className="apple-large-title mt-4 mb-6 text-text sm:mt-6 lg:text-left">
+          {hasSearched ? t('search.resultsFor', { query }) : t('search.title')}
         </h1>
 
         {error && (
-          <div className="text-center mb-6 p-4 bg-white/10 border border-white/20 rounded-lg text-white/90">
-            {error}
-          </div>
+          <div className="apple-content-box mb-6 apple-footnote text-text/90">{error}</div>
         )}
 
         {showInitialEmpty && (
-          <div className="text-center py-16">
-            <p className="text-white/70 text-lg">
-              Try searching for a movie or TV show using the search icon above.
+          <div className="apple-empty-state">
+            <p className="apple-headline text-secondary">
+              {t('search.hint')}
             </p>
           </div>
         )}
 
         {showNoResults && (
-          <div className="text-center py-16">
-            <p className="text-white/70 text-lg mb-2">
-              No results found for <span className="text-white font-medium">"{query}"</span>
+          <div className="apple-empty-state">
+            <p className="apple-headline text-secondary">
+              No results for <span className="text-text">{query}</span>
             </p>
-            <p className="text-white/50 text-sm">
-              Try different keywords or check the spelling.
-            </p>
+            <p className="apple-footnote mt-2">Try different keywords or check the spelling.</p>
           </div>
         )}
 
         {data.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 lg:gap-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-5 lg:gap-5">
             {data.map((item) => (
               <div
                 key={`${item.id}-${item.media_type}-search`}
@@ -155,22 +144,20 @@ const SearchPage = () => {
           </div>
         )}
 
-        {loading && data.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-20 gap-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-2 border-white/30 border-t-white"></div>
-            <p className="text-white/70 text-sm">Searching...</p>
-          </div>
+        <div ref={sentinelRef} className="h-px" aria-hidden="true" />
+
+        {isInitialLoading && data.length === 0 && (
+          <Loader size="lg" label={t('search.searching')} className="py-20" />
         )}
 
-        {loading && data.length > 0 && (
-          <div className="flex justify-center py-8">
-            <div className="animate-spin rounded-full h-10 w-10 border-2 border-white/30 border-t-white"></div>
-          </div>
-        )}
+        <LoadMoreIndicator
+          isLoading={isLoadingMore}
+          label={t('loading.moreResults')}
+        />
 
-        {!loading && data.length > 0 && pageNo >= totalPageNo && (
+        {!isLoading && data.length > 0 && pageNo >= totalPageNo && (
           <div className="text-center py-8">
-            <p className="text-white/50 text-sm">You&apos;ve reached the end of results</p>
+            <p className="apple-footnote">You&apos;ve reached the end of results</p>
           </div>
         )}
       </div>

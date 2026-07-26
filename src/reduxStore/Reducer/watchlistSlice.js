@@ -68,10 +68,14 @@ const watchlistSlice = createSlice({
       }
       saveToStorage(state);
     },
+    clearWatchlist: (state) => {
+      state.length = 0;
+      saveToStorage(state);
+    },
   },
 });
 
-export const { addToWatchlist, removeFromWatchlist, toggleWatchlist } =
+export const { addToWatchlist, removeFromWatchlist, toggleWatchlist, clearWatchlist } =
   watchlistSlice.actions;
 
 export const createList = () => ({ type: "watchlist/noop" });

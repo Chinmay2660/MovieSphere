@@ -13,13 +13,23 @@ import {
   setTrendingMovies,
   setTrendingTv,
   setAiringToday,
-  setOnTheAir
+  setOnTheAir,
+  setBollywoodData,
+  setMarathiMoviesData,
+  setEnglishMoviesData,
 } from '../reduxStore/Reducer/movieSlice';
 import Banner from '../components/Home/Banner';
 import CardCarousel from '../components/Home/CardCarousel';
+import { useLocale } from '../context/LocaleContext';
+
+const discoverByLanguage = (language) =>
+  axiosInstance.get('/discover/movie', {
+    params: { with_original_language: language, sort_by: 'popularity.desc' },
+  });
 
 const Home = () => {
   const dispatch = useDispatch();
+  const { language, t } = useLocale();
 
   const trendingData = useSelector((state) => state.movieData.bannerData);
   const upcomingData = useSelector((state) => state.movieData.upcomingData);
@@ -32,6 +42,10 @@ const Home = () => {
   const trendingTv = useSelector((state) => state.movieData.trendingTv);
   const airingToday = useSelector((state) => state.movieData.airingToday);
   const onTheAir = useSelector((state) => state.movieData.onTheAir);
+  const bollywoodData = useSelector((state) => state.movieData.bollywoodData);
+  const marathiMoviesData = useSelector((state) => state.movieData.marathiMoviesData);
+  const englishMoviesData = useSelector((state) => state.movieData.englishMoviesData);
+  const imageURL = useSelector((state) => state.movieData.imageURL);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,6 +56,21 @@ const Home = () => {
         if (!trendingData.length) {
           requests.push(axiosInstance.get('/trending/all/week'));
           handlers.push((data) => dispatch(setBannerData(data.results)));
+        }
+
+        if (!bollywoodData.length) {
+          requests.push(discoverByLanguage('hi'));
+          handlers.push((data) => dispatch(setBollywoodData(data.results)));
+        }
+
+        if (!marathiMoviesData.length) {
+          requests.push(discoverByLanguage('mr'));
+          handlers.push((data) => dispatch(setMarathiMoviesData(data.results)));
+        }
+
+        if (!englishMoviesData.length) {
+          requests.push(discoverByLanguage('en'));
+          handlers.push((data) => dispatch(setEnglishMoviesData(data.results)));
         }
 
         if (!upcomingData.length) {
@@ -94,7 +123,13 @@ const Home = () => {
           handlers.push((data) => dispatch(setOnTheAir(data.results)));
         }
 
-        requests.push(axiosInstance.get('/configuration'));
+        let configIndex = -1;
+        if (!imageURL) {
+          configIndex = requests.length;
+          requests.push(axiosInstance.get('/configuration'));
+        }
+
+        if (!requests.length) return;
 
         const responses = await Promise.all(requests);
 
@@ -104,8 +139,10 @@ const Home = () => {
           }
         });
 
-        const configResponse = responses[responses.length - 1];
-        dispatch(setImageURL(configResponse.data.images.secure_base_url + "original"));
+        if (configIndex >= 0) {
+          const configResponse = responses[configIndex];
+          dispatch(setImageURL(configResponse.data.images.secure_base_url + "original"));
+        }
 
       } catch (error) {
         console.error("Failed to fetch data", error);
@@ -113,24 +150,27 @@ const Home = () => {
     };
 
     fetchData();
-  }, [dispatch]);
+  }, [dispatch, language]);
 
   const carousels = [
-    { heading: "Trending Now", data: trendingData, trending: true },
-    { heading: "Now Playing in Theaters", data: nowPlayingData, trending: false, media_type: "movie" },
-    { heading: "Popular Movies", data: popularMoviesData, trending: false, media_type: "movie" },
-    { heading: "Popular TV Shows", data: popularTvData, trending: false, media_type: "tv" },
-    { heading: "Top Rated Movies", data: topRatedMovies, trending: false, media_type: "movie" },
-    { heading: "Airing Today", data: airingToday, trending: false, media_type: "tv" },
-    { heading: "Trending Movies", data: trendingMovies, trending: true, media_type: "movie" },
-    { heading: "Trending TV Shows", data: trendingTv, trending: true, media_type: "tv" },
-    { heading: "Top Rated TV Shows", data: topRatedTv, trending: false, media_type: "tv" },
-    { heading: "Upcoming Movies", data: upcomingData, trending: false, media_type: "movie" },
-    { heading: "On The Air", data: onTheAir, trending: false, media_type: "tv" },
+    { heading: t('home.trendingIndia'), data: trendingData, trending: true },
+    { heading: t('home.hindiCinema'), data: bollywoodData, trending: false, media_type: "movie" },
+    { heading: t('home.marathiCinema'), data: marathiMoviesData, trending: false, media_type: "movie" },
+    { heading: t('home.englishCinema'), data: englishMoviesData, trending: false, media_type: "movie" },
+    { heading: t('home.nowInTheatres'), data: nowPlayingData, trending: false, media_type: "movie" },
+    { heading: t('home.popularMovies'), data: popularMoviesData, trending: false, media_type: "movie" },
+    { heading: t('home.popularWebSeries'), data: popularTvData, trending: false, media_type: "tv" },
+    { heading: t('home.topRatedMovies'), data: topRatedMovies, trending: false, media_type: "movie" },
+    { heading: t('home.airingToday'), data: airingToday, trending: false, media_type: "tv" },
+    { heading: t('home.trendingMovies'), data: trendingMovies, trending: true, media_type: "movie" },
+    { heading: t('home.trendingWebSeries'), data: trendingTv, trending: true, media_type: "tv" },
+    { heading: t('home.topRatedWebSeries'), data: topRatedTv, trending: false, media_type: "tv" },
+    { heading: t('home.upcomingReleases'), data: upcomingData, trending: false, media_type: "movie" },
+    { heading: t('home.currentlyStreaming'), data: onTheAir, trending: false, media_type: "tv" },
   ].filter(carousel => carousel.data && carousel.data.length > 0);
 
   return (
-    <div className="relative w-full min-h-screen">
+    <div className="relative w-full max-w-full min-h-screen overflow-x-hidden">
       <Banner />
       <div className="space-y-2">
         {carousels.map((carousel, index) => (
