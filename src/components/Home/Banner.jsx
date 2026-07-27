@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import VideoPlay from "../VideoPlay";
 import LazyImage from "../Reusables/LazyImage";
 import axiosInstance from "../../lib/axiosConfig";
-import { getRatingColor } from "../../lib/utils";
+import { getRatingColor, getTmdbImageUrl, TMDB_IMAGE_SIZES } from "../../lib/utils";
 import { useLocale } from "../../context/LocaleContext";
 
 const MAX_SLIDES = 10;
@@ -156,9 +156,12 @@ const Banner = () => {
               >
                 {isNearSlide && imageURL && data?.backdrop_path ? (
                   <LazyImage
-                    src={imageURL + data.backdrop_path}
+                    src={getTmdbImageUrl(imageURL, data.backdrop_path, TMDB_IMAGE_SIZES.backdropHero)}
                     alt={index === currentIndex && title ? `Banner for ${title}` : ""}
                     eager={index === 0}
+                    width={1280}
+                    height={720}
+                    sizes="100vw"
                     className="absolute inset-0 h-full w-full object-cover object-center"
                   />
                 ) : (

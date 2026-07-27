@@ -6,9 +6,11 @@ import { useLocale } from "../context/LocaleContext";
 
 const MOBILE_TABLET_QUERY = "(max-width: 1023px)";
 const ROTATE_CONTROL_QUERY = "(max-width: 1279px), (hover: none) and (pointer: coarse)";
+const TOUCH_PRIMARY_QUERY = "(hover: none) and (pointer: coarse)";
 
 const isMobileOrTablet = () => window.matchMedia(MOBILE_TABLET_QUERY).matches;
 const shouldShowRotateControl = () => window.matchMedia(ROTATE_CONTROL_QUERY).matches;
+const isTouchPrimary = () => window.matchMedia(TOUCH_PRIMARY_QUERY).matches;
 
 const requestLandscapeOrientation = async (container, { allowFullscreen = true } = {}) => {
   const orientation = screen.orientation;
@@ -86,9 +88,10 @@ const VideoPlay = ({
     const [embedSrc, setEmbedSrc] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [isFullscreen, setIsFullscreen] = useState(false);
-    const [showControls, setShowControls] = useState(true);
+    const [showControls, setShowControls] = useState(false);
     const [isTheaterMode, setIsTheaterMode] = useState(false);
     const [showRotateControl, setShowRotateControl] = useState(() => shouldShowRotateControl());
+    const [isTouchDevice, setIsTouchDevice] = useState(() => isTouchPrimary());
     const [embedReady, setEmbedReady] = useState(false);
     const containerRef = useRef(null);
     const controlsTimeoutRef = useRef(null);
@@ -145,12 +148,19 @@ const VideoPlay = ({
     }, []);
 
     useEffect(() => {
-        const mediaQuery = window.matchMedia("(max-width: 1279px), (hover: none) and (pointer: coarse)");
-        const updateRotateControl = () => setShowRotateControl(mediaQuery.matches);
+        const rotateQuery = window.matchMedia(ROTATE_CONTROL_QUERY);
+        const touchQuery = window.matchMedia(TOUCH_PRIMARY_QUERY);
+        const updateRotateControl = () => setShowRotateControl(rotateQuery.matches);
+        const updateTouchDevice = () => setIsTouchDevice(touchQuery.matches);
 
         updateRotateControl();
-        mediaQuery.addEventListener("change", updateRotateControl);
-        return () => mediaQuery.removeEventListener("change", updateRotateControl);
+        updateTouchDevice();
+        rotateQuery.addEventListener("change", updateRotateControl);
+        touchQuery.addEventListener("change", updateTouchDevice);
+        return () => {
+            rotateQuery.removeEventListener("change", updateRotateControl);
+            touchQuery.removeEventListener("change", updateTouchDevice);
+        };
     }, []);
 
     useEffect(() => {
@@ -196,35 +206,64 @@ const VideoPlay = ({
     }, [selectedEpisode, episodeCount, selectedSeason]);
 
     const scheduleControlsHide = useCallback(() => {
+        if (!isTouchDevice) return;
+
         if (controlsTimeoutRef.current) {
             clearTimeout(controlsTimeoutRef.current);
         }
-
-        // ponytail: iframe eats pointer events once loaded, so keep chrome visible
-        if (embedSrc || isLoading) return;
 
         controlsTimeoutRef.current = setTimeout(() => {
             if (!showSeasonDropdown && !showEpisodeDropdown) {
                 setShowControls(false);
             }
         }, 3000);
-    }, [embedSrc, isLoading, showSeasonDropdown, showEpisodeDropdown]);
+    }, [isTouchDevice, showSeasonDropdown, showEpisodeDropdown]);
 
-    const handleMouseMove = () => {
+    const revealControls = useCallback(() => {
         setShowControls(true);
         scheduleControlsHide();
-    };
+    }, [scheduleControlsHide]);
 
-    const handleTouchStart = () => {
+    const hideControls = useCallback(() => {
+        if (showSeasonDropdown || showEpisodeDropdown) return;
+        setShowControls(false);
+    }, [showSeasonDropdown, showEpisodeDropdown]);
+
+    const handlePlayerMouseEnter = useCallback(() => {
+        if (isTouchDevice) return;
         setShowControls(true);
-        scheduleControlsHide();
-    };
+    }, [isTouchDevice]);
+
+    const handlePlayerMouseLeave = useCallback(() => {
+        if (isTouchDevice) return;
+        hideControls();
+    }, [hideControls, isTouchDevice]);
+
+    const handlePlayerOverlayClick = useCallback(() => {
+        if (!isTouchDevice) return;
+        setShowControls((prev) => {
+            const next = !prev;
+            if (next) scheduleControlsHide();
+            else if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+            return next;
+        });
+    }, [isTouchDevice, scheduleControlsHide]);
 
     const handleEmbedLoad = useCallback(() => {
         setIsLoading(false);
         setEmbedReady(true);
-        setShowControls(true);
-    }, []);
+        if (isTouchDevice) {
+            setShowControls(true);
+            scheduleControlsHide();
+        } else {
+            setShowControls(false);
+        }
+    }, [isTouchDevice, scheduleControlsHide]);
+
+    useEffect(() => {
+        if (!isTouchDevice || !showControls || showSeasonDropdown || showEpisodeDropdown) return;
+        scheduleControlsHide();
+    }, [isTouchDevice, showControls, showSeasonDropdown, showEpisodeDropdown, scheduleControlsHide]);
 
     const toggleFullscreen = async () => {
         try {
@@ -279,6 +318,7 @@ const VideoPlay = ({
 
     const canGoPrev = selectedEpisode > 1 || selectedSeason > 1;
     const canGoNext = selectedEpisode < episodeCount || validSeasons.some(s => s.season_number === selectedSeason + 1);
+    const controlsVisible = showControls || isLoading;
 
     return createPortal(
         <section 
@@ -291,13 +331,12 @@ const VideoPlay = ({
             <div 
                 ref={containerRef}
                 className={`relative flex h-dvh w-full flex-col bg-background ${isTheaterMode ? 'bg-background' : ''}`}
-                onMouseMove={handleMouseMove}
-                onTouchStart={handleTouchStart}
-                onMouseLeave={() => !showSeasonDropdown && !showEpisodeDropdown && setShowControls(false)}
+                onMouseEnter={handlePlayerMouseEnter}
+                onMouseLeave={handlePlayerMouseLeave}
             >
                 <div 
                     className={`absolute top-0 left-0 right-0 z-20 transition-all duration-300 ${
-                        showControls ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'
+                        controlsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'
                     }`}
                 >
                     <div className="bg-gradient-to-b from-background/90 via-background/60 to-transparent p-3 sm:p-4 pb-6 sm:pb-8 pt-[max(0.75rem,env(safe-area-inset-top))]">
@@ -312,8 +351,8 @@ const VideoPlay = ({
                 </button>
 
                                 <div className="h-6 w-px bg-surface-elevated hidden sm:block"></div>
-                                <div className="hidden sm:block">
-                                    <span className="text-text font-medium">
+                                <div>
+                                    <span className="text-text font-medium text-sm sm:text-base">
                                         {media_type === "tv" ? `S${selectedSeason} E${selectedEpisode}` : "Now Playing"}
                                     </span>
                                 </div>
@@ -327,6 +366,7 @@ const VideoPlay = ({
                                                     e.stopPropagation();
                                                     setShowSeasonDropdown(!showSeasonDropdown);
                                                     setShowEpisodeDropdown(false);
+                                                    revealControls();
                                                 }}
                                                 className="flex items-center gap-1 bg-surface-elevated hover:bg-surface-elevated backdrop-blur-sm px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-text text-xs sm:text-sm transition-all border border-accent/15"
                                             >
@@ -364,6 +404,7 @@ const VideoPlay = ({
                                                     e.stopPropagation();
                                                     setShowEpisodeDropdown(!showEpisodeDropdown);
                                                     setShowSeasonDropdown(false);
+                                                    revealControls();
                                                 }}
                                                 className="flex items-center gap-1 bg-surface-elevated hover:bg-surface-elevated backdrop-blur-sm px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-text text-xs sm:text-sm transition-all border border-accent/15"
                                             >
@@ -454,10 +495,18 @@ const VideoPlay = ({
                             onLoad={handleEmbedLoad}
                         />
                     ) : null}
+                    {!isLoading && isTouchDevice && (
+                        <button
+                            type="button"
+                            aria-label={controlsVisible ? t('video.hideControls') : t('video.showControls')}
+                            className="absolute inset-0 z-[15] cursor-pointer"
+                            onClick={handlePlayerOverlayClick}
+                        />
+                    )}
                 </div>
                 <div 
                     className={`absolute bottom-0 left-0 right-0 z-20 transition-all duration-300 ${
-                        showControls ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
+                        controlsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
                     }`}
                 >
                     <div className="bg-gradient-to-t from-background/90 via-background/60 to-transparent p-3 sm:p-4 pt-6 sm:pt-8 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
@@ -498,7 +547,7 @@ const VideoPlay = ({
                         </div>
                     </div>
                 </div>
-                {media_type === "tv" && showControls && (
+                {media_type === "tv" && controlsVisible && (
                     <>
                         {canGoPrev && (
                             <button

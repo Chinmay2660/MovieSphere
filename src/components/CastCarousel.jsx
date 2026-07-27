@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 import LazyImage from "./Reusables/LazyImage";
+import { getTmdbImageUrl, TMDB_IMAGE_SIZES } from "../lib/utils";
 
 const SCROLL_THRESHOLD = 8;
 
@@ -47,11 +48,12 @@ const CastCarousel = ({ castData, imageURL }) => {
                             {imageURL && item?.profile_path && (
                                 <div className="relative">
                                     <LazyImage
-                                        src={imageURL + item?.profile_path}
+                                        src={getTmdbImageUrl(imageURL, item?.profile_path, TMDB_IMAGE_SIZES.profile)}
                                         alt={item?.name}
                                         className="h-24 w-24 sm:h-32 sm:w-32 object-cover rounded-full"
-                                        width={128}
-                                        height={128}
+                                        width={185}
+                                        height={185}
+                                        sizes="128px"
                                         style={{ aspectRatio: "1/1" }}
                                     />
                                 </div>

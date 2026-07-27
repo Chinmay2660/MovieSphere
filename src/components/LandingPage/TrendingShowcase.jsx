@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
 import axiosInstance from "../../lib/axiosConfig";
 import LazyImage from "../Reusables/LazyImage";
+import { getTmdbImageUrl, TMDB_IMAGE_SIZES } from "../../lib/utils";
 
 const pickPosters = (items) =>
     (items ?? []).filter((item) => item.poster_path).slice(0, 14);
@@ -10,7 +11,6 @@ const pickPosters = (items) =>
 const TrendingShowcase = () => {
     const bannerData = useSelector((state) => state.movieData.bannerData);
     const imageURL = useSelector((state) => state.movieData.imageURL);
-    const imageBase = imageURL ? imageURL.replace("original", "w342") : "";
     const [posters, setPosters] = useState(() => pickPosters(bannerData));
 
     useEffect(() => {
@@ -30,7 +30,7 @@ const TrendingShowcase = () => {
         loadTrending();
     }, [bannerData]);
 
-    if (!posters.length || !imageBase) return null;
+    if (!posters.length || !imageURL) return null;
 
     const looped = [...posters, ...posters];
 
@@ -62,7 +62,7 @@ const TrendingShowcase = () => {
                         >
                             <div className="aspect-[2/3] overflow-hidden">
                                 <LazyImage
-                                    src={imageBase + item.poster_path}
+                                    src={getTmdbImageUrl(imageURL, item.poster_path, TMDB_IMAGE_SIZES.poster)}
                                     alt={title}
                                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                                 />

@@ -9,17 +9,15 @@ import Loader from "../components/Reusables/Loader";
 import CardCarousel from "../components/Home/CardCarousel";
 import { IoPlay, IoStar, IoCalendar, IoTime, IoTv, IoExpand, IoAddOutline, IoCheckmarkOutline, IoDownloadOutline } from "react-icons/io5";
 import CastCarousel from "../components/CastCarousel";
-import { getRatingColor, formatYear, formatLongDate } from "../lib/utils";
+import { getRatingColor, getTmdbImageUrl, TMDB_IMAGE_SIZES, formatYear, formatLongDate } from "../lib/utils";
 import { addToWatchlist, removeFromWatchlist } from "../reduxStore/Reducer/watchlistSlice";
 import { getDownloadKey, selectDownloadByKey } from "../reduxStore/Reducer/downloadsSlice";
 import { startDownload } from "../lib/downloadService";
 import { Link } from "react-router-dom";
 import { USER_MESSAGES } from "../lib/userFriendlyError";
-import { useLocale } from "../context/LocaleContext";
 
 const VideoPlay = lazy(() => import("../components/VideoPlay"));
 const DetailsPage = () => {
-  const { t } = useLocale();
   const params = useParams();
   const isTV = params?.explore === 'tv';
   const location = useLocation();
@@ -114,18 +112,14 @@ const DetailsPage = () => {
   const fetchData = async () => {
     setLoading(true);
     setError(null);
+    setCastData(null);
+    setSimilarData(null);
+    setRecommendationsData(null);
     try {
-      const [detailsResponse, castResponse, similarResponse, recommendationsResponse] = await Promise.all([
-        axiosInstance.get(`/${params?.explore}/${params?.id}`),
-        axiosInstance.get(`/${params?.explore}/${params?.id}/credits`),
-        axiosInstance.get(`/${params?.explore}/${params?.id}/similar`),
-        axiosInstance.get(`/${params?.explore}/${params?.id}/recommendations`)
-      ]);
+      const detailsResponse = await axiosInstance.get(`/${params?.explore}/${params?.id}`);
       setData(detailsResponse.data);
-      setCastData(castResponse.data);
-      setSimilarData(similarResponse.data.results);
-      setRecommendationsData(recommendationsResponse.data.results);
-      
+      setLoading(false);
+
       if (params?.explore === 'tv' && detailsResponse.data.seasons?.length > 0) {
         const seasons = detailsResponse.data.seasons;
         const stateSeason = location.state?.initialSeason;
@@ -138,9 +132,17 @@ const DetailsPage = () => {
           setSelectedSeason(firstValidSeason.season_number);
         }
       }
+
+      const [castResponse, similarResponse, recommendationsResponse] = await Promise.all([
+        axiosInstance.get(`/${params?.explore}/${params?.id}/credits`),
+        axiosInstance.get(`/${params?.explore}/${params?.id}/similar`),
+        axiosInstance.get(`/${params?.explore}/${params?.id}/recommendations`),
+      ]);
+      setCastData(castResponse.data);
+      setSimilarData(similarResponse.data.results);
+      setRecommendationsData(recommendationsResponse.data.results);
     } catch {
       setError(USER_MESSAGES.loadContent);
-    } finally {
       setLoading(false);
     }
   };
@@ -184,6 +186,18 @@ const DetailsPage = () => {
     }
   }, [loading, data, location.state, location.pathname, params?.explore, navigate]);
 
+  useEffect(() => {
+    if (loading || !data?.poster_path || !imageURL) return;
+
+    const href = getTmdbImageUrl(imageURL, data.poster_path, TMDB_IMAGE_SIZES.posterLg);
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.as = "image";
+    link.href = href;
+    document.head.appendChild(link);
+    return () => link.remove();
+  }, [loading, data?.poster_path, imageURL]);
+
   const handlePlayEpisode = (seasonNum, episodeNum) => {
     setPlayConfig({ season: seasonNum, episode: episodeNum });
     setPlayVideo(true);
@@ -200,11 +214,19 @@ const DetailsPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader
-          size="lg"
-          label={isTV ? t('loading.tvDetails') : t('loading.movieDetails')}
-        />
+      <div className="apple-page text-text lg:pt-0">
+        <div className="w-full h-[300px] sm:h-[400px] relative hidden lg:block bg-surface-elevated animate-pulse" />
+        <div className="apple-container flex max-w-screen-xl flex-col gap-6 py-6 sm:gap-8 sm:py-8 lg:flex-row lg:gap-10">
+          <div className="mx-auto lg:-mt-48 lg:mx-0 flex-shrink-0">
+            <div className="h-72 w-48 lg:h-96 lg:w-64 bg-surface-elevated animate-pulse rounded-xl" />
+          </div>
+          <div className="flex-1 space-y-4">
+            <div className="h-10 w-3/4 max-w-md bg-surface-elevated animate-pulse rounded-lg" />
+            <div className="h-4 w-1/2 bg-surface-elevated animate-pulse rounded" />
+            <div className="h-24 w-full bg-surface-elevated animate-pulse rounded-lg" />
+            <div className="h-10 w-32 bg-surface-elevated animate-pulse rounded-xl" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -231,12 +253,13 @@ const DetailsPage = () => {
       <div className="w-full h-[300px] sm:h-[400px] relative hidden lg:block">
         {imageURL && data?.backdrop_path && (
           <LazyImage
-            src={imageURL + data?.backdrop_path}
-            alt="Banner"
+            src={getTmdbImageUrl(imageURL, data.backdrop_path, TMDB_IMAGE_SIZES.backdrop)}
+            alt=""
             eager
+            width={780}
+            height={400}
+            sizes="100vw"
             className="h-full w-full object-cover"
-            width="1920"
-            height="400"
           />
         )}
         <div className="absolute w-full h-full top-0 bg-gradient-to-t from-background via-background/60 to-transparent"></div>
@@ -246,9 +269,12 @@ const DetailsPage = () => {
         <div className="relative mx-auto lg:-mt-48 lg:mx-0 flex-shrink-0">
           {imageURL && data?.poster_path ? (
             <LazyImage
-              src={imageURL + data?.poster_path}
-              alt="Poster"
+              src={getTmdbImageUrl(imageURL, data.poster_path, TMDB_IMAGE_SIZES.posterLg)}
+              alt={data?.title ?? data?.original_title ?? data?.name ?? "Poster"}
               eager
+              width={500}
+              height={750}
+              sizes="(max-width: 1024px) 192px, 256px"
               className="h-72 w-48 lg:h-96 lg:w-64 object-cover rounded-xl shadow-2xl"
             />
           ) : (
@@ -549,8 +575,11 @@ const DetailsPage = () => {
                         <div className="relative">
                           {episode.still_path ? (
                             <LazyImage
-                              src={imageURL + episode.still_path}
+                              src={getTmdbImageUrl(imageURL, episode.still_path, TMDB_IMAGE_SIZES.still)}
                               alt={episode.name}
+                              width={300}
+                              height={169}
+                              sizes="(max-width: 640px) 50vw, 25vw"
                               className="w-full h-28 sm:h-32 object-cover"
                             />
                           ) : (

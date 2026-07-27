@@ -37,6 +37,21 @@ export function formatYear(dateStr) {
   return /^\d{4}$/.test(year) ? year : null;
 }
 
+/** TMDB poster/backdrop sizes — avoids shipping `original` (~1MB+) everywhere. */
+export const TMDB_IMAGE_SIZES = {
+  poster: 'w342',
+  posterLg: 'w500',
+  backdrop: 'w780',
+  backdropHero: 'w1280',
+  profile: 'w185',
+  still: 'w300',
+};
+
+export function getTmdbImageUrl(baseUrl, path, size = TMDB_IMAGE_SIZES.posterLg) {
+  if (!baseUrl || !path) return '';
+  return baseUrl.replace(/original$/, size) + path;
+}
+
 export function formatLongDate(dateStr) {
   if (!dateStr) return '';
   const date = new Date(dateStr);

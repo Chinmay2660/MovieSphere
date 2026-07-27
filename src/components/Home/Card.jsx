@@ -2,7 +2,7 @@ import { useSelector } from 'react-redux';
 import { formatYear } from '../../lib/utils';
 import { Link } from 'react-router-dom';
 import { IoStar, IoPlay } from 'react-icons/io5';
-import { getRatingColor } from '../../lib/utils';
+import { getRatingColor, getTmdbImageUrl, TMDB_IMAGE_SIZES } from '../../lib/utils';
 import LazyImage from '../Reusables/LazyImage';
 
 const Card = ({ data, trending, index, media_type }) => {
@@ -31,8 +31,11 @@ const Card = ({ data, trending, index, media_type }) => {
 
                     {data.poster_path ? (
                         <LazyImage
-                            src={imageURL + data.poster_path}
+                            src={getTmdbImageUrl(imageURL, data.poster_path, TMDB_IMAGE_SIZES.poster)}
                             alt={title}
+                            width={342}
+                            height={513}
+                            sizes="(max-width: 640px) 45vw, 200px"
                             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                     ) : (
