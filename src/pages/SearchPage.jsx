@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import axiosInstance from "../lib/axiosConfig";
 import Card from "../components/Home/Card";
-import LoadMoreIndicator from "../components/Reusables/LoadMoreIndicator";
 import Loader from "../components/Reusables/Loader";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 import { getSearchQueryFromSearch } from "../lib/utils";
@@ -40,9 +39,8 @@ const SearchPage = () => {
       );
       setTotalPageNo(response.data.total_pages ?? 0);
       if (isFirstPage) setResolvedQuery(searchQuery);
-    } catch (err) {
+    } catch {
       setError(USER_MESSAGES.search);
-      console.error("Search fetch error", err);
       if (isFirstPage) setResolvedQuery(searchQuery);
     } finally {
       if (isFirstPage) setIsInitialLoading(false);
@@ -150,10 +148,9 @@ const SearchPage = () => {
           <Loader size="lg" label={t('search.searching')} className="py-20" />
         )}
 
-        <LoadMoreIndicator
-          isLoading={isLoadingMore}
-          label={t('loading.moreResults')}
-        />
+        {isLoadingMore && (
+          <Loader label={t('loading.moreResults')} className="py-8" />
+        )}
 
         {!isLoading && data.length > 0 && pageNo >= totalPageNo && (
           <div className="text-center py-8">

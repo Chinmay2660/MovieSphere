@@ -23,8 +23,8 @@ const saveToStorage = (items) => {
   try {
     const serializable = items.map(({ blobUrl, ...rest }) => rest);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(serializable));
-  } catch (e) {
-    console.error("Failed to save downloads metadata", e);
+  } catch {
+    // localStorage may be full or unavailable
   }
 };
 

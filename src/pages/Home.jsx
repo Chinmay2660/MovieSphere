@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import axiosInstance from '../lib/axiosConfig';
 import {
   setBannerData,
-  setImageURL,
   setNowPlayingData,
   setPopularMoviesData,
   setPopularTvData,
@@ -45,7 +44,6 @@ const Home = () => {
   const bollywoodData = useSelector((state) => state.movieData.bollywoodData);
   const marathiMoviesData = useSelector((state) => state.movieData.marathiMoviesData);
   const englishMoviesData = useSelector((state) => state.movieData.englishMoviesData);
-  const imageURL = useSelector((state) => state.movieData.imageURL);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -123,29 +121,16 @@ const Home = () => {
           handlers.push((data) => dispatch(setOnTheAir(data.results)));
         }
 
-        let configIndex = -1;
-        if (!imageURL) {
-          configIndex = requests.length;
-          requests.push(axiosInstance.get('/configuration'));
-        }
-
         if (!requests.length) return;
 
         const responses = await Promise.all(requests);
 
         responses.forEach((response, index) => {
-          if (index < handlers.length) {
-            handlers[index](response.data);
-          }
+          handlers[index](response.data);
         });
 
-        if (configIndex >= 0) {
-          const configResponse = responses[configIndex];
-          dispatch(setImageURL(configResponse.data.images.secure_base_url + "original"));
-        }
-
-      } catch (error) {
-        console.error("Failed to fetch data", error);
+      } catch {
+        // Home sections degrade gracefully when a fetch fails
       }
     };
 
@@ -172,7 +157,7 @@ const Home = () => {
   return (
     <div className="relative w-full max-w-full min-h-screen overflow-x-hidden">
       <Banner />
-      <div className="space-y-2">
+      <div className="relative z-10 -mt-4 space-y-2 sm:-mt-6">
         {carousels.map((carousel, index) => (
           <CardCarousel
             key={index}

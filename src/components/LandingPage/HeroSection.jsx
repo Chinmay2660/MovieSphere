@@ -50,7 +50,7 @@ const HeroSection = () => {
                     initial={{ opacity: 0, y: 28 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    className="liquid-glass rounded-[1.75rem] px-4 py-7 sm:rounded-[2rem] sm:px-8 sm:py-10 md:rounded-none md:border-0 md:bg-transparent md:p-0 md:shadow-none md:backdrop-blur-none"
+                    className="px-4 py-7 sm:px-8 sm:py-10 md:p-0"
                 >
                     <motion.span
                         initial={{ opacity: 0 }}

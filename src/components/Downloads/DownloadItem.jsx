@@ -21,9 +21,7 @@ const statusLabel = {
 };
 
 const sourceLabel = {
-  vidsrc_cc: "VidSrc",
-  vidsrc_to: "VidSrc",
-  "2embed": "2embed",
+  vidsrc_sbs: "VidSrc",
 };
 
 const chipTone = (status, isActive) => {

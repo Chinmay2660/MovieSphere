@@ -1,15 +1,13 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { removeFromWatchlist } from "../reduxStore/Reducer/watchlistSlice";
-import { selectAutoPlayFromWatchlist } from "../reduxStore/Reducer/settingsSlice";
-import { IoPlay, IoTrashOutline } from "react-icons/io5";
-import moment from "moment";
+import { IoTrashOutline } from "react-icons/io5";
+import { formatYear } from "../lib/utils";
 import LazyImage from "../components/Reusables/LazyImage";
 
 const WatchlistPage = () => {
   const items = useSelector((state) => state.watchlist);
   const imageURL = useSelector((state) => state.movieData.imageURL);
-  const autoPlayFromWatchlist = useSelector(selectAutoPlayFromWatchlist);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -28,17 +26,12 @@ const WatchlistPage = () => {
     }
   };
 
-  const handlePlay = (item) => {
-    const playState = autoPlayFromWatchlist ? { autoPlay: true } : {};
+  const handleOpenDetails = (item) => {
     if (item.type === "movie") {
-      navigate(`/movie/${item.id}`, { state: playState });
+      navigate(`/movie/${item.id}`);
     } else {
       navigate(`/tv/${item.tv_id}`, {
-        state: {
-          ...playState,
-          initialSeason: item.season_number,
-          initialEpisode: item.episode_number,
-        },
+        state: { initialSeason: item.season_number },
       });
     }
   };
@@ -53,7 +46,7 @@ const WatchlistPage = () => {
         <header className="apple-section-header">
           <h1 className="apple-large-title text-text">Watchlist</h1>
           <p className="apple-subheadline mt-2">
-            Movies and episodes you added. Tap a card to start watching.
+            Movies and episodes you added. Tap a card to view details.
           </p>
         </header>
 
@@ -77,7 +70,7 @@ const WatchlistPage = () => {
               className="apple-content-box flex flex-col overflow-hidden p-0"
             >
               <button
-                onClick={() => handlePlay(item)}
+                onClick={() => handleOpenDetails(item)}
                 className="flex min-h-0 flex-1 flex-col text-left"
               >
                 <div className="relative">
@@ -92,11 +85,6 @@ const WatchlistPage = () => {
                       <span className="apple-footnote">No image</span>
                     </div>
                   )}
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
-                    <div className="liquid-glass-strong rounded-full p-3">
-                      <IoPlay className="h-6 w-6 text-text" />
-                    </div>
-                  </div>
                   <div className="glass-pill absolute top-2 left-2 apple-caption-2 font-semibold text-text">
                     {item.type === "movie" ? "Movie" : `E${item.episode_number}`}
                   </div>
@@ -107,7 +95,7 @@ const WatchlistPage = () => {
                       <h2 className="apple-headline line-clamp-1">{item.title}</h2>
                       {item.release_date && (
                         <span className="apple-caption-1 mt-1 block">
-                          {moment(item.release_date).format("YYYY")}
+                          {formatYear(item.release_date)}
                         </span>
                       )}
                     </>

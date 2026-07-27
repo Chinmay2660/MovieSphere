@@ -143,13 +143,6 @@ export function getStaleResponse(config) {
   return getStale(key);
 }
 
-export function setCachedResponse(config, response) {
-  const key = cacheKey(config);
-  set(key, response, getCacheTtlMs(config.url));
-}
-
-export const CACHE_TTL_MS_EXPORT = DEFAULT_TTL_MS;
-
 export function clearApiCache() {
   cache.clear();
   inflight.clear();
@@ -239,4 +232,4 @@ export async function fetchWithCachePolicy(config, fetcher, { ttlMs, maxRetries 
   return promise;
 }
 
-export { cacheKey, getCacheTtlMs };
+export { getCacheTtlMs };

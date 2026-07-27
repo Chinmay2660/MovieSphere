@@ -1,13 +1,16 @@
+import { lazy } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
-import LandingPage from "../pages/LandingPage";
-import DetailsPage from "../pages/DetailsPage";
-import ExplorePage from "../pages/ExplorePage";
-import SearchPage from '../pages/SearchPage';
-import WatchlistPage from '../pages/WatchlistPage';
-import DownloadsPage from '../pages/DownloadsPage';
-import SettingsPage from '../pages/SettingsPage';
-import Home from "../pages/Home";
+
+const LandingPage = lazy(() => import("../pages/LandingPage"));
+const Home = lazy(() => import("../pages/Home"));
+const ExplorePage = lazy(() => import("../pages/ExplorePage"));
+const DetailsPage = lazy(() => import("../pages/DetailsPage"));
+const SearchPage = lazy(() => import("../pages/SearchPage"));
+const WatchlistPage = lazy(() => import("../pages/WatchlistPage"));
+const DownloadsPage = lazy(() => import("../pages/DownloadsPage"));
+const SettingsPage = lazy(() => import("../pages/SettingsPage"));
+const NotFound = lazy(() => import("../components/Reusables/ErrorPage"));
 
 const router = createBrowserRouter([
     {
@@ -46,8 +49,12 @@ const router = createBrowserRouter([
                 path: "/settings",
                 element: <SettingsPage />,
             },
+            {
+                path: "*",
+                element: <NotFound />,
+            },
         ]
     },
 ]);
 
-export default router
+export default router;

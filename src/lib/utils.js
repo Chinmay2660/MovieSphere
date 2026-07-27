@@ -30,3 +30,20 @@ export const getRatingColor = (voteAverage) => {
     if (score >= 3) return { text: 'text-orange-400', bg: 'bg-orange-400/20', color: '#fb923c' };
     return { text: 'text-red-400', bg: 'bg-red-400/20', color: '#f87171' };
 };
+
+export function formatYear(dateStr) {
+  if (!dateStr) return null;
+  const year = String(dateStr).slice(0, 4);
+  return /^\d{4}$/.test(year) ? year : null;
+}
+
+export function formatLongDate(dateStr) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  if (Number.isNaN(date.getTime())) return '';
+  return new Intl.DateTimeFormat(undefined, {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(date);
+}

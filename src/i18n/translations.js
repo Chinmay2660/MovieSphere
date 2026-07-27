@@ -26,6 +26,12 @@ export const translations = {
     'loading.playbackMovie': 'Movie is loading...',
     'loading.playbackEpisode': 'Episode is loading...',
     'loading.offline': 'Preparing playback...',
+    'video.rotateLandscape': 'Rotate to landscape',
+    'video.rotate': 'Rotate',
+    'video.playbackUnavailable': "This title isn't available to stream right now. Please try again later.",
+    'video.streamFailed': "The stream couldn't start. Try again or pick another episode.",
+    'video.retry': 'Try again',
+    'video.close': 'Close',
     'banner.playNow': 'Play Now',
     'banner.moreDetails': 'More Details',
     'banner.rating': 'Rating',
@@ -105,6 +111,12 @@ export const translations = {
     'loading.playbackMovie': 'फ़िल्म लोड हो रही है...',
     'loading.playbackEpisode': 'एपिसोड लोड हो रहा है...',
     'loading.offline': 'प्लेबैक तैयार हो रहा है...',
+    'video.rotateLandscape': 'लैंडस्केप में घुमाएँ',
+    'video.rotate': 'घुमाएँ',
+    'video.playbackUnavailable': 'यह टाइटल अभी स्ट्रीम के लिए उपलब्ध नहीं है। बाद में फिर कोशिश करें।',
+    'video.streamFailed': 'स्ट्रीम शुरू नहीं हो सकी। फिर कोशिश करें या दूसरा एपिसोड चुनें।',
+    'video.retry': 'फिर से कोशिश करें',
+    'video.close': 'बंद करें',
     'banner.playNow': 'अभी देखें',
     'banner.moreDetails': 'और जानें',
     'banner.rating': 'रेटिंग',
@@ -184,6 +196,12 @@ export const translations = {
     'loading.playbackMovie': 'चित्रपट लोड होत आहे...',
     'loading.playbackEpisode': 'भाग लोड होत आहे...',
     'loading.offline': 'प्लेबॅक तयार होत आहे...',
+    'video.rotateLandscape': 'लँडस्केपमध्ये फिरवा',
+    'video.rotate': 'फिरवा',
+    'video.playbackUnavailable': 'हे शीर्षक आत्ता स्ट्रीमिंगसाठी उपलब्ध नाही. नंतर पुन्हा प्रयत्न करा.',
+    'video.streamFailed': 'स्ट्रीम सुरू होऊ शकली नाही. पुन्हा प्रयत्न करा किंवा दुसरा भाग निवडा.',
+    'video.retry': 'पुन्हा प्रयत्न करा',
+    'video.close': 'बंद करा',
     'banner.playNow': 'आत्ता पहा',
     'banner.moreDetails': 'अधिक माहिती',
     'banner.rating': 'रेटिंग',
@@ -242,7 +260,7 @@ export const translations = {
 
 if (import.meta.env?.DEV) {
   for (const { code } of APP_LANGUAGES) {
-    console.assert(translations[code], `missing translations for ${code}`);
+    if (!translations[code]) throw new Error(`missing translations for ${code}`);
   }
 }
 

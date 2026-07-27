@@ -36,10 +36,23 @@ const CardCarousel = ({ data, trending, heading, media_type }) => {
             <h2 className="apple-title-2 mb-4 text-text sm:mb-5">{heading}</h2>
 
             <div className="relative">
+                {canScrollLeft && (
+                    <div
+                        className="pointer-events-none absolute inset-y-0 left-0 z-[5] w-8 bg-gradient-to-r from-background to-transparent sm:w-12"
+                        aria-hidden
+                    />
+                )}
+                {canScrollRight && (
+                    <div
+                        className="pointer-events-none absolute inset-y-0 right-0 z-[5] w-8 bg-gradient-to-l from-background to-transparent sm:w-12"
+                        aria-hidden
+                    />
+                )}
+
                 <div
                     ref={containerRef}
                     onScroll={updateScrollState}
-                    className="flex gap-4 overflow-x-auto overflow-y-visible scrollbar-none scroll-smooth pb-4"
+                    className="flex gap-4 overflow-x-auto scrollbar-none scroll-smooth py-1"
                 >
                     {data.map((item, index) => (
                         <div

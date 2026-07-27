@@ -14,14 +14,12 @@
     "@vercel/analytics": "^1.6.1",
     "axios": "^1.13.2",
     "framer-motion": "^12.24.0",
-    "moment": "^2.30.1",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-icons": "^5.5.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.11.0"
   },
-  "proxy": "http://localhost:8000",
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
     "@tailwindcss/vite": "^4.1.18",

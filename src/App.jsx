@@ -1,8 +1,9 @@
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import ErrorBoundary from "./components/Reusables/ErrorBoundary";
 import Footer from "./components/Reusables/Footer";
 import Header from "./components/Reusables/Header";
+import Loader from "./components/Reusables/Loader";
 import MobileBottomNav from "./components/Reusables/MobileBottomNav";
 import { Analytics } from "@vercel/analytics/react"
 
@@ -30,7 +31,9 @@ const App = () => {
       <div className="flex min-h-dvh flex-col text-text pb-[calc(3.0625rem+env(safe-area-inset-bottom))] md:pb-0">
         <main className="relative flex flex-1 flex-col overflow-x-hidden">
           <ErrorBoundary>
-            <Outlet />
+            <Suspense fallback={<Loader size="lg" className="min-h-[50vh]" />}>
+              <Outlet />
+            </Suspense>
           </ErrorBoundary>
         </main>
         {!shouldHideFooter && <Footer />}

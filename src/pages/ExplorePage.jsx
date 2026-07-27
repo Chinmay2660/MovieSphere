@@ -3,7 +3,6 @@ import axiosInstance from "../lib/axiosConfig";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import Card from "../components/Home/Card";
-import LoadMoreIndicator from "../components/Reusables/LoadMoreIndicator";
 import Loader from "../components/Reusables/Loader";
 import { setGenres } from "../reduxStore/Reducer/movieSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -84,8 +83,8 @@ const ExplorePage = () => {
     try {
       const response = await axiosInstance.get(`/genre/${params.explore}/list`);
       dispatch(setGenres({ type: params.explore, genres: response.data.genres }));
-    } catch (error) {
-      console.error("Failed to fetch genres", error);
+    } catch {
+      // Genre list is optional for explore filters
     }
   };
 
@@ -114,9 +113,8 @@ const ExplorePage = () => {
         setData((prev) => [...prev, ...response.data.results]);
       }
       setTotalPageNo(response.data.total_pages);
-    } catch (error) {
+    } catch {
       setError("Failed to fetch data");
-      console.error("Failed to fetch data", error);
     } finally {
       if (isFirstPage) setIsInitialLoading(false);
       else setIsLoadingMore(false);
@@ -485,10 +483,12 @@ const ExplorePage = () => {
             className="py-20"
           />
         )}
-        <LoadMoreIndicator
-          isLoading={isLoadingMore}
-          label={isTV ? t('loading.moreWebSeries') : t('loading.moreMovies')}
-        />
+        {isLoadingMore && (
+          <Loader
+            label={isTV ? t('loading.moreWebSeries') : t('loading.moreMovies')}
+            className="py-8"
+          />
+        )}
         {!isLoading && data.length === 0 && (
           <div className="text-center py-16">
             <p className="text-secondary text-lg">No results found</p>

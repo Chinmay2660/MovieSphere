@@ -1,14 +1,71 @@
-import { IoClose, IoChevronDown, IoChevronBack, IoChevronForward, IoExpand, IoContract, IoEye, IoEyeOff } from "react-icons/io5";
-import { useEffect, useState, useRef } from "react";
+import { IoClose, IoChevronDown, IoChevronBack, IoChevronForward, IoExpand, IoContract, IoEye, IoEyeOff, IoPhoneLandscapeOutline } from "react-icons/io5";
+import { useEffect, useState, useRef, useCallback, useLayoutEffect } from "react";
+import { createPortal } from "react-dom";
 import Loader from "./Reusables/Loader";
 import { useLocale } from "../context/LocaleContext";
 
+const MOBILE_TABLET_QUERY = "(max-width: 1023px)";
+const ROTATE_CONTROL_QUERY = "(max-width: 1279px), (hover: none) and (pointer: coarse)";
+
+const isMobileOrTablet = () => window.matchMedia(MOBILE_TABLET_QUERY).matches;
+const shouldShowRotateControl = () => window.matchMedia(ROTATE_CONTROL_QUERY).matches;
+
+const requestLandscapeOrientation = async (container, { allowFullscreen = true } = {}) => {
+  const orientation = screen.orientation;
+  if (!orientation?.lock) return false;
+
+  try {
+    await orientation.lock("landscape");
+    return true;
+  } catch {
+    // ponytail: most mobile browsers require fullscreen before orientation.lock
+  }
+
+  if (!allowFullscreen) return false;
+
+  try {
+    if (container && !document.fullscreenElement) {
+      await container.requestFullscreen();
+    }
+    await orientation.lock("landscape");
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const exitPlaybackFullscreen = async () => {
+  try {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+    }
+  } catch {
+    // Best-effort cleanup when leaving the player.
+  }
+};
+
+const unlockOrientation = () => {
+  try {
+    screen.orientation?.unlock?.();
+  } catch {
+    // Orientation unlock is best-effort only.
+  }
+};
+
 const VIDSRC = {
-  id: 'vidsrc_cc',
+  id: 'vidsrc_sbs',
   name: 'VidSrc',
   icon: '🎬',
-  getMovieUrl: (id) => `https://vidsrc.cc/v2/embed/movie/${id}`,
-  getTvUrl: (id, season, episode) => `https://vidsrc.cc/v2/embed/tv/${id}/${season}/${episode}`,
+  getMovieUrl: (id) => `https://vidsrc.sbs/embed/movie/${id}`,
+  getTvUrl: (id, season, episode) => `https://vidsrc.sbs/embed/tv/${id}/${season}/${episode}`,
+};
+
+const getDirectEmbedUrl = (mediaType, playVideoId, season, episode) => {
+  if (!playVideoId) return '';
+  if (mediaType === 'tv') {
+    return VIDSRC.getTvUrl(playVideoId, season, episode);
+  }
+  return VIDSRC.getMovieUrl(playVideoId);
 };
 
 const VideoPlay = ({ 
@@ -26,11 +83,13 @@ const VideoPlay = ({
     const [showEpisodeDropdown, setShowEpisodeDropdown] = useState(false);
     const [episodeCount, setEpisodeCount] = useState(1);
     const [videoKey, setVideoKey] = useState(0);
-    const selectedSource = VIDSRC;
+    const [embedSrc, setEmbedSrc] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [showControls, setShowControls] = useState(true);
     const [isTheaterMode, setIsTheaterMode] = useState(false);
+    const [showRotateControl, setShowRotateControl] = useState(() => shouldShowRotateControl());
+    const [embedReady, setEmbedReady] = useState(false);
     const containerRef = useRef(null);
     const controlsTimeoutRef = useRef(null);
 
@@ -46,7 +105,53 @@ const VideoPlay = ({
     useEffect(() => {
         setVideoKey(prev => prev + 1);
         setIsLoading(true);
-    }, [selectedSeason, selectedEpisode, selectedSource]);
+        setEmbedReady(false);
+    }, [selectedSeason, selectedEpisode]);
+
+    const handleClose = useCallback(async () => {
+        if (controlsTimeoutRef.current) {
+            clearTimeout(controlsTimeoutRef.current);
+        }
+        await exitPlaybackFullscreen();
+        unlockOrientation();
+        close();
+    }, [close]);
+
+    const resolveEmbedSrc = useCallback(() => {
+        if (!playVideoId) {
+            setEmbedSrc('');
+            setIsLoading(false);
+            return;
+        }
+
+        setIsLoading(true);
+        setEmbedReady(false);
+
+        const mediaType = media_type === 'tv' ? 'tv' : 'movie';
+        setEmbedSrc(getDirectEmbedUrl(mediaType, playVideoId, selectedSeason, selectedEpisode));
+        setVideoKey((prev) => prev + 1);
+    }, [playVideoId, media_type, selectedSeason, selectedEpisode]);
+
+    useEffect(() => {
+        resolveEmbedSrc();
+    }, [resolveEmbedSrc]);
+
+    useEffect(() => {
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+        return () => {
+            document.body.style.overflow = previousOverflow;
+        };
+    }, []);
+
+    useEffect(() => {
+        const mediaQuery = window.matchMedia("(max-width: 1279px), (hover: none) and (pointer: coarse)");
+        const updateRotateControl = () => setShowRotateControl(mediaQuery.matches);
+
+        updateRotateControl();
+        mediaQuery.addEventListener("change", updateRotateControl);
+        return () => mediaQuery.removeEventListener("change", updateRotateControl);
+    }, []);
 
     useEffect(() => {
         const handleFullscreenChange = () => {
@@ -57,10 +162,20 @@ const VideoPlay = ({
         return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
     }, []);
 
+    useLayoutEffect(() => {
+        if (!isMobileOrTablet()) return undefined;
+
+        requestLandscapeOrientation(containerRef.current, { allowFullscreen: false });
+        return () => {
+            exitPlaybackFullscreen();
+            unlockOrientation();
+        };
+    }, []);
+
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === 'Escape' && !document.fullscreenElement) {
-                close();
+                handleClose();
             }
             if (e.key === 'f' || e.key === 'F') {
                 toggleFullscreen();
@@ -80,29 +195,36 @@ const VideoPlay = ({
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [selectedEpisode, episodeCount, selectedSeason]);
 
-    const handleMouseMove = () => {
-        setShowControls(true);
+    const scheduleControlsHide = useCallback(() => {
         if (controlsTimeoutRef.current) {
             clearTimeout(controlsTimeoutRef.current);
         }
+
+        // ponytail: iframe eats pointer events once loaded, so keep chrome visible
+        if (embedSrc || isLoading) return;
+
         controlsTimeoutRef.current = setTimeout(() => {
             if (!showSeasonDropdown && !showEpisodeDropdown) {
                 setShowControls(false);
             }
         }, 3000);
+    }, [embedSrc, isLoading, showSeasonDropdown, showEpisodeDropdown]);
+
+    const handleMouseMove = () => {
+        setShowControls(true);
+        scheduleControlsHide();
     };
 
     const handleTouchStart = () => {
         setShowControls(true);
-        if (controlsTimeoutRef.current) {
-            clearTimeout(controlsTimeoutRef.current);
-        }
-        controlsTimeoutRef.current = setTimeout(() => {
-            if (!showSeasonDropdown && !showEpisodeDropdown) {
-                setShowControls(false);
-            }
-        }, 4000);
+        scheduleControlsHide();
     };
+
+    const handleEmbedLoad = useCallback(() => {
+        setIsLoading(false);
+        setEmbedReady(true);
+        setShowControls(true);
+    }, []);
 
     const toggleFullscreen = async () => {
         try {
@@ -111,16 +233,15 @@ const VideoPlay = ({
             } else {
                 await document.exitFullscreen();
             }
-        } catch (err) {
-            console.error('Fullscreen error:', err);
+        } catch {
+            // Fullscreen API may be unavailable or denied
         }
     };
 
-    const getVideoSrc = () => {
-        if (media_type === "tv") {
-            return selectedSource.getTvUrl(playVideoId, selectedSeason, selectedEpisode);
-        } else {
-            return selectedSource.getMovieUrl(playVideoId);
+    const handleRotateLandscape = async () => {
+        const didLock = await requestLandscapeOrientation(containerRef.current);
+        if (!didLock && !document.fullscreenElement) {
+            await toggleFullscreen();
         }
     };
 
@@ -159,17 +280,17 @@ const VideoPlay = ({
     const canGoPrev = selectedEpisode > 1 || selectedSeason > 1;
     const canGoNext = selectedEpisode < episodeCount || validSeasons.some(s => s.season_number === selectedSeason + 1);
 
-    return (
+    return createPortal(
         <section 
-            className="fixed inset-0 z-50 bg-surface"
+            className="fixed inset-0 z-[100] isolate bg-background"
             onClick={(e) => {
-                if (e.target === e.currentTarget) close();
+                if (e.target === e.currentTarget) handleClose();
                 closeAllDropdowns();
             }}
         >
             <div 
                 ref={containerRef}
-                className={`relative w-full h-full flex flex-col ${isTheaterMode ? 'bg-surface' : ''}`}
+                className={`relative flex h-dvh w-full flex-col bg-background ${isTheaterMode ? 'bg-background' : ''}`}
                 onMouseMove={handleMouseMove}
                 onTouchStart={handleTouchStart}
                 onMouseLeave={() => !showSeasonDropdown && !showEpisodeDropdown && setShowControls(false)}
@@ -183,7 +304,7 @@ const VideoPlay = ({
                         <div className="flex flex-wrap items-center justify-between gap-2 max-w-screen-2xl mx-auto">
                             <div className="flex items-center gap-2 sm:gap-3">
                                 <button 
-                                    onClick={close}
+                                    onClick={handleClose}
                                     className="p-2 text-text/80 hover:text-text hover:bg-surface-elevated rounded-full transition-all"
                                     title="Close (Esc)"
                                 >
@@ -284,20 +405,33 @@ const VideoPlay = ({
                                 >
                                     {isTheaterMode ? <IoEyeOff className="w-5 h-5" /> : <IoEye className="w-5 h-5" />}
                                 </button>
-                                <button 
-                                    onClick={toggleFullscreen}
-                                    className="p-2 text-text/80 hover:text-text hover:bg-surface-elevated rounded-full transition-all"
-                                    title="Fullscreen (F)"
-                                >
-                                    {isFullscreen ? <IoContract className="w-5 h-5" /> : <IoExpand className="w-5 h-5" />}
-                                </button>
+                                {showRotateControl ? (
+                                    <button
+                                        type="button"
+                                        onClick={handleRotateLandscape}
+                                        className="flex items-center gap-1.5 rounded-full bg-surface-elevated px-2.5 py-2 text-text transition-all hover:bg-surface-elevated border border-accent/15"
+                                        title={t('video.rotateLandscape')}
+                                        aria-label={t('video.rotateLandscape')}
+                                    >
+                                        <IoPhoneLandscapeOutline className="w-5 h-5 shrink-0" />
+                                        <span className="text-xs font-medium">{t('video.rotate')}</span>
+                                    </button>
+                                ) : (
+                                    <button 
+                                        onClick={toggleFullscreen}
+                                        className="p-2 text-text/80 hover:text-text hover:bg-surface-elevated rounded-full transition-all"
+                                        title="Fullscreen (F)"
+                                    >
+                                        {isFullscreen ? <IoContract className="w-5 h-5" /> : <IoExpand className="w-5 h-5" />}
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="flex-1 min-h-0 relative bg-surface">
+                <div className="flex-1 min-h-0 relative bg-background overflow-hidden">
                     {isLoading && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-surface z-10">
+                        <div className="absolute inset-0 flex items-center justify-center bg-background z-10">
                             <Loader
                                 size="lg"
                                 label={
@@ -308,16 +442,18 @@ const VideoPlay = ({
                             />
                         </div>
                     )}
-                    <iframe
-                        key={videoKey}
-                        title="video"
-                        src={getVideoSrc()}
-                        className="w-full h-full"
-                        style={{ border: 'none' }}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                        allowFullScreen
-                        onLoad={() => setIsLoading(false)}
-                    />
+                    {embedSrc ? (
+                        <iframe
+                            key={videoKey}
+                            title="video"
+                            src={embedSrc}
+                            className={`h-full w-full ${embedReady ? 'opacity-100' : 'opacity-0'}`}
+                            style={{ border: 'none' }}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                            allowFullScreen
+                            onLoad={handleEmbedLoad}
+                        />
+                    ) : null}
                 </div>
                 <div 
                     className={`absolute bottom-0 left-0 right-0 z-20 transition-all duration-300 ${
@@ -383,7 +519,8 @@ const VideoPlay = ({
                     </>
                 )}
             </div>
-        </section>
+        </section>,
+        document.body
     );
 };
 

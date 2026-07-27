@@ -16,8 +16,8 @@ const loadFromStorage = () => {
 const saveToStorage = (items) => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  } catch (e) {
-    console.error("Failed to save watchlist", e);
+  } catch {
+    // localStorage may be full or unavailable
   }
 };
 
@@ -58,28 +58,9 @@ const watchlistSlice = createSlice({
         saveToStorage(state);
       }
     },
-    toggleWatchlist: (state, action) => {
-      const item = action.payload;
-      const idx = findIndex(state, item);
-      if (idx >= 0) {
-        state.splice(idx, 1);
-      } else {
-        state.push(item);
-      }
-      saveToStorage(state);
-    },
-    clearWatchlist: (state) => {
-      state.length = 0;
-      saveToStorage(state);
-    },
   },
 });
 
-export const { addToWatchlist, removeFromWatchlist, toggleWatchlist, clearWatchlist } =
-  watchlistSlice.actions;
-
-export const createList = () => ({ type: "watchlist/noop" });
-
-export const isInWatchlist = (state, item) => findIndex(state.watchlist, item) >= 0;
+export const { addToWatchlist, removeFromWatchlist } = watchlistSlice.actions;
 
 export default watchlistSlice.reducer;

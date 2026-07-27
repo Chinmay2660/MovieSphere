@@ -50,8 +50,6 @@ const HowItWorks = () => {
                         visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
                     }}
                 >
-                    <div className="pointer-events-none absolute top-12 right-[16%] left-[16%] hidden h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent sm:block" aria-hidden />
-
                     {steps.map((item, idx) => {
                         const Icon = item.icon;
                         return (

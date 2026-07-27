@@ -16,9 +16,7 @@ export async function ensureConfiguration(dispatch, imageURL) {
     .then((response) => {
       dispatch(setImageURL(response.data.images.secure_base_url + 'original'));
     })
-    .catch((error) => {
-      console.error('Failed to fetch configuration', error);
-    })
+    .catch(() => {})
     .finally(() => {
       inflight = null;
     });

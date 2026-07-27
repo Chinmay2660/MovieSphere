@@ -5,6 +5,7 @@ import { IoPlay, IoInformationCircleOutline, IoChevronBack, IoChevronForward } f
 import { useNavigate } from "react-router-dom";
 import VideoPlay from "../VideoPlay";
 import LazyImage from "../Reusables/LazyImage";
+import axiosInstance from "../../lib/axiosConfig";
 import { getRatingColor } from "../../lib/utils";
 import { useLocale } from "../../context/LocaleContext";
 
@@ -18,7 +19,13 @@ const Banner = () => {
   );
   const bannerData = useSelector((state) => state.movieData.bannerData);
   const imageURL = useSelector((state) => state.movieData.imageURL);
-  const slides = useMemo(() => bannerData?.slice(0, MAX_SLIDES) ?? [], [bannerData]);
+  const slides = useMemo(
+    () =>
+      (bannerData ?? [])
+        .filter((item) => item?.media_type === "movie" || item?.media_type === "tv")
+        .slice(0, MAX_SLIDES),
+    [bannerData]
+  );
   const [playVideo, setPlayVideo] = useState(false);
   const [playVideoData, setPlayVideoData] = useState();
   const navigate = useNavigate();
@@ -35,8 +42,20 @@ const Banner = () => {
     setCurrentIndex((prevIndex) => (prevIndex === slideCount - 1 ? 0 : prevIndex + 1));
   }, [slideCount]);
 
-  const handleVideoPlay = useCallback((data) => {
-    setPlayVideoData(data);
+  const handleVideoPlay = useCallback(async (data) => {
+    if (!data?.id || (data.media_type !== "movie" && data.media_type !== "tv")) return;
+
+    if (data.media_type === "tv") {
+      try {
+        const { data: tvData } = await axiosInstance.get(`/tv/${data.id}`);
+        setPlayVideoData({ ...data, seasons: tvData?.seasons ?? [] });
+      } catch {
+        setPlayVideoData(data);
+      }
+    } else {
+      setPlayVideoData(data);
+    }
+
     setPlayVideo(true);
   }, []);
 
@@ -102,7 +121,7 @@ const Banner = () => {
 
   return (
     <section
-      className="relative isolate w-full overflow-hidden group pt-14 sm:pt-0 aspect-[4/5] max-h-[min(72dvh,640px)] sm:aspect-[16/9] sm:max-h-[80dvh]"
+      className="relative isolate w-full overflow-hidden group pt-14 sm:pt-0 aspect-[4/5] max-h-[min(72dvh,640px)] sm:aspect-[16/9] sm:max-h-[80dvh] shadow-[0_16px_32px_12px_rgba(12,10,9,0.55)]"
       aria-roledescription="carousel"
       aria-label={t("banner.carousel")}
       tabIndex={slideCount > 1 ? 0 : undefined}
@@ -116,7 +135,7 @@ const Banner = () => {
         if (!e.currentTarget.contains(e.relatedTarget)) resumeCarousel();
       }}
     >
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 overflow-hidden">
         <div
           className="flex h-full transition-transform duration-500 ease-out"
           style={{
@@ -146,12 +165,20 @@ const Banner = () => {
                   <div className="absolute inset-0 bg-surface" aria-hidden />
                 )}
 
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-transparent" aria-hidden />
+                <div
+                  className="absolute inset-0 bg-gradient-to-t from-background/80 from-0% via-background/35 via-45% to-transparent to-75%"
+                  aria-hidden
+                />
               </div>
             );
           })}
         </div>
       </div>
+
+      <div
+        className="pointer-events-none absolute inset-x-0 -bottom-6 z-[6] h-14 bg-gradient-to-b from-transparent via-background/30 to-background/75 sm:-bottom-8 sm:h-20"
+        aria-hidden
+      />
 
       <div className="absolute inset-x-0 bottom-0 z-10 px-4 pb-6 pt-16 sm:px-8 sm:pb-8 md:px-16">
         <div className="mx-auto w-full max-w-md md:mx-0">
@@ -231,7 +258,7 @@ const Banner = () => {
           <button
             type="button"
             onClick={handlePrevClick}
-            className="absolute left-2 top-1/2 z-20 flex -translate-y-1/2 liquid-glass-strong rounded-full p-2 text-text transition-all hover:scale-105 focus-visible:scale-105 sm:left-4 lg:opacity-0 lg:group-hover:opacity-100 lg:focus-visible:opacity-100"
+            className="absolute left-2 top-1/2 z-20 hidden -translate-y-1/2 liquid-glass-strong rounded-full p-2 text-text transition-all hover:scale-105 focus-visible:scale-105 sm:flex sm:left-4 lg:opacity-0 lg:group-hover:opacity-100 lg:focus-visible:opacity-100"
             aria-label={t('banner.prevSlide')}
           >
             <IoChevronBack className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden />
@@ -239,7 +266,7 @@ const Banner = () => {
           <button
             type="button"
             onClick={handleNextClick}
-            className="absolute right-2 top-1/2 z-20 flex -translate-y-1/2 liquid-glass-strong rounded-full p-2 text-text transition-all hover:scale-105 focus-visible:scale-105 sm:right-4 lg:opacity-0 lg:group-hover:opacity-100 lg:focus-visible:opacity-100"
+            className="absolute right-2 top-1/2 z-20 hidden -translate-y-1/2 liquid-glass-strong rounded-full p-2 text-text transition-all hover:scale-105 focus-visible:scale-105 sm:flex sm:right-4 lg:opacity-0 lg:group-hover:opacity-100 lg:focus-visible:opacity-100"
             aria-label={t('banner.nextSlide')}
           >
             <IoChevronForward className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden />
@@ -247,10 +274,11 @@ const Banner = () => {
         </>
       )}
 
-      {playVideo && (
+      {playVideo && playVideoData?.id && (
         <VideoPlay
-          playVideoId={playVideoData?.id}
-          media_type={playVideoData?.media_type}
+          playVideoId={playVideoData.id}
+          media_type={playVideoData.media_type}
+          seasons={playVideoData.seasons}
           close={() => setPlayVideo(false)}
         />
       )}

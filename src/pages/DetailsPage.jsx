@@ -1,17 +1,15 @@
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axiosInstance from "../lib/axiosConfig";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
-import moment from "moment";
 import Divider from "../components/Reusables/Divider";
 import LazyImage from "../components/Reusables/LazyImage";
 import Loader from "../components/Reusables/Loader";
 import CardCarousel from "../components/Home/CardCarousel";
 import { IoPlay, IoStar, IoCalendar, IoTime, IoTv, IoExpand, IoAddOutline, IoCheckmarkOutline, IoDownloadOutline } from "react-icons/io5";
-import VideoPlay from "../components/VideoPlay";
 import CastCarousel from "../components/CastCarousel";
-import { getRatingColor } from "../lib/utils";
+import { getRatingColor, formatYear, formatLongDate } from "../lib/utils";
 import { addToWatchlist, removeFromWatchlist } from "../reduxStore/Reducer/watchlistSlice";
 import { getDownloadKey, selectDownloadByKey } from "../reduxStore/Reducer/downloadsSlice";
 import { startDownload } from "../lib/downloadService";
@@ -19,6 +17,7 @@ import { Link } from "react-router-dom";
 import { USER_MESSAGES } from "../lib/userFriendlyError";
 import { useLocale } from "../context/LocaleContext";
 
+const VideoPlay = lazy(() => import("../components/VideoPlay"));
 const DetailsPage = () => {
   const { t } = useLocale();
   const params = useParams();
@@ -128,14 +127,19 @@ const DetailsPage = () => {
       setRecommendationsData(recommendationsResponse.data.results);
       
       if (params?.explore === 'tv' && detailsResponse.data.seasons?.length > 0) {
-        const firstValidSeason = detailsResponse.data.seasons.find(s => s.season_number > 0);
+        const seasons = detailsResponse.data.seasons;
+        const stateSeason = location.state?.initialSeason;
+        const fromState =
+          stateSeason != null
+            ? seasons.find((s) => s.season_number === stateSeason)
+            : null;
+        const firstValidSeason = fromState ?? seasons.find((s) => s.season_number > 0);
         if (firstValidSeason) {
           setSelectedSeason(firstValidSeason.season_number);
         }
       }
-    } catch (error) {
+    } catch {
       setError(USER_MESSAGES.loadContent);
-      console.error("Failed to fetch data", error);
     } finally {
       setLoading(false);
     }
@@ -146,8 +150,8 @@ const DetailsPage = () => {
     try {
       const response = await axiosInstance.get(`/tv/${params?.id}/season/${seasonNumber}`);
       setSeasonDetails(response.data);
-    } catch (error) {
-      console.error("Failed to fetch season details", error);
+    } catch {
+      // Season details are optional until user selects a season
     }
   };
 
@@ -174,6 +178,8 @@ const DetailsPage = () => {
         setPlayConfig({ season: 1, episode: 1 });
       }
       setPlayVideo(true);
+      navigate(location.pathname, { replace: true, state: {} });
+    } else if (state?.initialSeason != null) {
       navigate(location.pathname, { replace: true, state: {} });
     }
   }, [loading, data, location.state, location.pathname, params?.explore, navigate]);
@@ -273,7 +279,7 @@ const DetailsPage = () => {
             {(data?.release_date || data?.first_air_date) && (
               <div className="flex items-center gap-1 text-secondary">
                 <IoCalendar className="w-4 h-4" />
-                <span>{moment(data?.release_date || data?.first_air_date).format("YYYY")}</span>
+                <span>{formatYear(data?.release_date || data?.first_air_date)}</span>
               </div>
             )}
             {duration && (
@@ -308,74 +314,76 @@ const DetailsPage = () => {
             </div>
           )}
 
-          <div className="flex flex-wrap items-center gap-3 mt-4">
+          <div className="mt-4 flex flex-col items-start gap-3">
             <motion.button
               onClick={handlePlayClick}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="btn-primary flex items-center gap-2.5 py-3 px-6 active:scale-[0.98]"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              className="btn-primary inline-flex items-center justify-center gap-2.5 px-6 py-2.5 active:scale-[0.97]"
             >
               <IoPlay className="w-5 h-5 text-primary-fg" />
               <span>{isTV ? "Watch S1 E1" : "Play Now"}</span>
             </motion.button>
-            <button
-              onClick={handleDownloadMovie}
-              disabled={movieDownload?.status === "downloading" || movieDownload?.status === "queued"}
-              className="flex items-center justify-center gap-1.5 py-3 px-4 rounded-xl text-sm font-medium bg-primary/20 border border-primary/40 text-primary hover:bg-primary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <IoDownloadOutline className="w-4 h-4" />
-              <span>
-                {movieDownload?.status === "completed"
-                  ? "Downloaded"
-                  : movieDownload?.status === "downloading" || movieDownload?.status === "queued"
-                    ? `Downloading ${movieDownload.progress}%`
-                    : isTV
-                      ? `Download S${selectedSeason || 1} E1`
-                      : "Download"}
-              </span>
-            </button>
-            {movieDownload && (movieDownload.status === "downloading" || movieDownload.status === "queued") && (
-              <Link
-                to="/downloads"
-                className="text-xs text-primary hover:text-primary/80 underline"
-              >
-                View progress
-              </Link>
-            )}
-            {!isTV && (
+            <div className="flex flex-wrap items-stretch gap-3">
               <button
-                onClick={() => {
-                  if (movieInWatchlist) {
-                    dispatch(removeFromWatchlist({
-                      type: "movie",
-                      id: data.id,
-                    }));
-                  } else {
-                    dispatch(addToWatchlist({
-                      type: "movie",
-                      id: data.id,
-                      media_type: "movie",
-                      title: data?.title ?? data?.original_title,
-                      poster_path: data?.poster_path ?? null,
-                      release_date: data?.release_date ?? null,
-                    }));
-                  }
-                }}
-                className="flex items-center justify-center gap-1.5 py-3 px-4 rounded-lg text-sm font-medium bg-surface-elevated border border-accent/20 text-text hover:bg-surface-elevated transition-colors"
+                onClick={handleDownloadMovie}
+                disabled={movieDownload?.status === "downloading" || movieDownload?.status === "queued"}
+                className="inline-flex items-center justify-center gap-1.5 min-h-[var(--spacing-touch)] px-4 rounded-xl text-sm font-medium bg-primary/20 border border-primary/40 text-primary hover:bg-primary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {movieInWatchlist ? (
-                  <>
-                    <IoCheckmarkOutline className="w-4 h-4 text-green-400" />
-                    In Watchlist
-                  </>
-                ) : (
-                  <>
-                    <IoAddOutline className="w-4 h-4" />
-                    Add to Watchlist
-                  </>
-                )}
+                <IoDownloadOutline className="w-4 h-4 shrink-0" />
+                <span>
+                  {movieDownload?.status === "completed"
+                    ? "Downloaded"
+                    : movieDownload?.status === "downloading" || movieDownload?.status === "queued"
+                      ? `Downloading ${movieDownload.progress}%`
+                      : isTV
+                        ? `Download S${selectedSeason || 1} E1`
+                        : "Download"}
+                </span>
               </button>
-            )}
+              {!isTV && (
+                <button
+                  onClick={() => {
+                    if (movieInWatchlist) {
+                      dispatch(removeFromWatchlist({
+                        type: "movie",
+                        id: data.id,
+                      }));
+                    } else {
+                      dispatch(addToWatchlist({
+                        type: "movie",
+                        id: data.id,
+                        media_type: "movie",
+                        title: data?.title ?? data?.original_title,
+                        poster_path: data?.poster_path ?? null,
+                        release_date: data?.release_date ?? null,
+                      }));
+                    }
+                  }}
+                  className="inline-flex items-center justify-center gap-1.5 min-h-[var(--spacing-touch)] px-4 rounded-xl text-sm font-medium bg-surface-elevated border border-accent/20 text-text hover:bg-surface-elevated transition-colors"
+                >
+                  {movieInWatchlist ? (
+                    <>
+                      <IoCheckmarkOutline className="w-4 h-4 shrink-0 text-green-400" />
+                      <span>In Watchlist</span>
+                    </>
+                  ) : (
+                    <>
+                      <IoAddOutline className="w-4 h-4 shrink-0" />
+                      <span>Add to Watchlist</span>
+                    </>
+                  )}
+                </button>
+              )}
+              {movieDownload && (movieDownload.status === "downloading" || movieDownload.status === "queued") && (
+                <Link
+                  to="/downloads"
+                  className="inline-flex items-center self-center text-xs text-primary hover:text-primary/80 underline"
+                >
+                  View progress
+                </Link>
+              )}
+            </div>
           </div>
 
           <div className="mt-6">
@@ -393,14 +401,14 @@ const DetailsPage = () => {
             <div>
               <span className="text-muted">{isTV ? "First Air Date" : "Release Date"}</span>
               <p className="text-text font-medium">
-                {moment(data?.release_date || data?.first_air_date).format("MMMM Do, YYYY")}
+                {formatLongDate(data?.release_date || data?.first_air_date)}
               </p>
             </div>
             {isTV && data?.last_air_date && (
               <div>
                 <span className="text-muted">Last Air Date</span>
                 <p className="text-text font-medium">
-                  {moment(data.last_air_date).format("MMMM Do, YYYY")}
+                  {formatLongDate(data.last_air_date)}
                 </p>
               </div>
             )}
@@ -579,47 +587,49 @@ const DetailsPage = () => {
                           )}
                         </div>
                       </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (inWatchlist) {
-                            dispatch(removeFromWatchlist(episodeItem));
-                          } else {
-                            dispatch(addToWatchlist(episodeItem));
+                      <div className="flex flex-col gap-2 px-3 pb-3 flex-shrink-0">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (inWatchlist) {
+                              dispatch(removeFromWatchlist(episodeItem));
+                            } else {
+                              dispatch(addToWatchlist(episodeItem));
+                            }
+                          }}
+                          className="w-full py-1.5 px-2 rounded-lg text-xs font-medium bg-surface-elevated border border-accent/20 text-text hover:bg-surface-elevated transition-colors flex items-center justify-center gap-1.5"
+                        >
+                          {inWatchlist ? (
+                            <>
+                              <IoCheckmarkOutline className="w-3.5 h-3.5 text-green-400" />
+                              In Watchlist
+                            </>
+                          ) : (
+                            <>
+                              <IoAddOutline className="w-3.5 h-3.5" />
+                              Add to Watchlist
+                            </>
+                          )}
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDownloadEpisode(episode, selectedSeason);
+                          }}
+                          disabled={
+                            episodeDownload?.status === "downloading" ||
+                            episodeDownload?.status === "queued"
                           }
-                        }}
-                        className="w-full py-1.5 px-2 rounded-lg text-xs font-medium bg-surface-elevated border border-accent/20 text-text hover:bg-surface-elevated transition-colors flex items-center justify-center gap-1.5 flex-shrink-0"
-                      >
-                        {inWatchlist ? (
-                          <>
-                            <IoCheckmarkOutline className="w-3.5 h-3.5 text-green-400" />
-                            In Watchlist
-                          </>
-                        ) : (
-                          <>
-                            <IoAddOutline className="w-3.5 h-3.5" />
-                            Add to Watchlist
-                          </>
-                        )}
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDownloadEpisode(episode, selectedSeason);
-                        }}
-                        disabled={
-                          episodeDownload?.status === "downloading" ||
-                          episodeDownload?.status === "queued"
-                        }
-                        className="w-full py-1.5 px-2 rounded-lg text-xs font-medium bg-primary/20 border border-primary/30 text-primary hover:bg-primary/30 transition-colors flex items-center justify-center gap-1.5 flex-shrink-0 disabled:opacity-50"
-                      >
-                        <IoDownloadOutline className="w-3.5 h-3.5" />
-                        {episodeDownload?.status === "completed"
-                          ? "Downloaded"
-                          : episodeDownload?.status === "downloading" || episodeDownload?.status === "queued"
-                            ? `${episodeDownload.progress}%`
-                            : "Download"}
-                      </button>
+                          className="w-full py-1.5 px-2 rounded-lg text-xs font-medium bg-primary/20 border border-primary/30 text-primary hover:bg-primary/30 transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
+                        >
+                          <IoDownloadOutline className="w-3.5 h-3.5" />
+                          {episodeDownload?.status === "completed"
+                            ? "Downloaded"
+                            : episodeDownload?.status === "downloading" || episodeDownload?.status === "queued"
+                              ? `${episodeDownload.progress}%`
+                              : "Download"}
+                        </button>
+                      </div>
                     </div>
                   );
                 })}
@@ -671,14 +681,16 @@ const DetailsPage = () => {
       )}
 
       {playVideo && (
-        <VideoPlay
-          playVideoId={params?.id}
-          media_type={params?.explore}
-          close={() => setPlayVideo(false)}
-          seasons={data?.seasons}
-          initialSeason={playConfig.season}
-          initialEpisode={playConfig.episode}
-        />
+        <Suspense fallback={<Loader size="lg" className="fixed inset-0 z-[100] bg-background" />}>
+          <VideoPlay
+            playVideoId={params?.id}
+            media_type={params?.explore}
+            close={() => setPlayVideo(false)}
+            seasons={data?.seasons}
+            initialSeason={playConfig.season}
+            initialEpisode={playConfig.episode}
+          />
+        </Suspense>
       )}
     </div>
   );

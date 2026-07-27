@@ -82,10 +82,6 @@ class ErrorBoundary extends Component {
     };
   }
 
-  componentDidCatch(error, errorInfo) {
-    console.error("ErrorBoundary caught:", error, errorInfo);
-  }
-
   handleRetry() {
     this.setState((prev) => ({
       hasError: false,
