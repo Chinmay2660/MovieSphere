@@ -1,5 +1,5 @@
 import { useLocale } from '../../context/LocaleContext';
-import MovieSphereIcon from '../components/Reusables/MovieSphereIcon';
+import MovieSphereIcon from './MovieSphereIcon';
 
 const NotFound = () => {
   const { t } = useLocale();
