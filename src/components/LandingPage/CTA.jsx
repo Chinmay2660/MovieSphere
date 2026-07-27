@@ -21,7 +21,7 @@ const CTA = () => {
                     <MovieSphereIcon className="mx-auto h-10 w-10 opacity-90" alt="" />
                     <span className="section-label mt-4 block">Get started</span>
                     <h2 className="apple-title-1 mt-3 text-text sm:apple-large-title">
-                        Your next favorite film is one tap away.
+                        Your next favorite movie is one tap away.
                     </h2>
                     <p className="apple-subheadline mx-auto mt-3 max-w-md">
                         Hindi, Marathi, English, and regional picks — thousands streaming free on MovieSphere.
@@ -33,7 +33,7 @@ const CTA = () => {
                             <IoArrowForwardOutline className="h-4 w-4" />
                         </a>
                         <a href="/tv" className="btn-ghost">
-                            Browse Web Series
+                            Browse Series
                         </a>
                     </div>
                 </div>

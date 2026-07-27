@@ -694,7 +694,7 @@ const DetailsPage = () => {
       {similarData?.length > 0 && (
         <CardCarousel
           data={similarData}
-          heading={"Similar " + (isTV ? "TV Shows" : "Movies")}
+          heading={"Similar " + (isTV ? "Series" : "Movies")}
           trending={false}
           media_type={params?.explore}
         />
@@ -703,7 +703,7 @@ const DetailsPage = () => {
       {recommendationsData?.length > 0 && (
         <CardCarousel
           data={recommendationsData}
-          heading={"Recommended " + (isTV ? "TV Shows" : "Movies")}
+          heading={"Recommended " + (isTV ? "Series" : "Movies")}
           trending={false}
           media_type={params?.explore}
         />

@@ -12,8 +12,8 @@ import {
 
 export const navigation = [
     { titleKey: "nav.home", path: "/home", shortTitleKey: "nav.home", icon: IoHomeOutline, iconActive: IoHome },
-    { titleKey: "nav.webSeries", path: "/tv", shortTitleKey: "nav.series", icon: IoTvOutline, iconActive: IoTv },
-    { titleKey: "nav.movies", path: "/movie", shortTitleKey: "nav.films", icon: IoFilmOutline, iconActive: IoFilm },
+    { titleKey: "nav.series", path: "/tv", shortTitleKey: "nav.series", icon: IoTvOutline, iconActive: IoTv },
+    { titleKey: "nav.movies", path: "/movie", shortTitleKey: "nav.movies", icon: IoFilmOutline, iconActive: IoFilm },
     { titleKey: "nav.watchlist", path: "/watchlist", shortTitleKey: "nav.watchlist", icon: IoBookmarkOutline, iconActive: IoBookmark },
     { titleKey: "nav.downloads", path: "/downloads", shortTitleKey: "nav.downloads", icon: IoDownloadOutline, iconActive: IoDownload },
 ];
@@ -27,7 +27,7 @@ export const features = [
     {
         icon: <IoSearchOutline className="h-6 w-6" />,
         title: "Instant Search",
-        desc: "Find any film or web series in seconds. Filter by genre, year, or IMDb-style ratings.",
+        desc: "Find any movie or series in seconds. Filter by genre, year, or IMDb-style ratings.",
     },
     {
         icon: <IoBookmarkOutline className="h-6 w-6" />,
@@ -54,14 +54,14 @@ export const features = [
 export const faqsList = [
     {
         q: "What is MovieSphere?",
-        a: "MovieSphere is a free streaming platform for Bollywood, regional Indian cinema, and international movies & web series. Browse trending titles, build a watchlist, download for offline viewing — no account or subscription needed."
+        a: "MovieSphere is a free streaming platform for Bollywood, regional Indian cinema, and international movies & series. Browse trending titles, build a watchlist, download for offline viewing — no account or subscription needed."
     },
     {
         q: "Is MovieSphere really free?",
         a: "Yes. No subscriptions, no credit cards, and no hidden fees. Open the app, pick a title, and press play — ₹0 forever."
     },
     {
-        q: "Can I download shows for offline viewing?",
+        q: "Can I download movies and series for offline viewing?",
         a: "Yes. Save movies and episodes from the details page, then watch from the Downloads tab — ideal for commutes or when your network is weak."
     },
     {

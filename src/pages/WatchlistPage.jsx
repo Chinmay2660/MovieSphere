@@ -54,7 +54,7 @@ const WatchlistPage = () => {
           <div className="apple-content-box apple-empty-state">
             <p className="apple-headline text-secondary">Your watchlist is empty</p>
             <p className="apple-footnote mx-auto mt-2 max-w-sm">
-              Add movies from their detail page, or add episodes from a TV show&apos;s Seasons & Episodes section.
+              Add movies from their detail page, or add episodes from a series&apos; Seasons & Episodes section.
             </p>
           </div>
         )}

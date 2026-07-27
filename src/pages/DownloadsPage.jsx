@@ -44,7 +44,7 @@ const DownloadsPage = () => {
             <IoDownloadOutline className="mx-auto mb-4 h-12 w-12 text-muted" />
             <p className="apple-headline text-secondary">No downloads yet</p>
             <p className="apple-footnote mx-auto mt-2 max-w-sm">
-              Go to a movie or TV show detail page and tap Download to save it for offline viewing.
+              Go to a movie or series detail page and tap Download to save it for offline viewing.
             </p>
           </div>
         )}

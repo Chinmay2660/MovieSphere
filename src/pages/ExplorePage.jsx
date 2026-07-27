@@ -244,7 +244,7 @@ const ExplorePage = () => {
   }, [params.explore]);
 
   const getHeading = () => {
-    const type = params.explore === 'tv' ? "Web Series" : "Movies";
+    const type = params.explore === 'tv' ? t('nav.series') : t('nav.movies');
     if (appliedGenres.length === 1) {
       const genreName = genres.find(g => g.id.toString() === appliedGenres[0])?.name;
       if (genreName) return `${genreName} ${type}`;
@@ -263,8 +263,8 @@ const ExplorePage = () => {
   return (
     <div className="apple-page">
       <div className="apple-container">
-        <header className="apple-section-header mt-4 flex flex-row items-center justify-between gap-4 sm:mt-6">
-          <h1 className="apple-large-title truncate text-text">{getHeading()}</h1>
+        <header className="apple-section-header mt-4 flex flex-row items-start justify-between gap-4 sm:mt-6">
+          <h1 className="apple-large-title min-w-0 flex-1 text-text">{getHeading()}</h1>
           
           <div className="relative flex-shrink-0" ref={filterRef}>
             <button

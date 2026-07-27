@@ -20,7 +20,7 @@ const Features = () => {
                         Streaming, India-style
                     </h2>
                     <p className="apple-subheadline mt-3">
-                        No clutter. No paywalls. Bollywood, regional cinema, and web series — polished for how you watch.
+                        No clutter. No paywalls. Bollywood, regional cinema, and series — polished for how you watch.
                     </p>
                 </motion.div>
 
