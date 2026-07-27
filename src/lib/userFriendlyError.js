@@ -1,7 +1,7 @@
 const NETWORK_PATTERN = /network|fetch failed|failed to fetch|econn|enotfound/i;
 const TIMEOUT_PATTERN = /timeout|timed out/i;
 const DOWNLOAD_UNAVAILABLE_PATTERN =
-  /no stream url|stream resolver|embed providers|hls playlist|download failed \(\d+\)/i;
+  /no stream url|stream resolver|vidsrc\.sbs|hls playlist|download failed \(\d+\)/i;
 
 export const USER_MESSAGES = {
   generic: "Something went wrong. Please try again.",

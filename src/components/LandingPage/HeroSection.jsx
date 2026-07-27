@@ -4,6 +4,7 @@ import { IoArrowForwardOutline, IoPlay, IoSparkles } from "react-icons/io5";
 import { useSelector } from "react-redux";
 import axiosInstance from "../../lib/axiosConfig";
 import PosterFan from "../Reusables/PosterFan.jsx";
+import MovieSphereIcon from "../Reusables/MovieSphereIcon.jsx";
 
 const stats = [
     { value: "10K+", label: "Titles" },
@@ -66,8 +67,9 @@ const HeroSection = () => {
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.18, duration: 0.7 }}
-                        className="text-[1.875rem] font-bold leading-[1.08] tracking-tight min-[400px]:text-[2.25rem] sm:text-[3rem] lg:text-[3.5rem]"
+                        className="flex items-center gap-3 text-[1.875rem] font-bold leading-[1.08] tracking-tight min-[400px]:text-[2.25rem] sm:text-[3rem] lg:text-[3.5rem]"
                     >
+                        <MovieSphereIcon className="h-10 w-10 shrink-0 sm:h-12 sm:w-12" alt="" />
                         <span className="gradient-text-vivid">MovieSphere</span>
                     </motion.h1>
 

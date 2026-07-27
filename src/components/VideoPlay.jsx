@@ -55,14 +55,11 @@ const unlockOrientation = () => {
 };
 
 const VIDSRC = {
-  id: 'vidsrc_sbs',
-  name: 'VidSrc',
-  icon: '🎬',
   getMovieUrl: (id) => `https://vidsrc.sbs/embed/movie/${id}`,
   getTvUrl: (id, season, episode) => `https://vidsrc.sbs/embed/tv/${id}/${season}/${episode}`,
 };
 
-const getDirectEmbedUrl = (mediaType, playVideoId, season, episode) => {
+const getEmbedUrl = (mediaType, playVideoId, season, episode) => {
   if (!playVideoId) return '';
   if (mediaType === 'tv') {
     return VIDSRC.getTvUrl(playVideoId, season, episode);
@@ -120,7 +117,7 @@ const VideoPlay = ({
         close();
     }, [close]);
 
-    const resolveEmbedSrc = useCallback(() => {
+    const resolvePlaybackSrc = useCallback(() => {
         if (!playVideoId) {
             setEmbedSrc('');
             setIsLoading(false);
@@ -131,13 +128,13 @@ const VideoPlay = ({
         setEmbedReady(false);
 
         const mediaType = media_type === 'tv' ? 'tv' : 'movie';
-        setEmbedSrc(getDirectEmbedUrl(mediaType, playVideoId, selectedSeason, selectedEpisode));
+        setEmbedSrc(getEmbedUrl(mediaType, playVideoId, selectedSeason, selectedEpisode));
         setVideoKey((prev) => prev + 1);
     }, [playVideoId, media_type, selectedSeason, selectedEpisode]);
 
     useEffect(() => {
-        resolveEmbedSrc();
-    }, [resolveEmbedSrc]);
+        resolvePlaybackSrc();
+    }, [resolvePlaybackSrc]);
 
     useEffect(() => {
         const previousOverflow = document.body.style.overflow;
@@ -240,13 +237,17 @@ const VideoPlay = ({
     }, [hideControls, isTouchDevice]);
 
     const handlePlayerOverlayClick = useCallback(() => {
-        if (!isTouchDevice) return;
-        setShowControls((prev) => {
-            const next = !prev;
-            if (next) scheduleControlsHide();
-            else if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
-            return next;
-        });
+        if (isTouchDevice) {
+            setShowControls((prev) => {
+                const next = !prev;
+                if (next) scheduleControlsHide();
+                else if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+                return next;
+            });
+            return;
+        }
+
+        setShowControls(true);
     }, [isTouchDevice, scheduleControlsHide]);
 
     const handleEmbedLoad = useCallback(() => {
@@ -486,16 +487,15 @@ const VideoPlay = ({
                     {embedSrc ? (
                         <iframe
                             key={videoKey}
-                            title="video"
                             src={embedSrc}
-                            className={`h-full w-full ${embedReady ? 'opacity-100' : 'opacity-0'}`}
-                            style={{ border: 'none' }}
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                            title="Video player"
+                            className={`h-full w-full border-0 bg-black ${embedReady ? 'opacity-100' : 'opacity-0'}`}
                             allowFullScreen
+                            allow="autoplay; encrypted-media; picture-in-picture"
                             onLoad={handleEmbedLoad}
                         />
                     ) : null}
-                    {!isLoading && isTouchDevice && (
+                    {!isLoading && (
                         <button
                             type="button"
                             aria-label={controlsVisible ? t('video.hideControls') : t('video.showControls')}

@@ -55,13 +55,17 @@ export const startDownload = async (item, dispatch) => {
     const chunks = [];
     let bytesDownloaded = 0;
 
+    if (source) {
+      dispatch(updateDownloadProgress({ key, progress: 0, bytesDownloaded: 0, totalBytes, source }));
+    }
+
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
       chunks.push(value);
       bytesDownloaded += value.length;
       const progress = totalBytes > 0 ? Math.round((bytesDownloaded / totalBytes) * 100) : 0;
-      dispatch(updateDownloadProgress({ key, progress, bytesDownloaded, totalBytes }));
+      dispatch(updateDownloadProgress({ key, progress, bytesDownloaded, totalBytes, source: source ?? undefined }));
     }
 
     const blob = new Blob(chunks, { type: contentType });

@@ -34,7 +34,7 @@ const DownloadsPage = () => {
           <div>
             <h1 className="apple-large-title text-text">Downloads</h1>
             <p className="apple-subheadline mt-1">
-              Watch offline. Streams resolve from the same embed sources used for playback.
+              Watch offline. Streams are resolved from vidsrc.sbs.
             </p>
           </div>
         </header>

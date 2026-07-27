@@ -21,8 +21,8 @@ const Banner = () => {
   const imageURL = useSelector((state) => state.movieData.imageURL);
   const slides = useMemo(
     () =>
-      (bannerData ?? [])
-        .filter((item) => item?.media_type === "movie" || item?.media_type === "tv")
+      bannerData
+        .filter((item) => item.media_type === "movie" || item.media_type === "tv")
         .slice(0, MAX_SLIDES),
     [bannerData]
   );
@@ -43,15 +43,11 @@ const Banner = () => {
   }, [slideCount]);
 
   const handleVideoPlay = useCallback(async (data) => {
-    if (!data?.id || (data.media_type !== "movie" && data.media_type !== "tv")) return;
+    if (!data.id || (data.media_type !== "movie" && data.media_type !== "tv")) return;
 
     if (data.media_type === "tv") {
-      try {
-        const { data: tvData } = await axiosInstance.get(`/tv/${data.id}`);
-        setPlayVideoData({ ...data, seasons: tvData?.seasons ?? [] });
-      } catch {
-        setPlayVideoData(data);
-      }
+      const { data: tvData } = await axiosInstance.get(`/tv/${data.id}`);
+      setPlayVideoData({ ...data, seasons: tvData.seasons });
     } else {
       setPlayVideoData(data);
     }
@@ -117,7 +113,7 @@ const Banner = () => {
 
   const currentSlide = slides[currentIndex];
   const currentTitle =
-    currentSlide?.title || currentSlide?.original_title || currentSlide?.name;
+    currentSlide.media_type === "tv" ? currentSlide.name : currentSlide.title;
 
   return (
     <section
@@ -145,16 +141,16 @@ const Banner = () => {
         >
           {slides.map((data, index) => {
             const isNearSlide = Math.abs(index - currentIndex) <= 1;
-            const title = data?.title || data?.original_title || data?.name;
+            const title = data.media_type === "tv" ? data.name : data.title;
 
             return (
               <div
-                key={data?.id ?? index}
+                key={data.id}
                 className="relative h-full shrink-0"
                 style={{ width: `${100 / slideCount}%` }}
                 aria-hidden={index !== currentIndex}
               >
-                {isNearSlide && imageURL && data?.backdrop_path ? (
+                {isNearSlide && imageURL && data.backdrop_path ? (
                   <LazyImage
                     src={getTmdbImageUrl(imageURL, data.backdrop_path, TMDB_IMAGE_SIZES.backdropHero)}
                     alt={index === currentIndex && title ? `Banner for ${title}` : ""}
@@ -189,15 +185,15 @@ const Banner = () => {
             {currentTitle}
           </h2>
           <p className="my-2 line-clamp-2 text-sm text-text/90 drop-shadow-lg sm:line-clamp-3 sm:text-base">
-            {currentSlide?.overview}
+            {currentSlide.overview}
           </p>
           <div className="flex flex-wrap items-center gap-2 text-xs text-text sm:gap-4 sm:text-base">
-            {currentSlide?.vote_average > 0 && (
+            {currentSlide.vote_average > 0 && (
               <p className={getRatingColor(currentSlide.vote_average).text}>
                 {t('banner.rating')}: {Number(currentSlide.vote_average).toFixed(1)}/10
               </p>
             )}
-            {currentSlide?.popularity > 0 && (
+            {currentSlide.popularity > 0 && (
               <>
                 <span className="text-muted">|</span>
                 <p className="text-green-400">
@@ -213,7 +209,7 @@ const Banner = () => {
               onClick={() => handleVideoPlay(currentSlide)}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              aria-label={currentTitle ? t("banner.playNowFor", { title: currentTitle }) : t("banner.playNow")}
+              aria-label={t("banner.playNowFor", { title: currentTitle })}
               className="btn-primary flex items-center justify-center gap-2 px-5 py-2.5 text-sm active:scale-[0.97] sm:min-w-[9rem]"
             >
               <IoPlay className="h-4 w-4" aria-hidden />
@@ -221,8 +217,8 @@ const Banner = () => {
             </motion.button>
             <button
               type="button"
-              onClick={() => navigate(`/${currentSlide?.media_type}/${currentSlide?.id}`)}
-              aria-label={currentTitle ? t("banner.moreDetailsFor", { title: currentTitle }) : t("banner.moreDetails")}
+              onClick={() => navigate(`/${currentSlide.media_type}/${currentSlide.id}`)}
+              aria-label={t("banner.moreDetailsFor", { title: currentTitle })}
               className="btn-ghost flex items-center justify-center gap-2 px-5 py-2.5 text-sm active:scale-[0.97] sm:min-w-[9rem]"
             >
               <IoInformationCircleOutline className="h-4 w-4 text-accent" aria-hidden />
@@ -277,7 +273,7 @@ const Banner = () => {
         </>
       )}
 
-      {playVideo && playVideoData?.id && (
+      {playVideo && playVideoData.id && (
         <VideoPlay
           playVideoId={playVideoData.id}
           media_type={playVideoData.media_type}

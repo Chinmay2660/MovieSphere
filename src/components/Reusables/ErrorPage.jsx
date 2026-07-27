@@ -1,4 +1,5 @@
 import { useLocale } from '../../context/LocaleContext';
+import MovieSphereIcon from '../components/Reusables/MovieSphereIcon';
 
 const NotFound = () => {
   const { t } = useLocale();
@@ -6,6 +7,7 @@ const NotFound = () => {
   return (
     <div className="grid h-screen place-content-center bg-background px-4">
       <div className="text-center">
+        <MovieSphereIcon className="mx-auto mb-6 h-12 w-12 opacity-80" alt="MovieSphere" />
         <h1 className="gradient-text text-9xl font-black">404</h1>
         <p className="text-2xl font-bold tracking-tight text-text sm:text-4xl">Uh-oh!</p>
         <p className="mt-4 text-muted">We can&apos;t find that page.</p>

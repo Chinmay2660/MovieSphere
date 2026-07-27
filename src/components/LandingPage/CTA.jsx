@@ -1,6 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { IoArrowForwardOutline, IoPlay } from "react-icons/io5";
+import MovieSphereIcon from "../Reusables/MovieSphereIcon.jsx";
 
 const CTA = () => {
     const ref = useRef(null);
@@ -17,7 +18,8 @@ const CTA = () => {
                     <div className="pointer-events-none absolute -top-24 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-accent/30 blur-[80px]" aria-hidden />
                     <div className="pointer-events-none absolute -bottom-16 right-8 h-32 w-32 rounded-full bg-accent-purple/25 blur-[60px]" aria-hidden />
 
-                    <span className="section-label">Get started</span>
+                    <MovieSphereIcon className="mx-auto h-10 w-10 opacity-90" alt="" />
+                    <span className="section-label mt-4 block">Get started</span>
                     <h2 className="apple-title-1 mt-3 text-text sm:apple-large-title">
                         Your next favorite film is one tap away.
                     </h2>

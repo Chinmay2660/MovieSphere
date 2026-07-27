@@ -67,13 +67,14 @@ const downloadsSlice = createSlice({
       saveToStorage(state);
     },
     updateDownloadProgress: (state, action) => {
-      const { key, progress, bytesDownloaded, totalBytes } = action.payload;
+      const { key, progress, bytesDownloaded, totalBytes, source } = action.payload;
       const item = state.find((d) => d.key === key);
       if (!item) return;
       item.status = "downloading";
       item.progress = progress;
       item.bytesDownloaded = bytesDownloaded;
       item.totalBytes = totalBytes;
+      if (source) item.source = source;
     },
     setDownloadCompleted: (state, action) => {
       const { key, source, mimeType, format } = action.payload;

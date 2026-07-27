@@ -3,7 +3,7 @@ import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-
 import { IoSearchOutline, IoSettingsOutline } from 'react-icons/io5';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { navigation } from '../../lib/constants';
-import logo from '../../assets/MovieSphereLogo.png';
+import MovieSphereIcon from './MovieSphereIcon';
 import { debounce, getSearchQueryFromSearch, sanitizeSearchQuery } from "../../lib/utils";
 import { useLocale } from '../../context/LocaleContext';
 
@@ -75,8 +75,8 @@ const Header = () => {
     const navButtonClass = (isActive) =>
         `apple-footnote min-h-[2.75rem] px-3.5 py-1.5 rounded-full font-medium transition-all duration-200 ${
             isActive
-                ? 'bg-primary text-primary-fg'
-                : 'text-secondary hover:text-text hover:bg-white/8'
+                ? 'bg-primary text-primary-fg hover:bg-primary/90 hover:shadow-[0_0_16px_rgba(255,153,51,0.35)]'
+                : '!text-text/85 hover:!text-primary hover:bg-primary/15 hover:shadow-[inset_0_0_0_0.5px_rgba(255,153,51,0.35)]'
         }`;
 
     return (
@@ -87,6 +87,15 @@ const Header = () => {
                 transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
                 className="liquid-glass-strong hidden md:flex max-w-fit fixed top-5 inset-x-0 mx-auto rounded-full z-50 px-2 py-1.5 items-center justify-center gap-0.5"
             >
+                <button
+                    type="button"
+                    onClick={() => navigate('/')}
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-primary/15 active:scale-[0.97]"
+                    aria-label="Go to home"
+                >
+                    <MovieSphereIcon className="h-5 w-5" />
+                </button>
+
                 <div className="flex items-center">
                     {navigation.map((item, idx) => {
                         const isActive = activePath === item.path;
@@ -146,16 +155,11 @@ const Header = () => {
             >
                 <button
                     type="button"
-                    onClick={() => navigate('/home')}
+                    onClick={() => navigate('/')}
                     className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full active:bg-white/10"
                     aria-label="Go to home"
                 >
-                    <img
-                        src={logo}
-                        className="h-6 w-auto opacity-90"
-                        alt=""
-                        style={{ filter: 'brightness(0) invert(1)' }}
-                    />
+                    <MovieSphereIcon className="h-6 w-6 opacity-90" />
                 </button>
 
                 <div className="min-w-0 flex-1" ref={searchRef}>
