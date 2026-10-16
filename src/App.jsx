@@ -28,7 +28,7 @@ const App = () => {
 
       <Header />
       <MobileBottomNav />
-      <div className="flex min-h-dvh flex-col text-text pb-[calc(3.0625rem+env(safe-area-inset-bottom))] md:pb-0">
+      <div className="flex min-h-dvh flex-col text-text pb-[calc(3.8125rem+env(safe-area-inset-bottom))] md:pb-0">
         <main className="relative flex flex-1 flex-col overflow-x-hidden">
           <ErrorBoundary>
             <Suspense fallback={<Loader size="lg" className="min-h-[50vh]" />}>

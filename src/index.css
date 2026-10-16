@@ -34,8 +34,8 @@ html {
 
 @media (max-width: 767px) {
   html {
-    scroll-padding-top: calc(3.75rem + env(safe-area-inset-top));
-    scroll-padding-bottom: calc(3.0625rem + env(safe-area-inset-bottom));
+    scroll-padding-top: calc(4.5rem + env(safe-area-inset-top));
+    scroll-padding-bottom: calc(3.8125rem + env(safe-area-inset-bottom));
   }
 }
 
@@ -180,7 +180,7 @@ a:not(.btn-primary):not(.btn-ghost):not(.btn-blue):not(.btn-secondary) {
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding-top: calc(3.25rem + env(safe-area-inset-top, 0px));
+  padding-top: calc(4.5rem + env(safe-area-inset-top, 0px));
   @media (width >= 48rem) {
     padding-top: 5rem;
   }
@@ -491,14 +491,16 @@ a:not(.btn-primary):not(.btn-ghost):not(.btn-blue):not(.btn-secondary) {
   background: rgba(28, 28, 30, 0.78);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-top: 0.5px solid rgba(255, 255, 255, 0.1);
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
 }
 
 @utility ios-nav-bar {
   background: rgba(28, 28, 30, 0.78);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
 }
 
 @utility ios-search-field {
@@ -522,6 +524,13 @@ a:not(.btn-primary):not(.btn-ghost):not(.btn-blue):not(.btn-secondary) {
     line-height: inherit;
     color: inherit;
     &::placeholder { color: var(--color-secondary); }
+    &::-webkit-search-cancel-button {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 0.875rem;
+      width: 0.875rem;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23A8A29E'%3E%3Cpath d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/%3E%3C/svg%3E") center / contain no-repeat;
+    }
   }
 }
 

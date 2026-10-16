@@ -18,9 +18,9 @@ const MobileBottomNav = () => {
     return (
         <nav
             aria-label="Main navigation"
-            className="fixed inset-x-0 bottom-0 z-50 md:hidden ios-tab-bar pb-[env(safe-area-inset-bottom)]"
+            className="fixed inset-x-0 bottom-0 z-50 md:hidden px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
         >
-            <div className="flex items-stretch">
+            <div className="ios-tab-bar flex items-stretch overflow-hidden rounded-full">
                 {mobileNavItems.map((item) => {
                     const isActive = isNavActive(item.path, pathname);
                     const Icon = isActive ? item.iconActive : item.icon;

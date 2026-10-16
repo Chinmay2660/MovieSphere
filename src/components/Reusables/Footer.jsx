@@ -9,8 +9,8 @@ const Footer = () => {
     const { t } = useLocale();
 
     return (
-        <footer className="apple-container pb-4 pt-2 md:pb-6">
-            <div className="liquid-glass mx-auto max-w-3xl rounded-full px-4 py-2.5 sm:px-5 sm:py-3">
+        <footer className="apple-container max-md:px-6 max-md:pt-6 max-md:pb-14 md:pt-6 md:pb-10">
+            <div className="liquid-glass mx-auto max-w-3xl rounded-full max-md:px-6 max-md:py-4 md:px-5 md:py-3">
                 <div className="flex items-center justify-between gap-3 sm:gap-4">
                     <button
                         type="button"

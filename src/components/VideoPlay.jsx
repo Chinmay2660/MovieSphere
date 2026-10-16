@@ -55,16 +55,11 @@ const unlockOrientation = () => {
 };
 
 const VIDSRC = {
-  getMovieUrl: (id) => `https://vidsrc.sbs/embed/movie/${id}`,
-  getTvUrl: (id, season, episode) => `https://vidsrc.sbs/embed/tv/${id}/${season}/${episode}`,
-};
-
-const getEmbedUrl = (mediaType, playVideoId, season, episode) => {
-  if (!playVideoId) return '';
-  if (mediaType === 'tv') {
-    return VIDSRC.getTvUrl(playVideoId, season, episode);
-  }
-  return VIDSRC.getMovieUrl(playVideoId);
+  id: 'vidsrc_cc',
+  name: 'VidSrc',
+  icon: '🎬',
+  getMovieUrl: (id) => `https://vidsrc.cc/v2/embed/movie/${id}`,
+  getTvUrl: (id, season, episode) => `https://vidsrc.cc/v2/embed/tv/${id}/${season}/${episode}`,
 };
 
 const VideoPlay = ({ 
@@ -82,14 +77,13 @@ const VideoPlay = ({
     const [showEpisodeDropdown, setShowEpisodeDropdown] = useState(false);
     const [episodeCount, setEpisodeCount] = useState(1);
     const [videoKey, setVideoKey] = useState(0);
-    const [embedSrc, setEmbedSrc] = useState('');
+    const selectedSource = VIDSRC;
     const [isLoading, setIsLoading] = useState(true);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [showControls, setShowControls] = useState(false);
     const [isTheaterMode, setIsTheaterMode] = useState(false);
     const [showRotateControl, setShowRotateControl] = useState(() => shouldShowRotateControl());
     const [isTouchDevice, setIsTouchDevice] = useState(() => isTouchPrimary());
-    const [embedReady, setEmbedReady] = useState(false);
     const containerRef = useRef(null);
     const controlsTimeoutRef = useRef(null);
 
@@ -105,8 +99,7 @@ const VideoPlay = ({
     useEffect(() => {
         setVideoKey(prev => prev + 1);
         setIsLoading(true);
-        setEmbedReady(false);
-    }, [selectedSeason, selectedEpisode]);
+    }, [selectedSeason, selectedEpisode, selectedSource]);
 
     const handleClose = useCallback(async () => {
         if (controlsTimeoutRef.current) {
@@ -117,24 +110,13 @@ const VideoPlay = ({
         close();
     }, [close]);
 
-    const resolvePlaybackSrc = useCallback(() => {
-        if (!playVideoId) {
-            setEmbedSrc('');
-            setIsLoading(false);
-            return;
+    const getVideoSrc = () => {
+        if (!playVideoId) return '';
+        if (media_type === 'tv') {
+            return selectedSource.getTvUrl(playVideoId, selectedSeason, selectedEpisode);
         }
-
-        setIsLoading(true);
-        setEmbedReady(false);
-
-        const mediaType = media_type === 'tv' ? 'tv' : 'movie';
-        setEmbedSrc(getEmbedUrl(mediaType, playVideoId, selectedSeason, selectedEpisode));
-        setVideoKey((prev) => prev + 1);
-    }, [playVideoId, media_type, selectedSeason, selectedEpisode]);
-
-    useEffect(() => {
-        resolvePlaybackSrc();
-    }, [resolvePlaybackSrc]);
+        return selectedSource.getMovieUrl(playVideoId);
+    };
 
     useEffect(() => {
         const previousOverflow = document.body.style.overflow;
@@ -252,7 +234,6 @@ const VideoPlay = ({
 
     const handleEmbedLoad = useCallback(() => {
         setIsLoading(false);
-        setEmbedReady(true);
         if (isTouchDevice) {
             setShowControls(true);
             scheduleControlsHide();
@@ -320,6 +301,7 @@ const VideoPlay = ({
     const canGoPrev = selectedEpisode > 1 || selectedSeason > 1;
     const canGoNext = selectedEpisode < episodeCount || validSeasons.some(s => s.season_number === selectedSeason + 1);
     const controlsVisible = showControls || isLoading;
+    const videoSrc = getVideoSrc();
 
     return createPortal(
         <section 
@@ -484,14 +466,15 @@ const VideoPlay = ({
                             />
                         </div>
                     )}
-                    {embedSrc ? (
+                    {videoSrc ? (
                         <iframe
                             key={videoKey}
-                            src={embedSrc}
-                            title="Video player"
-                            className={`h-full w-full border-0 bg-black ${embedReady ? 'opacity-100' : 'opacity-0'}`}
+                            title="video"
+                            src={videoSrc}
+                            className="h-full w-full border-0 bg-black"
+                            style={{ border: 'none' }}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                             allowFullScreen
-                            allow="autoplay; encrypted-media; picture-in-picture"
                             onLoad={handleEmbedLoad}
                         />
                     ) : null}

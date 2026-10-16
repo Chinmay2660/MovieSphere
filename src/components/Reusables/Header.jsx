@@ -151,8 +151,9 @@ const Header = () => {
             <motion.div
                 initial={{ opacity: 1, y: 0 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="md:hidden fixed top-0 inset-x-0 z-50 flex items-center gap-3 px-4 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] ios-nav-bar"
+                className="md:hidden fixed top-0 inset-x-0 z-50 px-4 pt-[max(0.75rem,env(safe-area-inset-top))]"
             >
+                <div className="ios-nav-bar flex items-center gap-3 rounded-full px-3 py-2">
                 <button
                     type="button"
                     onClick={() => navigate('/')}
@@ -204,6 +205,7 @@ const Header = () => {
                 >
                     <IoSettingsOutline className="text-xl" aria-hidden />
                 </button>
+                </div>
             </motion.div>
         </AnimatePresence>
     );

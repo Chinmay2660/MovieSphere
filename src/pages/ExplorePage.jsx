@@ -278,7 +278,7 @@ const ExplorePage = () => {
               <IoFilter className="w-5 h-5" />
               <span>Filters</span>
               {activeFilterCount > 0 && (
-                <span className="flex items-center justify-center w-5 h-5 text-xs font-bold bg-surface text-text rounded-full">
+                <span className="flex items-center justify-center min-w-5 h-5 px-1 text-xs font-bold rounded-full bg-text text-primary-fg">
                   {activeFilterCount}
                 </span>
               )}
