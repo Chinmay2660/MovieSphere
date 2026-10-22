@@ -34,8 +34,8 @@ export function youtubeEmbedUrl(
     modestbranding: '1',
     rel: '0',
     enablejsapi: '1',
-    disablekb: '1',
-    fs: '0',
+    disablekb: controls ? '0' : '1',
+    fs: controls ? '1' : '0',
     iv_load_policy: '3',
   });
   if (typeof window !== 'undefined') {

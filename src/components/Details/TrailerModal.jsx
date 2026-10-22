@@ -1,34 +1,27 @@
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { IoClose, IoOpenOutline } from 'react-icons/io5';
+import { IoClose } from 'react-icons/io5';
 import { lockBodyScroll } from '../../lib/scrollLock';
 import { youtubeEmbedUrl } from '../../lib/tmdbVideos';
-import { subscribeYoutubeIframe, useYoutubeTrailerEmbed } from '../../lib/youtubeEmbed';
+import {
+  isYoutubeEmbedMessage,
+  isYoutubeEndedMessage,
+  parseYoutubeMessage,
+} from '../../lib/youtubeEmbed';
 import LazyImage from '../Reusables/LazyImage';
 
-const blockPlayerPointer = (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-};
+const TrailerModal = ({ youtubeKey, title, closeLabel, posterSrc, onClose }) => {
+  const [iframeReady, setIframeReady] = useState(false);
 
-const TrailerModal = ({
-  youtubeKey,
-  title,
-  closeLabel,
-  openOnYoutubeLabel,
-  posterSrc,
-  onClose,
-  onOpenYoutube,
-}) => {
-  const iframeRef = useRef(null);
-  const [embedFailed, setEmbedFailed] = useState(false);
-  const [src] = useState(() =>
-    youtubeEmbedUrl(youtubeKey, {
-      autoplay: true,
-      mute: false,
-      controls: false,
-      loop: false,
-    })
+  const src = useMemo(
+    () =>
+      youtubeEmbedUrl(youtubeKey, {
+        autoplay: true,
+        mute: false,
+        controls: true,
+        loop: false,
+      }),
+    [youtubeKey]
   );
 
   useEffect(() => lockBodyScroll(), []);
@@ -41,35 +34,21 @@ const TrailerModal = ({
     return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);
 
-  const handleEnded = useCallback(() => {
-    onClose();
+  useEffect(() => {
+    const handleMessage = (event) => {
+      if (!isYoutubeEmbedMessage(event)) return;
+      const data = parseYoutubeMessage(event.data);
+      if (isYoutubeEndedMessage(data)) onClose();
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
   }, [onClose]);
-
-  const handleUnavailable = useCallback(() => {
-    setEmbedFailed(true);
-  }, []);
-
-  const { isActive } = useYoutubeTrailerEmbed({
-    active: Boolean(youtubeKey) && !embedFailed,
-    onEnded: handleEnded,
-    onUnavailable: handleUnavailable,
-    iframeRef,
-    resumeOnPause: true,
-  });
-
-  const handleIframeLoad = () => {
-    subscribeYoutubeIframe(iframeRef.current);
-  };
-
-  const handleOpenYoutube = () => {
-    onOpenYoutube?.();
-  };
 
   if (!youtubeKey) return null;
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[110] flex flex-col items-center justify-center gap-4 bg-black/90 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[110] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-label={title}
@@ -82,69 +61,24 @@ const TrailerModal = ({
       >
         <IoClose className="h-6 w-6" />
       </button>
-      <div className="trailer-embed-shell relative w-full max-w-4xl overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl aspect-video">
-        {posterSrc && (
+      <div className="relative w-full max-w-4xl overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl aspect-video">
+        {posterSrc && !iframeReady && (
           <LazyImage
             src={posterSrc}
             alt=""
             className="absolute inset-0 h-full w-full object-cover"
           />
         )}
-
-        {!embedFailed && (
-          <>
-            <iframe
-              id="moviesphere-trailer-embed"
-              ref={iframeRef}
-              title={title}
-              src={src}
-              onLoad={handleIframeLoad}
-              tabIndex={-1}
-              className={`trailer-embed-frame pointer-events-none absolute inset-0 z-10 h-full w-full transition-opacity duration-500 ${
-                isActive ? 'opacity-100' : 'opacity-0'
-              }`}
-              allow="autoplay; encrypted-media; picture-in-picture"
-              referrerPolicy="strict-origin-when-cross-origin"
-            />
-            <div
-              className="trailer-touch-blocker absolute inset-0 z-30 bg-transparent"
-              role="presentation"
-              aria-hidden
-              onPointerDown={blockPlayerPointer}
-              onPointerUp={blockPlayerPointer}
-              onClick={blockPlayerPointer}
-              onTouchStart={blockPlayerPointer}
-              onTouchEnd={blockPlayerPointer}
-              onContextMenu={blockPlayerPointer}
-            />
-          </>
-        )}
-
-        {embedFailed && (
-          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 px-6 text-center">
-            <p className="apple-headline text-text">{title}</p>
-            <button
-              type="button"
-              onClick={handleOpenYoutube}
-              className="btn-primary inline-flex gap-2 px-6"
-            >
-              <IoOpenOutline className="h-5 w-5" aria-hidden />
-              {openOnYoutubeLabel}
-            </button>
-          </div>
-        )}
+        <iframe
+          title={title}
+          src={src}
+          onLoad={() => setIframeReady(true)}
+          className="absolute inset-0 z-10 h-full w-full border-0 bg-black"
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+          allowFullScreen
+          referrerPolicy="strict-origin-when-cross-origin"
+        />
       </div>
-
-      {!embedFailed && (
-        <button
-          type="button"
-          onClick={handleOpenYoutube}
-          className="btn-ghost z-[40] gap-2 px-4 py-2 text-sm text-text/90"
-        >
-          <IoOpenOutline className="h-4 w-4 shrink-0" aria-hidden />
-          {openOnYoutubeLabel}
-        </button>
-      )}
     </div>,
     document.body
   );

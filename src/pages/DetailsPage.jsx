@@ -1,6 +1,6 @@
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axiosInstance from "../lib/axiosConfig";
-import { lazy, Suspense, useCallback, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import Divider from "../components/Reusables/Divider";
@@ -10,7 +10,7 @@ import CardCarousel from "../components/Home/CardCarousel";
 import { IoPlay, IoStar, IoCalendar, IoTime, IoTv, IoExpand, IoAddOutline, IoCheckmarkOutline, IoDownloadOutline, IoVideocamOutline } from "react-icons/io5";
 import DetailsHeroMedia from "../components/Details/DetailsHeroMedia";
 import TrailerModal from "../components/Details/TrailerModal";
-import { pickYoutubeTrailer, youtubeWatchUrl } from "../lib/tmdbVideos";
+import { pickYoutubeTrailer } from "../lib/tmdbVideos";
 import CastCarousel from "../components/CastCarousel";
 import { getRatingColor, getTmdbImageUrl, TMDB_IMAGE_SIZES, formatYear, formatLongDate } from "../lib/utils";
 import { addToWatchlist, removeFromWatchlist } from "../reduxStore/Reducer/watchlistSlice";
@@ -250,13 +250,6 @@ const DetailsPage = () => {
     }
     setPlayVideo(true);
   };
-
-  const handleOpenTrailerOnYoutube = useCallback(() => {
-    if (!trailer?.key) return;
-    setHeroTrailerSuppressed(true);
-    setShowTrailerModal(false);
-    window.open(youtubeWatchUrl(trailer.key), '_blank', 'noopener,noreferrer');
-  }, [trailer]);
 
   if (loading) {
     return (
@@ -819,9 +812,7 @@ const DetailsPage = () => {
               ? getTmdbImageUrl(imageURL, data.backdrop_path, TMDB_IMAGE_SIZES.backdrop)
               : null
           }
-          openOnYoutubeLabel={t('details.openOnYoutube')}
           onClose={() => setShowTrailerModal(false)}
-          onOpenYoutube={handleOpenTrailerOnYoutube}
         />
       )}
     </div>

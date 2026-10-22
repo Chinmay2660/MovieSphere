@@ -686,32 +686,6 @@ html::-webkit-scrollbar-corner,
 
 @utility grain { position: relative; }
 
-.trailer-embed-shell {
-  isolation: isolate;
-}
-
-.trailer-touch-blocker {
-  touch-action: none;
-  cursor: default;
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-/* Soft vignette over embed — dims YouTube center transport if it flashes */
-.trailer-embed-shell:has(.trailer-embed-frame)::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 25;
-  pointer-events: none;
-  background: radial-gradient(
-    circle at 50% 50%,
-    rgba(12, 10, 9, 0.55) 0%,
-    rgba(12, 10, 9, 0.12) 38%,
-    transparent 62%
-  );
-}
-
 /* ── Explore & search browse (streaming-style) ── */
 
 @utility explore-toolbar {
