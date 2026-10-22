@@ -42,7 +42,7 @@ const ErrorFallback = ({ onRetry, errorMessage }) => {
 
         {import.meta.env.DEV && errorMessage && (
           <pre
-            className="glass-card mx-auto mt-5 max-w-full overflow-x-auto rounded-xl px-3 py-2 text-left text-xs text-text/80 break-words whitespace-pre-wrap font-mono"
+            className="app-scrollbar glass-card mx-auto mt-5 max-w-full overflow-x-auto rounded-xl px-3 py-2 text-left text-xs text-text/80 break-words whitespace-pre-wrap font-mono"
           >
             {errorMessage}
           </pre>
@@ -80,6 +80,12 @@ class ErrorBoundary extends Component {
       hasError: true,
       errorMessage: error?.message ?? String(error),
     };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    if (import.meta.env.DEV) {
+      console.error("ErrorBoundary caught:", error, errorInfo?.componentStack);
+    }
   }
 
   handleRetry() {

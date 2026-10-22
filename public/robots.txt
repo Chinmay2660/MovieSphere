@@ -1,0 +1,4 @@
+# ponytail: reduces polite crawler noise; does not stop vulnerability scanners
+User-agent: *
+Allow: /
+Disallow: /api/

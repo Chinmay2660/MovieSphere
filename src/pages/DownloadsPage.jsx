@@ -25,7 +25,7 @@ const DownloadsPage = () => {
   return (
     <div className="apple-page">
       <div
-        className={`apple-container max-w-3xl py-6 sm:py-8${
+        className={`apple-container max-w-3xl page-content-footer py-4 sm:py-6${
           isEmpty ? " flex flex-1 flex-col justify-center" : ""
         }`}
       >
@@ -34,7 +34,7 @@ const DownloadsPage = () => {
           <div>
             <h1 className="apple-large-title text-text">Downloads</h1>
             <p className="apple-subheadline mt-1">
-              Watch offline. Streams are resolved from vidsrc.sbs.
+              Download only works when the app can find a direct MP4/HLS file (same as &quot;Direct stream&quot; in the player). Embed players like Videasy play in the browser but cannot be saved.
             </p>
           </div>
         </header>

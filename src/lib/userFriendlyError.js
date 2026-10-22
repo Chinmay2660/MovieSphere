@@ -1,7 +1,7 @@
 const NETWORK_PATTERN = /network|fetch failed|failed to fetch|econn|enotfound/i;
 const TIMEOUT_PATTERN = /timeout|timed out/i;
 const DOWNLOAD_UNAVAILABLE_PATTERN =
-  /no stream url|stream resolver|vidsrc\.sbs|hls playlist|download failed \(\d+\)/i;
+  /no stream url|stream resolver|vidsrc|hls playlist|download failed \(\d+\)/i;
 
 export const USER_MESSAGES = {
   generic: "Something went wrong. Please try again.",
@@ -10,6 +10,8 @@ export const USER_MESSAGES = {
   download: "Download didn't complete. Please try again.",
   downloadUnavailable:
     "This title isn't available for download right now. Try watching online instead.",
+  downloadEmbedOnly:
+    "This title plays in the embed player only—our server couldn't find a direct video file to save. In the player, try the “Direct stream” source; if that plays, download again.",
   network: "We couldn't connect right now. Check your internet and try again.",
   timeout: "This is taking longer than expected. Please try again.",
   playback: "This download can't be played in your browser. Try playing it online instead.",

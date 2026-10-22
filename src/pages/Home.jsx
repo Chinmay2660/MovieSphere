@@ -135,6 +135,7 @@ const Home = () => {
     };
 
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fill empty Redux slices; re-run on language change
   }, [dispatch, language]);
 
   const carousels = [
@@ -155,9 +156,9 @@ const Home = () => {
   ].filter(carousel => carousel.data && carousel.data.length > 0);
 
   return (
-    <div className="relative w-full max-w-full min-h-screen overflow-x-hidden">
+    <div className="relative w-full min-w-0 flex-1 pb-6 md:pb-10">
       <Banner />
-      <div className="relative z-10 -mt-4 space-y-2 sm:-mt-6">
+      <div className="relative z-10 -mt-4 space-y-1 sm:-mt-6 sm:space-y-2">
         {carousels.map((carousel, index) => (
           <CardCarousel
             key={index}

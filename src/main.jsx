@@ -8,10 +8,12 @@ import router from './routes/routes.jsx';
 import { getStoredLanguage } from './lib/languages';
 import { setRequestLanguage } from './lib/locale';
 import { ensureConfiguration } from './lib/fetchConfiguration';
+import { resumeInterruptedDownloads } from './lib/downloadResume';
 
 document.documentElement.lang = getStoredLanguage();
 setRequestLanguage(getStoredLanguage());
 ensureConfiguration(store.dispatch, store.getState().movieData.imageURL);
+resumeInterruptedDownloads(store.dispatch, store.getState().downloads);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <>

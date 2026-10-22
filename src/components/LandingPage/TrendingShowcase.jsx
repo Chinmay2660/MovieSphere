@@ -35,7 +35,7 @@ const TrendingShowcase = () => {
     const looped = [...posters, ...posters];
 
     return (
-        <section className="relative z-10 overflow-hidden py-6 sm:py-8">
+        <section className="relative z-10 w-full min-w-0 overflow-x-clip py-6 sm:py-8">
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-background to-transparent sm:w-24" />
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-background to-transparent sm:w-24" />
 
@@ -50,6 +50,7 @@ const TrendingShowcase = () => {
                 <p className="apple-footnote mt-2">India-first picks — updated daily</p>
             </motion.div>
 
+            <div className="mx-auto w-full max-w-[100vw] overflow-x-clip">
             <div className="flex w-max animate-marquee gap-3 px-3 sm:gap-4">
                 {looped.map((item, idx) => {
                     const title = item.title || item.name || "Title";
@@ -74,6 +75,7 @@ const TrendingShowcase = () => {
                         </a>
                     );
                 })}
+            </div>
             </div>
         </section>
     );

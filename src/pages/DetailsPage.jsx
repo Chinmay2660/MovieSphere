@@ -1,13 +1,16 @@
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axiosInstance from "../lib/axiosConfig";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import Divider from "../components/Reusables/Divider";
 import LazyImage from "../components/Reusables/LazyImage";
 import Loader from "../components/Reusables/Loader";
 import CardCarousel from "../components/Home/CardCarousel";
-import { IoPlay, IoStar, IoCalendar, IoTime, IoTv, IoExpand, IoAddOutline, IoCheckmarkOutline, IoDownloadOutline } from "react-icons/io5";
+import { IoPlay, IoStar, IoCalendar, IoTime, IoTv, IoExpand, IoAddOutline, IoCheckmarkOutline, IoDownloadOutline, IoVideocamOutline } from "react-icons/io5";
+import DetailsHeroMedia from "../components/Details/DetailsHeroMedia";
+import TrailerModal from "../components/Details/TrailerModal";
+import { pickYoutubeTrailer, youtubeWatchUrl } from "../lib/tmdbVideos";
 import CastCarousel from "../components/CastCarousel";
 import { getRatingColor, getTmdbImageUrl, TMDB_IMAGE_SIZES, formatYear, formatLongDate } from "../lib/utils";
 import { addToWatchlist, removeFromWatchlist } from "../reduxStore/Reducer/watchlistSlice";
@@ -15,9 +18,12 @@ import { getDownloadKey, selectDownloadByKey } from "../reduxStore/Reducer/downl
 import { startDownload } from "../lib/downloadService";
 import { Link } from "react-router-dom";
 import { USER_MESSAGES } from "../lib/userFriendlyError";
+import { isNumericMediaId } from "../lib/safeApiPath";
+import { useLocale } from "../context/LocaleContext";
 
 const VideoPlay = lazy(() => import("../components/VideoPlay"));
 const DetailsPage = () => {
+  const { t } = useLocale();
   const params = useParams();
   const isTV = params?.explore === 'tv';
   const location = useLocation();
@@ -34,6 +40,10 @@ const DetailsPage = () => {
   const [seasonDetails, setSeasonDetails] = useState(null);
   const [showAllEpisodes, setShowAllEpisodes] = useState(false);
   const [playConfig, setPlayConfig] = useState({ season: 1, episode: 1 });
+  const [trailer, setTrailer] = useState(null);
+  const [extraBackdrops, setExtraBackdrops] = useState([]);
+  const [showTrailerModal, setShowTrailerModal] = useState(false);
+  const [heroTrailerSuppressed, setHeroTrailerSuppressed] = useState(false);
   const dispatch = useDispatch();
   const watchlist = useSelector((state) => state.watchlist);
   const downloads = useSelector((state) => state.downloads);
@@ -110,11 +120,27 @@ const DetailsPage = () => {
     );
 
   const fetchData = async () => {
+    const explore = params?.explore;
+    const id = params?.id;
+    if (
+      (explore !== "movie" && explore !== "tv") ||
+      !id ||
+      !isNumericMediaId(id)
+    ) {
+      setError(USER_MESSAGES.loadContent);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setCastData(null);
     setSimilarData(null);
     setRecommendationsData(null);
+    setTrailer(null);
+    setExtraBackdrops([]);
+    setShowTrailerModal(false);
+    setHeroTrailerSuppressed(false);
     try {
       const detailsResponse = await axiosInstance.get(`/${params?.explore}/${params?.id}`);
       setData(detailsResponse.data);
@@ -133,14 +159,25 @@ const DetailsPage = () => {
         }
       }
 
-      const [castResponse, similarResponse, recommendationsResponse] = await Promise.all([
-        axiosInstance.get(`/${params?.explore}/${params?.id}/credits`),
-        axiosInstance.get(`/${params?.explore}/${params?.id}/similar`),
-        axiosInstance.get(`/${params?.explore}/${params?.id}/recommendations`),
-      ]);
+      const mediaBase = `/${params?.explore}/${params?.id}`;
+      const [castResponse, similarResponse, recommendationsResponse, videosResponse, imagesResponse] =
+        await Promise.all([
+          axiosInstance.get(`${mediaBase}/credits`),
+          axiosInstance.get(`${mediaBase}/similar`),
+          axiosInstance.get(`${mediaBase}/recommendations`),
+          axiosInstance.get(`${mediaBase}/videos`).catch(() => ({ data: { results: [] } })),
+          axiosInstance.get(`${mediaBase}/images`).catch(() => ({ data: { backdrops: [] } })),
+        ]);
       setCastData(castResponse.data);
       setSimilarData(similarResponse.data.results);
       setRecommendationsData(recommendationsResponse.data.results);
+      setTrailer(pickYoutubeTrailer(videosResponse.data));
+      const mainBackdrop = detailsResponse.data?.backdrop_path;
+      const moreStills = (imagesResponse.data?.backdrops ?? [])
+        .map((b) => b?.file_path)
+        .filter((path) => path && path !== mainBackdrop)
+        .slice(0, 5);
+      setExtraBackdrops(moreStills);
     } catch {
       setError(USER_MESSAGES.loadContent);
       setLoading(false);
@@ -160,6 +197,7 @@ const DetailsPage = () => {
   useEffect(() => {
     fetchData();
     setShowAllEpisodes(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- refetch only when route id/type changes
   }, [params?.explore, params?.id]);
 
   useEffect(() => {
@@ -167,6 +205,7 @@ const DetailsPage = () => {
       fetchSeasonDetails(selectedSeason);
       setShowAllEpisodes(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- season fetch tied to selectedSeason + tv id
   }, [selectedSeason, params?.id]);
 
   useEffect(() => {
@@ -212,6 +251,13 @@ const DetailsPage = () => {
     setPlayVideo(true);
   };
 
+  const handleOpenTrailerOnYoutube = useCallback(() => {
+    if (!trailer?.key) return;
+    setHeroTrailerSuppressed(true);
+    setShowTrailerModal(false);
+    window.open(youtubeWatchUrl(trailer.key), '_blank', 'noopener,noreferrer');
+  }, [trailer]);
+
   if (loading) {
     return (
       <div className="apple-page text-text lg:pt-0">
@@ -233,8 +279,19 @@ const DetailsPage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <span className="text-tertiary text-lg">{error}</span>
+      <div className="apple-page">
+        <div className="apple-container flex flex-1 flex-col justify-center py-16">
+          <div className="apple-content-box apple-empty-state">
+            <p className="apple-headline text-secondary">{error}</p>
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="btn-ghost mt-5 px-5"
+            >
+              {t('common.goBackHome')}
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -248,24 +305,20 @@ const DetailsPage = () => {
     ? seasonDetails?.episodes 
     : seasonDetails?.episodes?.slice(0, 8);
 
+  const displayTitle = data?.title ?? data?.original_title ?? data?.name ?? '';
+
   return (
     <div className="apple-page text-text lg:pt-0">
-      <div className="w-full h-[300px] sm:h-[400px] relative hidden lg:block">
-        {imageURL && data?.backdrop_path && (
-          <LazyImage
-            src={getTmdbImageUrl(imageURL, data.backdrop_path, TMDB_IMAGE_SIZES.backdrop)}
-            alt=""
-            eager
-            width={780}
-            height={400}
-            sizes="100vw"
-            className="h-full w-full object-cover"
-          />
-        )}
-        <div className="absolute w-full h-full top-0 bg-gradient-to-t from-background via-background/60 to-transparent"></div>
-      </div>
+      <DetailsHeroMedia
+        imageURL={imageURL}
+        backdropPath={data?.backdrop_path}
+        extraBackdropPaths={extraBackdrops}
+        trailerKey={trailer?.key}
+        title={displayTitle}
+        paused={playVideo || showTrailerModal || heroTrailerSuppressed}
+      />
 
-      <div className="apple-container flex max-w-screen-xl flex-col gap-6 py-6 sm:gap-8 sm:py-8 lg:flex-row lg:gap-10">
+      <div className="apple-container page-content-footer flex max-w-screen-xl flex-col gap-6 py-6 sm:gap-8 sm:py-8 lg:flex-row lg:gap-10">
         <div className="relative mx-auto lg:-mt-48 lg:mx-0 flex-shrink-0">
           {imageURL && data?.poster_path ? (
             <LazyImage
@@ -289,7 +342,7 @@ const DetailsPage = () => {
             {data?.title ?? data?.original_title ?? data?.name}
           </h1>
           {data?.tagline && (
-            <p className="apple-callout mt-2 italic text-secondary">"{data.tagline}"</p>
+            <p className="apple-callout mt-2 italic text-secondary">&ldquo;{data.tagline}&rdquo;</p>
           )}
 
           <div className="flex flex-wrap items-center gap-4 mt-3">
@@ -340,28 +393,60 @@ const DetailsPage = () => {
             </div>
           )}
 
-          <div className="mt-4 flex flex-col items-start gap-3">
-            <motion.button
-              onClick={handlePlayClick}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              className="btn-primary inline-flex items-center justify-center gap-2.5 px-6 py-2.5 active:scale-[0.97]"
+          <div className="mt-4 flex w-full max-w-xl flex-col gap-3">
+            <div
+              className={
+                trailer?.key
+                  ? "grid grid-cols-1 gap-3 min-[420px]:grid-cols-2"
+                  : "grid grid-cols-1"
+              }
             >
-              <IoPlay className="w-5 h-5 text-primary-fg" />
-              <span>{isTV ? "Watch S1 E1" : "Play Now"}</span>
-            </motion.button>
-            <div className="flex flex-wrap items-stretch gap-3">
+              <motion.button
+                type="button"
+                onClick={handlePlayClick}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                className="btn-primary w-full gap-2 px-5 py-2.5 text-sm active:scale-[0.97] sm:text-base"
+              >
+                <IoPlay className="h-5 w-5 shrink-0 text-primary-fg" aria-hidden />
+                <span>{isTV ? t('details.playSeries') : t('details.playNow')}</span>
+              </motion.button>
+              {trailer?.key && (
+                <button
+                  type="button"
+                  onClick={() => setShowTrailerModal(true)}
+                  className="btn-ghost w-full gap-2 px-5 py-2.5 text-sm sm:text-base"
+                >
+                  <IoVideocamOutline className="h-5 w-5 shrink-0" aria-hidden />
+                  <span>{t('details.watchTrailer')}</span>
+                </button>
+              )}
+            </div>
+
+            <div
+              className={
+                !isTV
+                  ? "grid grid-cols-2 gap-3"
+                  : "grid grid-cols-1"
+              }
+            >
               <button
+                type="button"
                 onClick={handleDownloadMovie}
                 disabled={movieDownload?.status === "downloading" || movieDownload?.status === "queued"}
-                className="inline-flex items-center justify-center gap-1.5 min-h-[var(--spacing-touch)] px-4 rounded-xl text-sm font-medium bg-primary/20 border border-primary/40 text-primary hover:bg-primary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-ghost w-full min-w-0 gap-1.5 border-primary/35 px-3 py-2.5 text-sm text-primary hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4"
               >
-                <IoDownloadOutline className="w-4 h-4 shrink-0" />
-                <span>
+                <IoDownloadOutline className="h-4 w-4 shrink-0" aria-hidden />
+                <span className="truncate">
                   {movieDownload?.status === "completed"
                     ? "Downloaded"
                     : movieDownload?.status === "downloading" || movieDownload?.status === "queued"
-                      ? `Downloading ${movieDownload.progress}%`
+                      ? (
+                        <>
+                          <span className="hidden min-[420px]:inline">Downloading </span>
+                          {movieDownload.progress}%
+                        </>
+                      )
                       : isTV
                         ? `Download S${selectedSeason || 1} E1`
                         : "Download"}
@@ -369,6 +454,7 @@ const DetailsPage = () => {
               </button>
               {!isTV && (
                 <button
+                  type="button"
                   onClick={() => {
                     if (movieInWatchlist) {
                       dispatch(removeFromWatchlist({
@@ -386,36 +472,37 @@ const DetailsPage = () => {
                       }));
                     }
                   }}
-                  className="inline-flex items-center justify-center gap-1.5 min-h-[var(--spacing-touch)] px-4 rounded-xl text-sm font-medium bg-surface-elevated border border-accent/20 text-text hover:bg-surface-elevated transition-colors"
+                  className="btn-ghost w-full min-w-0 gap-1.5 px-3 py-2.5 text-sm sm:px-4"
                 >
                   {movieInWatchlist ? (
                     <>
-                      <IoCheckmarkOutline className="w-4 h-4 shrink-0 text-green-400" />
-                      <span>In Watchlist</span>
+                      <IoCheckmarkOutline className="h-4 w-4 shrink-0 text-green-400" aria-hidden />
+                      <span className="truncate">In Watchlist</span>
                     </>
                   ) : (
                     <>
-                      <IoAddOutline className="w-4 h-4 shrink-0" />
-                      <span>Add to Watchlist</span>
+                      <IoAddOutline className="h-4 w-4 shrink-0" aria-hidden />
+                      <span className="truncate">Watchlist</span>
                     </>
                   )}
                 </button>
               )}
-              {movieDownload && (movieDownload.status === "downloading" || movieDownload.status === "queued") && (
-                <Link
-                  to="/downloads"
-                  className="inline-flex items-center self-center text-xs text-primary hover:text-primary/80 underline"
-                >
-                  View progress
-                </Link>
-              )}
             </div>
+
+            {movieDownload && (movieDownload.status === "downloading" || movieDownload.status === "queued") && (
+              <Link
+                to="/downloads"
+                className="text-center text-xs text-primary underline hover:text-primary/80"
+              >
+                View download progress
+              </Link>
+            )}
           </div>
 
           <div className="mt-6">
-            <h3 className="text-xl font-bold text-text mb-2">Overview</h3>
-            <p className="text-text/80 leading-relaxed">{data?.overview}</p>
-            </div>
+            <h3 className="apple-title-3 mb-2 text-text">Overview</h3>
+            <p className="apple-body text-text/85 max-w-3xl">{data?.overview}</p>
+          </div>
 
             <Divider />
 
@@ -512,7 +599,7 @@ const DetailsPage = () => {
         <div className="container mx-auto px-4 lg:px-8 max-w-screen-xl mb-8">
           <h3 className="text-xl font-bold text-text mb-4">Seasons & Episodes</h3>
           
-          <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-none">
+          <div className="scroll-row scroll-smooth gap-2 pb-4">
             {data.seasons
               .filter(s => s.season_number > 0)
               .map((season) => (
@@ -720,6 +807,22 @@ const DetailsPage = () => {
             initialEpisode={playConfig.episode}
           />
         </Suspense>
+      )}
+
+      {showTrailerModal && trailer?.key && (
+        <TrailerModal
+          youtubeKey={trailer.key}
+          title={trailer.name || t('details.watchTrailer')}
+          closeLabel={t('details.closeTrailer')}
+          posterSrc={
+            imageURL && data?.backdrop_path
+              ? getTmdbImageUrl(imageURL, data.backdrop_path, TMDB_IMAGE_SIZES.backdrop)
+              : null
+          }
+          openOnYoutubeLabel={t('details.openOnYoutube')}
+          onClose={() => setShowTrailerModal(false)}
+          onOpenYoutube={handleOpenTrailerOnYoutube}
+        />
       )}
     </div>
   );

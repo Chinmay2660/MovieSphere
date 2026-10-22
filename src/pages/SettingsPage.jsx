@@ -33,7 +33,7 @@ const SettingsPage = () => {
 
   return (
     <div className="apple-page">
-      <div className="apple-container max-w-2xl py-6 sm:py-8">
+      <div className="apple-container max-w-2xl page-content-footer py-4 sm:py-6">
         <header className="apple-section-header flex items-center gap-3">
           <IoSettingsOutline className="h-8 w-8 text-accent" aria-hidden />
           <div>

@@ -6,18 +6,18 @@ import Header from "./components/Reusables/Header";
 import Loader from "./components/Reusables/Loader";
 import MobileBottomNav from "./components/Reusables/MobileBottomNav";
 import { Analytics } from "@vercel/analytics/react"
+import { scrollAppToTop } from "./lib/scrollToTop";
 
 const App = () => {
   const location = useLocation();
 
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    scrollAppToTop();
   }, [location.pathname, location.search]);
 
   const hideFooterPaths = ["/tv", "/movie", "/watchlist", "/downloads", "/settings"];
-  const isSearchPath = location.pathname === "/search" && location.search.includes("q=");
-
-  const shouldHideFooter = hideFooterPaths.includes(location.pathname) || isSearchPath;
+  const shouldHideFooter =
+    hideFooterPaths.includes(location.pathname) || location.pathname === "/search";
 
   return (
     <>
@@ -28,8 +28,8 @@ const App = () => {
 
       <Header />
       <MobileBottomNav />
-      <div className="flex min-h-dvh flex-col text-text pb-[calc(3.8125rem+env(safe-area-inset-bottom))] md:pb-0">
-        <main className="relative flex flex-1 flex-col overflow-x-hidden">
+      <div className="app-shell text-text pb-[calc(3.8125rem+env(safe-area-inset-bottom))] md:pb-0">
+        <main className="app-main">
           <ErrorBoundary>
             <Suspense fallback={<Loader size="lg" className="min-h-[50vh]" />}>
               <Outlet />

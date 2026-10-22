@@ -117,7 +117,7 @@ const Banner = () => {
 
   return (
     <section
-      className="relative isolate w-full overflow-hidden group pt-14 sm:pt-0 aspect-[4/5] max-h-[min(72dvh,640px)] sm:aspect-[16/9] sm:max-h-[80dvh] shadow-[0_16px_32px_12px_rgba(12,10,9,0.55)]"
+      className="relative isolate w-full min-w-0 max-w-full overflow-hidden group pt-14 sm:pt-0 aspect-[4/5] max-h-[min(72dvh,640px)] sm:aspect-[16/9] sm:max-h-[80dvh] shadow-[0_16px_32px_12px_rgba(12,10,9,0.55)]"
       aria-roledescription="carousel"
       aria-label={t("banner.carousel")}
       tabIndex={slideCount > 1 ? 0 : undefined}

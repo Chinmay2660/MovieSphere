@@ -14,9 +14,12 @@ const Card = ({ data, trending, index, media_type }) => {
     const year = formatYear(releaseDate);
 
     return (
-        <Link to={"/" + mediaType + "/" + data.id} className="group relative block w-full">
-            <div className="rounded-[1.25rem] shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition-all duration-500 group-hover:scale-[1.02] group-hover:shadow-[0_8px_28px_rgba(0,0,0,0.45)]">
-                <div className="relative aspect-[2/3] overflow-hidden rounded-[1.25rem] bg-background">
+        <Link
+            to={"/" + mediaType + "/" + data.id}
+            className="group relative block w-full max-w-[15rem] mx-auto sm:max-w-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-[1.25rem]"
+        >
+            <div className="rounded-[1.25rem] shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition-[transform,box-shadow] duration-500 group-hover:scale-[1.02] group-hover:shadow-[0_8px_28px_rgba(0,0,0,0.45)] [transform-origin:center]">
+                <div className="relative isolate aspect-[2/3] overflow-hidden rounded-[1.25rem] bg-background">
                     {trending && index && (
                         <div className="glass-pill absolute top-2.5 left-2.5 z-20 apple-caption-1 font-semibold text-text">
                             #{index}

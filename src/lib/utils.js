@@ -15,6 +15,12 @@ export function getSearchQueryFromSearch(search) {
   return q ? sanitizeSearchQuery(q) : "";
 }
 
+export function getSearchTypeFromSearch(search) {
+  const type = new URLSearchParams(search).get("type");
+  if (type === "movie" || type === "tv") return type;
+  return "all";
+}
+
 export const debounce = (func, delay) => {
     let timer;
     return (...args) => {

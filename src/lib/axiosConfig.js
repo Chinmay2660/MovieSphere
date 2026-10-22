@@ -6,9 +6,15 @@ import {
   getStaleResponse,
 } from "./apiCache";
 import { getRequestLanguage, getRequestRegion } from "./locale";
+import { assertSafeApiPath } from "./safeApiPath";
+
+const API_TIMEOUT_MS = 15_000;
 
 const axiosInstance = axios.create({
   baseURL: "/api",
+  timeout: API_TIMEOUT_MS,
+  withCredentials: false,
+  maxRedirects: 0,
   adapter: async (config) => {
     const method = (config.method || "get").toLowerCase();
     const defaultAdapter = axios.getAdapter(axios.defaults.adapter, config);
@@ -34,6 +40,11 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use((config) => {
+  const method = (config.method || "get").toLowerCase();
+  if (method === "get" && config.url) {
+    assertSafeApiPath(config.url);
+  }
+
   config.params = {
     ...config.params,
     region: getRequestRegion(),

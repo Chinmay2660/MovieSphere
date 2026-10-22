@@ -4,8 +4,10 @@ import { removeFromWatchlist } from "../reduxStore/Reducer/watchlistSlice";
 import { IoTrashOutline } from "react-icons/io5";
 import { formatYear } from "../lib/utils";
 import LazyImage from "../components/Reusables/LazyImage";
+import { useLocale } from "../context/LocaleContext";
 
 const WatchlistPage = () => {
+  const { t } = useLocale();
   const items = useSelector((state) => state.watchlist);
   const imageURL = useSelector((state) => state.movieData.imageURL);
   const dispatch = useDispatch();
@@ -39,23 +41,19 @@ const WatchlistPage = () => {
   return (
     <div className="apple-page">
       <div
-        className={`apple-container py-6 sm:py-8${
+        className={`apple-container page-content-footer py-4 sm:py-6${
           items.length === 0 ? " flex flex-1 flex-col justify-center" : ""
         }`}
       >
         <header className="apple-section-header">
-          <h1 className="apple-large-title text-text">Watchlist</h1>
-          <p className="apple-subheadline mt-2">
-            Movies and episodes you added. Tap a card to view details.
-          </p>
+          <h1 className="apple-large-title text-text">{t('nav.watchlist')}</h1>
+          <p className="apple-subheadline mt-2 max-w-2xl">{t('watchlist.subtitle')}</p>
         </header>
 
         {items.length === 0 && (
           <div className="apple-content-box apple-empty-state">
-            <p className="apple-headline text-secondary">Your watchlist is empty</p>
-            <p className="apple-footnote mx-auto mt-2 max-w-sm">
-              Add movies from their detail page, or add episodes from a series&apos; Seasons & Episodes section.
-            </p>
+            <p className="apple-headline text-secondary">{t('watchlist.emptyTitle')}</p>
+            <p className="apple-footnote mx-auto mt-2 max-w-sm">{t('watchlist.emptyHint')}</p>
           </div>
         )}
 

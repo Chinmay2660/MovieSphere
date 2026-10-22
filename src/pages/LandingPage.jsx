@@ -17,7 +17,7 @@ const LandingPageMain = () => {
   }, []);
 
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative w-full min-w-0 overflow-x-clip">
       {isImageLoaded && (
         <>
           <div

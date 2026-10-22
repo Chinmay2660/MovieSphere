@@ -8,10 +8,19 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          redux: ['@reduxjs/toolkit', 'react-redux'],
-          motion: ['framer-motion'],
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return;
+          if (
+            /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom)[\\/]/.test(id)
+          ) {
+            return 'vendor';
+          }
+          if (/[\\/]node_modules[\\/](@reduxjs\/toolkit|react-redux|redux)[\\/]/.test(id)) {
+            return 'redux';
+          }
+          if (/[\\/]node_modules[\\/]framer-motion[\\/]/.test(id)) {
+            return 'motion';
+          }
         },
       },
     },

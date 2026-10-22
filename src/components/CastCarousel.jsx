@@ -37,10 +37,10 @@ const CastCarousel = ({ castData, imageURL }) => {
 
     return (
         <div className="relative group/cast">
-            <div className="overflow-hidden relative">
+            <div className="relative min-w-0 max-w-full overflow-x-clip">
                 <div
                     ref={containerRef}
-                    className="flex overflow-x-auto gap-4 scrollbar-none scroll-smooth"
+                    className="scroll-row scroll-smooth gap-4"
                     onScroll={updateScrollState}
                 >
                     {castData.map((item, index) => (

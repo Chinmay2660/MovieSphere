@@ -21,6 +21,10 @@ const statusLabel = {
 };
 
 const sourceLabel = {
+  vidsrc_su: "VidSrc",
+  vidsrc_io: "VidSrc",
+  vidsrc_party: "VidSrc",
+  vidsrc_to: "VidSrc",
   vidsrc_sbs: "VidSrc",
 };
 
@@ -106,7 +110,9 @@ const DownloadItem = ({ item, imageURL, onPlay }) => {
           <div className="mt-2 space-y-1">
             <ProgressBar value={item.progress} indeterminate={isPreparing} />
             {isPreparing ? (
-              <p className="apple-caption-1 text-muted">Starting download…</p>
+              <p className="apple-caption-1 text-muted">
+                {item.status === "queued" ? "Checking for a direct video file…" : "Starting download…"}
+              </p>
             ) : (
               <div className="flex justify-between apple-caption-1">
                 <span>{item.progress}%</span>

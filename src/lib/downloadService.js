@@ -6,18 +6,12 @@ import {
   setDownloadCancelled,
   getDownloadKey,
 } from "../reduxStore/Reducer/downloadsSlice";
-import { saveBlob, deleteBlob } from "./downloadStorage";
-import { toUserMessage } from "./userFriendlyError";
+import { createDownloadSink, deleteBlob } from "./downloadStorage";
+import { buildDownloadPath, fetchDownloadAvailability } from "./mediaApiUrls";
+import { toUserMessage, USER_MESSAGES } from "./userFriendlyError";
 
 const activeControllers = new Map();
-
-const buildDownloadUrl = (item) => {
-  const title = encodeURIComponent(item.title ?? item.show_name ?? "video");
-  if (item.type === "movie") {
-    return `/api/download/movie/${item.id}?title=${title}`;
-  }
-  return `/api/download/tv/${item.tv_id}/${item.season_number}/${item.episode_number}?title=${title}`;
-};
+const DOWNLOAD_TIMEOUT_MS = 2 * 60 * 60 * 1000;
 
 const formatBytes = (bytes) => {
   if (!bytes || bytes <= 0) return "0 B";
@@ -32,14 +26,54 @@ export const startDownload = async (item, dispatch) => {
   const key = getDownloadKey(item);
   if (activeControllers.has(key)) return;
 
+  let downloadUrl;
+  try {
+    downloadUrl = buildDownloadPath(item);
+  } catch (error) {
+    dispatch(addDownload(item));
+    dispatch(setDownloadFailed({ key, error: toUserMessage(error, "download") }));
+    return;
+  }
+
+  let availability = { available: true };
+  try {
+    availability = await fetchDownloadAvailability(item);
+  } catch {
+    // If the probe fails, still try the full download.
+  }
+
   dispatch(addDownload(item));
   dispatch(updateDownloadProgress({ key, progress: 0, bytesDownloaded: 0, totalBytes: 0 }));
 
+  if (!availability.available) {
+    dispatch(
+      setDownloadFailed({
+        key,
+        error: USER_MESSAGES.downloadEmbedOnly,
+      })
+    );
+    return;
+  }
+
   const controller = new AbortController();
   activeControllers.set(key, controller);
+  const timeoutId = setTimeout(() => controller.abort(), DOWNLOAD_TIMEOUT_MS);
+
+  let sink;
+  try {
+    sink = await createDownloadSink(key);
+  } catch (error) {
+    dispatch(setDownloadFailed({ key, error: toUserMessage(error, "download") }));
+    return;
+  }
 
   try {
-    const response = await fetch(buildDownloadUrl(item), { signal: controller.signal });
+    const response = await fetch(downloadUrl, {
+      signal: controller.signal,
+      credentials: "same-origin",
+      cache: "no-store",
+      redirect: "error",
+    });
     if (!response.ok) {
       const errBody = await response.json().catch(() => ({}));
       throw new Error(errBody.error ?? errBody.message ?? "download failed");
@@ -52,7 +86,6 @@ export const startDownload = async (item, dispatch) => {
     const reader = response.body?.getReader();
     if (!reader) throw new Error("streaming not supported");
 
-    const chunks = [];
     let bytesDownloaded = 0;
 
     if (source) {
@@ -62,23 +95,26 @@ export const startDownload = async (item, dispatch) => {
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      chunks.push(value);
+      await sink.write(value);
       bytesDownloaded += value.length;
       const progress = totalBytes > 0 ? Math.round((bytesDownloaded / totalBytes) * 100) : 0;
       dispatch(updateDownloadProgress({ key, progress, bytesDownloaded, totalBytes, source: source ?? undefined }));
     }
 
-    const blob = new Blob(chunks, { type: contentType });
-    await saveBlob(key, blob);
+    await sink.close(contentType);
     dispatch(setDownloadCompleted({ key, source, mimeType: contentType, format }));
   } catch (error) {
     if (error.name === "AbortError") {
       dispatch(setDownloadCancelled({ key }));
+      await sink?.abort?.().catch(() => {});
       await deleteBlob(key).catch(() => {});
     } else {
+      await sink?.abort?.().catch(() => {});
+      await deleteBlob(key).catch(() => {});
       dispatch(setDownloadFailed({ key, error: toUserMessage(error, "download") }));
     }
   } finally {
+    clearTimeout(timeoutId);
     activeControllers.delete(key);
   }
 };

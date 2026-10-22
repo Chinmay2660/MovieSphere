@@ -6,6 +6,8 @@ import { navigation } from '../../lib/constants';
 import MovieSphereIcon from './MovieSphereIcon';
 import { debounce, getSearchQueryFromSearch, sanitizeSearchQuery } from "../../lib/utils";
 import { useLocale } from '../../context/LocaleContext';
+import { useSelector } from 'react-redux';
+import NavCountBadge from './NavCountBadge';
 
 const Header = () => {
     const { t } = useLocale();
@@ -16,23 +18,33 @@ const Header = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
     const location = useLocation();
+    const watchlistCount = useSelector((state) => state.watchlist.length);
+    const downloadsCount = useSelector((state) => state.downloads.length);
     const searchRef = useRef(null);
+    const pinHeaderRef = useRef(false);
 
     useEffect(() => {
         setActivePath(location.pathname);
     }, [location]);
 
     useEffect(() => {
+        pinHeaderRef.current =
+            location.pathname === '/search' ||
+            isSearchOpen ||
+            location.pathname === '/watchlist' ||
+            location.pathname === '/downloads' ||
+            location.pathname === '/settings';
+    }, [location.pathname, isSearchOpen]);
+
+    useEffect(() => {
         const urlQuery = getSearchQueryFromSearch(location.search);
-        if (location.pathname === "/search" && urlQuery) {
+        if (location.pathname === "/search") {
             setSearchQuery(urlQuery);
             setIsSearchOpen(true);
             return;
         }
-        if (location.pathname !== "/search") {
-            setSearchQuery("");
-            setIsSearchOpen(false);
-        }
+        setSearchQuery("");
+        setIsSearchOpen(false);
     }, [location.pathname, location.search]);
 
     useEffect(() => {
@@ -49,17 +61,27 @@ const Header = () => {
     }, [location.pathname]);
 
     useMotionValueEvent(scrollY, "change", (current) => {
-        setVisible(current <= 100);
+        setVisible(pinHeaderRef.current || current <= 100);
     });
+
+    const searchTypeForPath = useCallback((pathname) => {
+        if (pathname === '/movie' || pathname.startsWith('/movie/')) return 'movie';
+        if (pathname === '/tv' || pathname.startsWith('/tv/')) return 'tv';
+        return null;
+    }, []);
 
     const navigateToSearch = useCallback((value) => {
         if (value) {
             const sanitized = sanitizeSearchQuery(String(value).trim() || value);
-            if (sanitized) navigate(`/search?q=${encodeURIComponent(sanitized)}`);
-        } else {
-            navigate('/home');
+            if (!sanitized) return;
+            const type = searchTypeForPath(location.pathname);
+            const params = new URLSearchParams({ q: sanitized });
+            if (type) params.set('type', type);
+            navigate(`/search?${params.toString()}`);
+        } else if (location.pathname === '/search') {
+            navigate('/search');
         }
-    }, [navigate]);
+    }, [navigate, location.pathname, searchTypeForPath]);
 
     const debouncedSearch = useMemo(
         () => debounce(navigateToSearch, 600),
@@ -72,8 +94,14 @@ const Header = () => {
         debouncedSearch(value);
     };
 
+    const navBadgeCount = (path) => {
+        if (path === '/watchlist') return watchlistCount;
+        if (path === '/downloads') return downloadsCount;
+        return 0;
+    };
+
     const navButtonClass = (isActive) =>
-        `apple-footnote min-h-[2.75rem] px-3.5 py-1.5 rounded-full font-medium transition-all duration-200 ${
+        `apple-footnote inline-flex items-center justify-center min-h-[2.75rem] px-3.5 py-1.5 rounded-full font-medium transition-all duration-200 ${
             isActive
                 ? 'bg-primary text-primary-fg hover:bg-primary/90 hover:shadow-[0_0_16px_rgba(255,153,51,0.35)]'
                 : '!text-text/85 hover:!text-primary hover:bg-primary/15 hover:shadow-[inset_0_0_0_0.5px_rgba(255,153,51,0.35)]'
@@ -85,7 +113,7 @@ const Header = () => {
                 initial={{ opacity: 1, y: -100 }}
                 animate={{ y: visible ? 0 : -100, opacity: visible ? 1 : 0 }}
                 transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
-                className="liquid-glass-strong hidden md:flex max-w-fit fixed top-5 inset-x-0 mx-auto rounded-full z-50 px-2 py-1.5 items-center justify-center gap-0.5"
+                className="liquid-glass-strong hidden md:flex fixed top-5 left-1/2 z-50 w-max max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center justify-center gap-0.5 rounded-full px-2 py-1.5"
             >
                 <button
                     type="button"
@@ -99,13 +127,21 @@ const Header = () => {
                 <div className="flex items-center">
                     {navigation.map((item, idx) => {
                         const isActive = activePath === item.path;
+                        const badgeCount = navBadgeCount(item.path);
                         return (
                             <button
                                 key={idx}
+                                type="button"
                                 onClick={() => navigate(item.path)}
-                                className={navButtonClass(isActive)}
+                                className={`${navButtonClass(isActive)} gap-1.5`}
+                                aria-label={
+                                    badgeCount > 0
+                                        ? `${t(item.titleKey)}, ${badgeCount}`
+                                        : t(item.titleKey)
+                                }
                             >
-                                {t(item.titleKey)}
+                                <span className="leading-none">{t(item.titleKey)}</span>
+                                <NavCountBadge count={badgeCount} inverted={isActive} />
                             </button>
                         );
                     })}
@@ -125,7 +161,7 @@ const Header = () => {
                             value={searchQuery}
                             onChange={handleInputChange}
                             placeholder={t('search.placeholder')}
-                            className="glass-pill p-1.5 text-text text-xs w-36 bg-transparent focus:outline-none placeholder:text-muted"
+                            className="glass-pill min-h-[2.25rem] px-3 py-1.5 text-text text-sm w-40 sm:w-52 bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 placeholder:text-muted"
                             autoFocus
                         />
                     </motion.div>
@@ -151,7 +187,7 @@ const Header = () => {
             <motion.div
                 initial={{ opacity: 1, y: 0 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="md:hidden fixed top-0 inset-x-0 z-50 px-4 pt-[max(0.75rem,env(safe-area-inset-top))]"
+                className="md:hidden fixed top-0 inset-x-0 z-50 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-4"
             >
                 <div className="ios-nav-bar flex items-center gap-3 rounded-full px-3 py-2">
                 <button
