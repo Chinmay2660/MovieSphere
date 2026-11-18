@@ -1,6 +1,6 @@
 const DEFAULT_TTL_MS = 5 * 60 * 1000;
 const STALE_MAX_AGE_MS = 24 * 60 * 60 * 1000;
-const STORAGE_KEY = 'moviesphere-api-cache';
+const STORAGE_KEY = 'moviesphere-api-cache-v2';
 const MAX_CACHE_ENTRIES = 80;
 const MAX_ENTRY_BYTES = 120_000;
 const MAX_CONCURRENT_REQUESTS = 4;
@@ -26,10 +26,10 @@ function getCacheTtlMs(url) {
   if (/\/season\/\d+$/.test(path)) return 60 * 60 * 1000;
   if (/\/(similar|recommendations)$/.test(path)) return 30 * 60 * 1000;
   if (path.startsWith('/search')) return 2 * 60 * 1000;
-  if (path.startsWith('/trending')) return 15 * 60 * 1000;
-  if (path.startsWith('/discover')) return 10 * 60 * 1000;
+  if (path.startsWith('/trending')) return 30 * 60 * 1000;
+  if (path.startsWith('/discover')) return 20 * 60 * 1000;
   if (/^\/(movie|tv)\/(popular|upcoming|now_playing|top_rated|airing_today|on_the_air)$/.test(path)) {
-    return 15 * 60 * 1000;
+    return 30 * 60 * 1000;
   }
 
   return DEFAULT_TTL_MS;
@@ -83,7 +83,7 @@ function set(key, data, ttlMs = DEFAULT_TTL_MS) {
 let persistTimer = null;
 
 function schedulePersist() {
-  if (persistTimer || typeof sessionStorage === 'undefined') return;
+  if (persistTimer || typeof localStorage === 'undefined') return;
   persistTimer = setTimeout(() => {
     persistTimer = null;
     persistCache();
@@ -105,17 +105,17 @@ function persistCache() {
         }
       });
 
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ v: 1, entries }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ v: 1, entries }));
   } catch {
     // ponytail: quota exceeded — in-memory cache still works
   }
 }
 
 function loadPersistedCache() {
-  if (typeof sessionStorage === 'undefined') return;
+  if (typeof localStorage === 'undefined') return;
 
   try {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
 
     const parsed = JSON.parse(raw);
@@ -127,7 +127,7 @@ function loadPersistedCache() {
       if (!cache.has(key)) cache.set(key, entry);
     }
   } catch {
-    sessionStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STORAGE_KEY);
   }
 }
 
@@ -146,8 +146,8 @@ export function getStaleResponse(config) {
 export function clearApiCache() {
   cache.clear();
   inflight.clear();
-  if (typeof sessionStorage !== 'undefined') {
-    sessionStorage.removeItem(STORAGE_KEY);
+  if (typeof localStorage !== 'undefined') {
+    localStorage.removeItem(STORAGE_KEY);
   }
 }
 

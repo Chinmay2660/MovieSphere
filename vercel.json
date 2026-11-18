@@ -29,8 +29,39 @@
       ]
     },
     {
+      "source": "/api/(configuration|genre/.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800"
+        }
+      ]
+    },
+    {
+      "source": "/api/(movie|tv|trending|discover|search)(/.*)?",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400"
+        }
+      ]
+    },
+    {
+      "source": "/(moviesphere.svg|robots.txt)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, s-maxage=604800"
+        }
+      ]
+    },
+    {
       "source": "/(.*)",
       "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow, noarchive, noimageindex, noai, noimageai"
+        },
         {
           "key": "X-Content-Type-Options",
           "value": "nosniff"
@@ -100,7 +131,7 @@
       "destination": "https://api-moviesphere2660.vercel.app/api/$1"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api/)[^.]*)",
       "destination": "/index.html"
     }
   ]
